@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chaos Rising - Écran de Chargement SCP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(180deg, #0a0e27 0%, #0f1428 100%);
+            color: #00ff41;
+            font-family: 'IBM Plex Mono', monospace;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Scanlines */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1;
+            animation: scanlines 8s linear infinite;
+        }
+
+        /* Vignette */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { text-shadow: 0 0 20px #00ff41, 0 0 40px #00aa2a; }
+            50% { text-shadow: 0 0 5px #00ff41, 0 0 10px #00ff41; }
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .title {
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #00ff41;
+            text-shadow: 0 0 20px #00ff41, 0 0 40px #00aa2a;
+            animation: pulse-glow 2s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            letter-spacing: 0.1em;
+            color: #00ccff;
+            text-shadow: 0 0 10px #00ccff;
+            margin-bottom: 40px;
+            animation: fade-in 0.8s ease-out;
+        }
+
+        .stage {
+            display: none;
+            animation: fade-in 0.6s ease-out;
+        }
+
+        .stage.active {
+            display: block;
+        }
+
+        .text {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #00ff41;
+            text-shadow: 0 0 5px #00ff41;
+            margin: 15px 0;
+        }
+
+        .text-secondary {
+            color: #00ccff;
+            text-shadow: 0 0 10px #00ccff;
+        }
+
+        .text-alert {
+            color: #ff0055;
+            text-shadow: 0 0 10px #ff0055;
+        }
+
+        .border {
+            border: 2px solid #00ff41;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3), inset 0 0 10px rgba(0, 255, 65, 0.1);
+        }
+
+        .border-alert {
+            border: 2px solid #ff0055;
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.3), inset 0 0 10px rgba(255, 0, 85, 0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #0f1428;
+            border: 1px solid #00ff41;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff41, #00ccff);
+            width: 0%;
+            transition: width 0.2s linear;
+            box-shadow: 0 0 10px #00ff41;
+        }
+
+        .scan-circle {
+            width: 150px;
+            height: 150px;
+            margin: 30px auto;
+            border: 2px solid #00ff41;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scan-inner {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #00ccff;
+            border-radius: 50%;
+            animation: spin 3s linear infinite;
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00ff41, transparent);
+            top: 50%;
+            animation: scan-move 2s linear infinite;
+        }
+
+        @keyframes scan-move {
+            0% { transform: translateY(-75px); }
+            100% { transform: translateY(75px); }
+        }
+
+        .quote {
+            font-style: italic;
+            font-size: 1.1rem;
+            margin: 20px 0;
+            color: #00ccff;
+        }
+
+        .cursor {
+            display: inline-block;
+            animation: blink 1s infinite;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .grid-item {
+            border: 1px solid #00ff41;
+            padding: 15px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #00ff41;
+            font-size: 0.8rem;
+            color: #00aa2a;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .status-item {
+            border: 1px solid #00ff41;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- STAGE 1: BOOT -->
+        <div class="stage active" id="stage-boot">
+            <div class="title">███████████████████████</div>
+            <div class="subtitle">FONDATION SCP</div>
+            <div class="text">> SÉCURISER. CONFINER. PROTÉGER.</div>
+            <div style="margin-top: 60px;">
+                <div class="text">> INITIALISATION DU TERMINAL SITE-09</div>
+                <div class="text">> CHARGEMENT DES PROTOCOLES DE SÉCURITÉ...</div>
+                <div class="text pulse">> <span class="cursor">_</span></div>
+            </div>
+        </div>
+
+        <!-- STAGE 2: SCAN -->
+        <div class="stage" id="stage-scan">
+            <div class="title">SCAN BIOMÉTRIQUE</div>
+            <div class="scan-circle">
+                <div class="scan-inner"></div>
+                <div class="scan-line"></div>
+            </div>
+            <div class="text">> PROGRESSION DU SCAN: <span id="scan-progress">0</span>%</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="scan-bar"></div>
+            </div>
+            <div class="text">> ANALYSE DES DONNÉES BIOMÉTRIQUES...</div>
+            <div class="text">> MOTIF RÉTINIEN: RECONNU</div>
+            <div class="text">> EMPREINTE DIGITALE: VÉRIFIÉE</div>
+            <div class="text text-secondary">> IDENTITÉ CONFIRMÉE</div>
+        </div>
+
+        <!-- STAGE 3: LOADING -->
+        <div class="stage" id="stage-loading">
+            <div class="title">INITIALISATION</div>
+            <div class="text">> PROGRESSION: <span id="loading-progress">0</span>%</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="loading-bar"></div>
+            </div>
+            <div class="grid">
+                <div class="grid-item">> MÉMOIRE: <span id="memory">0</span> MB</div>
+                <div class="grid-item">> CACHE: <span id="cache">0</span> MB</div>
+                <div class="grid-item">> THREADS: <span id="threads">1</span></div>
+                <div class="grid-item">> STATUT: ACTIF</div>
+            </div>
+        </div>
+
+        <!-- STAGE 4: COMPLETE -->
+        <div class="stage" id="stage-complete">
+            <div class="title">PRÊT</div>
+            <div class="border border-alert">
+                <div class="text text-alert">⚠ DÉGAGEMENT DE SÉCURITÉ REQUIS ⚠</div>
+                <div class="text">Vous accédez à une installation de la Fondation.</div>
+                <div class="text">L'accès non autorisé est interdit.</div>
+            </div>
+            <div class="border">
+                <div class="quote" id="quote">"La Fondation protège l'humanité de l'inexplicable."</div>
+                <div class="text" style="font-size: 0.9rem;">- Base de Données de la Fondation SCP</div>
+            </div>
+            <div class="status-grid">
+                <div class="status-item">✓ SÉCURISÉ</div>
+                <div class="status-item">✓ CONFINÉ</div>
+                <div class="status-item">✓ PROTÉGÉ</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>SITE-09 | TERMINAL v4.2.1</div>
+            <div>© SCP Foundation 2024</div>
+        </div>
+    </div>
+
+    <script>
+        const quotes = [
+            "La Fondation protège l'humanité de l'inexplicable.",
+            "Nous confinons ce qui ne devrait pas être confiné.",
+            "Le savoir est un pouvoir. Le pouvoir doit être confiné.",
+            "Dans l'ombre, nous gardons le monde en sécurité.",
+            "Sécuriser. Confiner. Protéger.",
+            "La vérité est classifiée.",
+            "La normalité est une illusion.",
+            "Nous sommes les gardiens des secrets.",
+            "Certaines portes ne devraient jamais s'ouvrir.",
+            "Le monde dort paisiblement, inconscient de ce qui rôde dans l'obscurité.",
+            "L'ignorance est une bénédiction. Nous portons le fardeau du savoir.",
+            "Tous les monstres n'ont pas un visage.",
+            "La réalité est fragile. Nous sommes ses gardiens.",
+            "L'inexpliqué doit rester inexpliqué.",
+            "Nous ne négocions pas avec les anomalies."
+        ];
+
+        const stages = [
+            { id: 'stage-boot', duration: 2 },
+            { id: 'stage-scan', duration: 3 },
+            { id: 'stage-loading', duration: 8 },
+            { id: 'stage-complete', duration: 2 }
+        ];
+
+        let currentStage = 0;
+        let stageStartTime = Date.now();
+
+        function showStage(index) {
+            document.querySelectorAll('.stage').forEach(el => el.classList.remove('active'));
+            document.getElementById(stages[index].id).classList.add('active');
+            currentStage = index;
+            stageStartTime = Date.now();
+        }
+
+        function updateProgress() {
+            const now = Date.now();
+            const elapsed = (now - stageStartTime) / 1000;
+            const stageDuration = stages[currentStage].duration;
+            const progress = Math.min((elapsed / stageDuration) * 100, 100);
+
+            if (currentStage === 1) {
+                // Scan stage
+                document.getElementById('scan-progress').textContent = Math.floor(progress);
+                document.getElementById('scan-bar').style.width = progress + '%';
+            } else if (currentStage === 2) {
+                // Loading stage
+                document.getElementById('loading-progress').textContent = Math.floor(progress);
+                document.getElementById('loading-bar').style.width = progress + '%';
+                document.getElementById('memory').textContent = Math.floor(progress * 1.6);
+                document.getElementById('cache').textContent = Math.floor(progress * 0.8);
+                document.getElementById('threads').textContent = Math.floor(progress / 10) + 1;
+            }
+
+            if (elapsed >= stageDuration && currentStage < stages.length - 1) {
+                showStage(currentStage + 1);
+            }
+
+            requestAnimationFrame(updateProgress);
+        }
+
+        // Initialiser
+        document.getElementById('quote').textContent = '"' + quotes[Math.floor(Math.random() * quotes.length)] + '"';
+        updateProgress();
+    </script>
+</body>
+</html>
