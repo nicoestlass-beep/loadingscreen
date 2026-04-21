@@ -1,1 +1,1144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chaos Rising - Écran de Chargement SCP Complet</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00ff41;
+            --secondary: #00ccff;
+            --alert: #ff0055;
+            --warning: #ffaa00;
+            --success: #00ff88;
+            --bg-dark: #0a0e27;
+            --bg-darker: #050714;
+            --bg-black: #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-black);
+            overflow: hidden;
+        }
+
+        body {
+            background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 50%, var(--bg-black) 100%);
+            color: var(--primary);
+            font-family: 'IBM Plex Mono', 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* CRT Scanlines */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.12),
+                rgba(0, 0, 0, 0.12) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 999;
+            animation: scanlines 8s linear infinite;
+        }
+
+        /* CRT Flicker */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(18, 16, 16, 0.08);
+            opacity: 0;
+            z-index: 998;
+            pointer-events: none;
+            animation: flicker 0.15s infinite;
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+            pointer-events: none;
+            z-index: 997;
+        }
+
+        .container {
+            position: relative;
+            z-index: 100;
+            text-align: center;
+            max-width: 1000px;
+            width: 95%;
+            padding: 50px;
+            border: 1px solid rgba(0, 255, 65, 0.15);
+            background: rgba(5, 7, 20, 0.85);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(0, 255, 65, 0.05);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Animations */
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.27861; }
+            5% { opacity: 0.34769; }
+            10% { opacity: 0.23604; }
+            15% { opacity: 0.90626; }
+            20% { opacity: 0.18128; }
+            25% { opacity: 0.83891; }
+            30% { opacity: 0.65583; }
+            35% { opacity: 0.57807; }
+            40% { opacity: 0.26559; }
+            45% { opacity: 0.84693; }
+            50% { opacity: 0.96019; }
+            55% { opacity: 0.08523; }
+            60% { opacity: 0.71056; }
+            65% { opacity: 0.73437; }
+            70% { opacity: 0.28557; }
+            75% { opacity: 0.96303; }
+            80% { opacity: 0.2268; }
+            85% { opacity: 0.03677; }
+            90% { opacity: 0.5667; }
+            95% { opacity: 0.56213; }
+            100% { opacity: 0.40078; }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { text-shadow: 0 0 20px var(--primary), 0 0 40px #00aa2a, 0 0 60px #008800; }
+            50% { text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary); }
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fade-out {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes glitch {
+            0% { clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%); }
+            20% { clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%); }
+            40% { clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%); }
+            60% { clip-path: polygon(0 40%, 100% 40%, 100% 80%, 0 80%); }
+            80% { clip-path: polygon(0 10%, 100% 10%, 100% 60%, 0 60%); }
+            100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+        }
+
+        @keyframes matrix-rain {
+            0% { transform: translateY(-100%); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            animation: fade-in 0.8s ease-out;
+            min-height: 100%;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page.exit {
+            animation: fade-out 0.6s ease-in;
+        }
+
+        /* Typography */
+        .title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--primary), 0 0 40px #00aa2a;
+            animation: pulse-glow 2s ease-in-out infinite;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            letter-spacing: 0.3em;
+            color: var(--secondary);
+            text-shadow: 0 0 10px var(--secondary);
+            margin-bottom: 30px;
+            animation: fade-in 0.8s ease-out;
+        }
+
+        .text {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--primary);
+            text-shadow: 0 0 5px var(--primary);
+            margin: 12px 0;
+            text-align: left;
+            word-wrap: break-word;
+        }
+
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+
+        .text-secondary {
+            color: var(--secondary);
+            text-shadow: 0 0 10px var(--secondary);
+        }
+
+        .text-alert {
+            color: var(--alert);
+            text-shadow: 0 0 10px var(--alert);
+        }
+
+        .text-warning {
+            color: var(--warning);
+            text-shadow: 0 0 10px var(--warning);
+        }
+
+        .text-success {
+            color: var(--success);
+            text-shadow: 0 0 10px var(--success);
+        }
+
+        /* Borders and Boxes */
+        .border {
+            border: 1px solid var(--primary);
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.15), inset 0 0 15px rgba(0, 255, 65, 0.05);
+            background: rgba(0, 255, 65, 0.02);
+            position: relative;
+        }
+
+        .border::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            width: 15px;
+            height: 15px;
+            border-top: 2px solid var(--primary);
+            border-left: 2px solid var(--primary);
+        }
+
+        .border::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            right: -1px;
+            width: 15px;
+            height: 15px;
+            border-bottom: 2px solid var(--primary);
+            border-right: 2px solid var(--primary);
+        }
+
+        .border-alert {
+            border-color: var(--alert);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.15), inset 0 0 15px rgba(255, 0, 85, 0.05);
+            background: rgba(255, 0, 85, 0.02);
+        }
+
+        .border-alert::before,
+        .border-alert::after {
+            border-color: var(--alert);
+        }
+
+        .border-warning {
+            border-color: var(--warning);
+            box-shadow: 0 0 15px rgba(255, 170, 0, 0.15);
+            background: rgba(255, 170, 0, 0.02);
+        }
+
+        .border-warning::before,
+        .border-warning::after {
+            border-color: var(--warning);
+        }
+
+        /* Progress Bars */
+        .progress-container {
+            margin: 30px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--secondary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(0, 255, 65, 0.1);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(0, 255, 65, 0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* Grids */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .grid-2x2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .grid-3x3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .grid-item {
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            padding: 12px;
+            text-align: left;
+            font-size: 0.8rem;
+            background: rgba(0, 255, 65, 0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .grid-item.alert {
+            border-color: var(--alert);
+            background: rgba(255, 0, 85, 0.03);
+        }
+
+        /* Scan Circle */
+        .scan-circle {
+            width: 200px;
+            height: 200px;
+            margin: 30px auto;
+            border: 2px solid rgba(0, 255, 65, 0.3);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, rgba(0, 255, 65, 0.05) 0%, transparent 70%);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.1);
+        }
+
+        .scan-inner {
+            width: 150px;
+            height: 150px;
+            border: 1px dashed var(--secondary);
+            border-radius: 50%;
+            animation: spin 12s linear infinite;
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            top: 50%;
+            box-shadow: 0 0 20px var(--primary);
+            animation: scan-move 3s ease-in-out infinite;
+        }
+
+        @keyframes scan-move {
+            0%, 100% { transform: translateY(-100px); opacity: 0; }
+            50% { transform: translateY(100px); opacity: 1; }
+        }
+
+        /* Cursor */
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 18px;
+            background-color: var(--primary);
+            margin-left: 5px;
+            vertical-align: middle;
+            animation: blink 1s infinite;
+        }
+
+        /* Data Display */
+        .data-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+            font-size: 0.85rem;
+        }
+
+        .data-line:last-child {
+            border-bottom: none;
+        }
+
+        .data-key {
+            color: var(--secondary);
+        }
+
+        .data-value {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .status-ok {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .status-warning {
+            background: var(--warning);
+            box-shadow: 0 0 10px var(--warning);
+            animation: pulse-warning 1s ease-in-out infinite;
+        }
+
+        .status-error {
+            background: var(--alert);
+            box-shadow: 0 0 10px var(--alert);
+            animation: pulse-error 0.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes pulse-warning {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes pulse-error {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 255, 65, 0.2);
+            font-size: 0.7rem;
+            color: rgba(0, 255, 65, 0.4);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .title { font-size: 2rem; }
+            .subtitle { font-size: 0.9rem; }
+            .grid { grid-template-columns: 1fr; }
+            .container { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="vignette"></div>
+    <div class="container">
+        <!-- PAGE 1: BOOT INITIALIZATION -->
+        <div class="page active" id="page-1">
+            <div class="title">███████████████████████</div>
+            <div class="subtitle">FONDATION SCP - SYSTÈME DE CONFINEMENT</div>
+            <div class="text text-center">> SÉCURISER. CONFINER. PROTÉGER.</div>
+            
+            <div style="margin-top: 40px; border-left: 3px solid var(--primary); padding-left: 20px; text-align: left;">
+                <div class="text">> INITIALISATION DU TERMINAL SITE-09...</div>
+                <div class="text">> CHARGEMENT DES PROTOCOLES DE SÉCURITÉ...</div>
+                <div class="text">> VÉRIFICATION DE L'INTÉGRITÉ DU SYSTÈME...</div>
+                <div class="text" id="hack-effect" style="color: #fff; min-height: 1.8em;"></div>
+                <div class="text">> SYSTÈME PRÊT POUR L'ACCÈS. <span class="cursor"></span></div>
+            </div>
+        </div>
+
+        <!-- PAGE 2: BIOMETRIC SCAN -->
+        <div class="page" id="page-2">
+            <div class="title">SCAN BIOMÉTRIQUE</div>
+            <div class="scan-circle">
+                <div class="scan-inner"></div>
+                <div class="scan-line"></div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>ANALYSE BIOMÉTRIQUE EN COURS...</span>
+                    <span><span id="scan-progress">0</span>%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="scan-bar"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-2x2">
+                <div class="grid-item">
+                    <span>MOTIF RÉTINIEN:</span>
+                    <span class="text-secondary" id="retina-status">EN ATTENTE</span>
+                </div>
+                <div class="grid-item">
+                    <span>EMPREINTE DIGITALE:</span>
+                    <span class="text-secondary" id="fingerprint-status">EN ATTENTE</span>
+                </div>
+                <div class="grid-item">
+                    <span>SIGNATURE ADN:</span>
+                    <span class="text-secondary" id="dna-status">EN ATTENTE</span>
+                </div>
+                <div class="grid-item">
+                    <span>IDENTITÉ CONFIRMÉE:</span>
+                    <span class="text-secondary" id="id-status">VÉRIFICATION</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 3: SECURITY CLEARANCE -->
+        <div class="page" id="page-3">
+            <div class="title">VÉRIFICATION DE DÉGAGEMENT</div>
+            <div class="border border-alert">
+                <div class="text text-alert text-center" style="font-weight: bold;">⚠ DÉGAGEMENT DE SÉCURITÉ NIVEAU 4 REQUIS ⚠</div>
+                <div class="text text-center" style="margin-top: 15px;">Vous accédez à une installation hautement classifiée de la Fondation SCP.</div>
+                <div class="text text-center">Toute activité est enregistrée, surveillée et analysée.</div>
+                <div class="text text-center" style="margin-top: 15px; color: var(--warning);">Divulgation non autorisée = Procédure de Classe-K.</div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>VÉRIFICATION DES ACCRÉDITATIONS...</span>
+                    <span><span id="clearance-progress">0</span>%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="clearance-bar"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-3x3">
+                <div class="grid-item">
+                    <span class="status-indicator status-ok"></span>
+                    <span>CLASSE-O</span>
+                </div>
+                <div class="grid-item">
+                    <span class="status-indicator status-ok"></span>
+                    <span>CLASSE-1</span>
+                </div>
+                <div class="grid-item">
+                    <span class="status-indicator status-ok"></span>
+                    <span>CLASSE-2</span>
+                </div>
+                <div class="grid-item">
+                    <span class="status-indicator status-ok"></span>
+                    <span>CLASSE-3</span>
+                </div>
+                <div class="grid-item">
+                    <span class="status-indicator status-ok"></span>
+                    <span>CLASSE-4</span>
+                </div>
+                <div class="grid-item">
+                    <span class="status-indicator status-warning"></span>
+                    <span>CLASSE-5</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 4: SYSTEM INITIALIZATION -->
+        <div class="page" id="page-4">
+            <div class="title">INITIALISATION SYSTÈME</div>
+            
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>CHARGEMENT DES DONNÉES CRITIQUES...</span>
+                    <span><span id="loading-progress">0</span>%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="loading-bar"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-2x2">
+                <div class="grid-item">
+                    <span>MÉMOIRE SYSTÈME:</span>
+                    <span><span id="memory">0</span> MB</span>
+                </div>
+                <div class="grid-item">
+                    <span>CACHE DISTRIBUÉ:</span>
+                    <span><span id="cache">0</span> MB</span>
+                </div>
+                <div class="grid-item">
+                    <span>THREADS ACTIFS:</span>
+                    <span><span id="threads">1</span></span>
+                </div>
+                <div class="grid-item">
+                    <span>LIAISON SATELLITE:</span>
+                    <span class="text-success">ÉTABLIE</span>
+                </div>
+            </div>
+
+            <div class="text" id="loading-subtext" style="margin-top: 20px; text-align: center; color: var(--secondary);">
+                > Accès aux serveurs de la Zone-19...
+            </div>
+        </div>
+
+        <!-- PAGE 5: DATABASE ACCESS -->
+        <div class="page" id="page-5">
+            <div class="title">ACCÈS À LA BASE DE DONNÉES</div>
+            
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>CONNEXION AUX ARCHIVES CENTRALES...</span>
+                    <span><span id="db-progress">0</span>%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="db-bar"></div>
+                </div>
+            </div>
+
+            <div class="border">
+                <div class="data-line">
+                    <span class="data-key">FICHIERS DISPONIBLES:</span>
+                    <span class="data-value" id="files-count">0</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">ANOMALIES CATALOGUÉES:</span>
+                    <span class="data-value" id="anomalies-count">0</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">INCIDENTS ENREGISTRÉS:</span>
+                    <span class="data-value" id="incidents-count">0</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">SITES ACTIFS:</span>
+                    <span class="data-value" id="sites-count">0</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">PERSONNEL CONNECTÉ:</span>
+                    <span class="data-value" id="personnel-count">0</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">STATUT GLOBAL:</span>
+                    <span class="data-value text-success">NOMINAL</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 6: ANOMALY REPORT -->
+        <div class="page" id="page-6">
+            <div class="title">RAPPORT D'ANOMALIES</div>
+            
+            <div class="border border-warning">
+                <div class="text text-warning text-center" style="font-weight: bold;">⚠ ALERTE CONFINEMENT - NIVEAU ÉLEVÉ ⚠</div>
+                <div class="text text-center" style="margin-top: 15px;">Plusieurs anomalies détectées dans les secteurs 7, 12 et 19.</div>
+                <div class="text text-center">Protocoles de confinement renforcés activés.</div>
+            </div>
+
+            <div class="grid grid-2x2">
+                <div class="grid-item alert">
+                    <span>SCP-173:</span>
+                    <span class="text-alert">CONFINÉ</span>
+                </div>
+                <div class="grid-item alert">
+                    <span>SCP-682:</span>
+                    <span class="text-alert">CONFINÉ</span>
+                </div>
+                <div class="grid-item">
+                    <span>SCP-914:</span>
+                    <span class="text-success">OPÉRATIONNEL</span>
+                </div>
+                <div class="grid-item">
+                    <span>SCP-500:</span>
+                    <span class="text-success">SÉCURISÉ</span>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>INTÉGRITÉ DES CONTENEURS:</span>
+                    <span><span id="integrity-progress">0</span>%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="integrity-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 7: INCIDENT LOG -->
+        <div class="page" id="page-7">
+            <div class="title">JOURNAL DES INCIDENTS</div>
+            
+            <div class="border">
+                <div class="data-line">
+                    <span class="data-key">[14:32:15]</span>
+                    <span class="data-value">Tentative d'accès non autorisé détectée</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">[14:33:42]</span>
+                    <span class="data-value">Protocole de sécurité Classe-K activé</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">[14:35:08]</span>
+                    <span class="data-value">Anomalie SCP-682 détectée en secteur 7</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">[14:36:21]</span>
+                    <span class="data-value">Confinement d'urgence initié</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">[14:37:45]</span>
+                    <span class="data-value">Tous les sites mis en alerte rouge</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">[14:39:12]</span>
+                    <span class="data-value">Situation stabilisée. Retour à la normale.</span>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>SYNCHRONISATION DU JOURNAL...</span>
+                    <span><span id="log-progress">0</span>%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="log-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 8: NETWORK STATUS -->
+        <div class="page" id="page-8">
+            <div class="title">STATUT DU RÉSEAU</div>
+            
+            <div class="grid grid-3x3">
+                <div class="grid-item">
+                    <span>SITE-01:</span>
+                    <span class="status-indicator status-ok"></span>
+                </div>
+                <div class="grid-item">
+                    <span>SITE-09:</span>
+                    <span class="status-indicator status-ok"></span>
+                </div>
+                <div class="grid-item">
+                    <span>SITE-19:</span>
+                    <span class="status-indicator status-ok"></span>
+                </div>
+                <div class="grid-item">
+                    <span>SITE-23:</span>
+                    <span class="status-indicator status-ok"></span>
+                </div>
+                <div class="grid-item">
+                    <span>SITE-43:</span>
+                    <span class="status-indicator status-ok"></span>
+                </div>
+                <div class="grid-item">
+                    <span>SITE-77:</span>
+                    <span class="status-indicator status-warning"></span>
+                </div>
+                <div class="grid-item">
+                    <span>SITE-91:</span>
+                    <span class="status-indicator status-ok"></span>
+                </div>
+                <div class="grid-item">
+                    <span>ZONE-12:</span>
+                    <span class="status-indicator status-ok"></span>
+                </div>
+                <div class="grid-item">
+                    <span>ZONE-19:</span>
+                    <span class="status-indicator status-ok"></span>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>LATENCE RÉSEAU MOYENNE:</span>
+                    <span><span id="latency">0</span> ms</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="latency-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 9: PERSONNEL STATUS -->
+        <div class="page" id="page-9">
+            <div class="title">STATUT DU PERSONNEL</div>
+            
+            <div class="border">
+                <div class="data-line">
+                    <span class="data-key">ADMINISTRATEURS:</span>
+                    <span class="data-value" id="admin-count">0</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">CHERCHEURS:</span>
+                    <span class="data-value" id="researcher-count">0</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">AGENTS DE SÉCURITÉ:</span>
+                    <span class="data-value" id="security-count">0</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">PERSONNEL MÉDICAL:</span>
+                    <span class="data-value" id="medical-count">0</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">PERSONNEL TECHNIQUE:</span>
+                    <span class="data-value" id="tech-count">0</span>
+                </div>
+                <div class="data-line">
+                    <span class="data-key">TOTAL CONNECTÉ:</span>
+                    <span class="data-value text-success" id="total-personnel">0</span>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>TAUX DE PRÉSENCE:</span>
+                    <span><span id="presence-rate">0</span>%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="presence-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 10: FINAL ACCESS -->
+        <div class="page" id="page-10">
+            <div class="title">ACCÈS AUTORISÉ</div>
+            
+            <div class="border border-alert">
+                <div class="text text-alert text-center" style="font-weight: bold;">⚠ DÉGAGEMENT DE SÉCURITÉ NIVEAU 5 CONFIRMÉ ⚠</div>
+                <div class="text text-center" style="margin-top: 15px;">Bienvenue Agent. Vous avez accès aux archives classifiées.</div>
+                <div class="text text-center">Rappelez-vous: La Fondation protège l'humanité de l'inexplicable.</div>
+            </div>
+
+            <div class="border">
+                <div class="text text-center" style="font-style: italic; color: var(--secondary); font-size: 1.1rem;" id="final-quote"></div>
+            </div>
+
+            <div class="grid grid-3x3">
+                <div class="grid-item">
+                    <span class="status-indicator status-ok"></span>
+                    <span>SÉCURISÉ</span>
+                </div>
+                <div class="grid-item">
+                    <span class="status-indicator status-ok"></span>
+                    <span>CONFINÉ</span>
+                </div>
+                <div class="grid-item">
+                    <span class="status-indicator status-ok"></span>
+                    <span>PROTÉGÉ</span>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>SYSTÈME COMPLÈTEMENT OPÉRATIONNEL</span>
+                    <span>100%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="final-bar" style="width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div>SITE-09 | TERMINAL v6.2.7 (ENCRYPTED) | SECURE CONNECTION</div>
+            <div>© Chaos Rising 2026 | System Admin: Noctis | Last Update: 2026-04-22</div>
+        </div>
+    </div>
+
+    <script>
+        // Quotes Database
+        const quotes = [
+            "La Fondation protège l'humanité de l'inexplicable.",
+            "Nous confinons ce qui ne devrait pas être confiné.",
+            "Le savoir est un pouvoir. Le pouvoir doit être confiné.",
+            "Dans l'ombre, nous gardons le monde en sécurité.",
+            "Sécuriser. Confiner. Protéger.",
+            "La vérité est classifiée.",
+            "La normalité est une illusion.",
+            "Nous sommes les gardiens des secrets.",
+            "Certaines portes ne devraient jamais s'ouvrir.",
+            "Le monde dort paisiblement, inconscient de ce qui rôde dans l'obscurité.",
+            "L'ignorance est une bénédiction. Nous portons le fardeau du savoir.",
+            "Tous les monstres n'ont pas un visage.",
+            "La réalité est fragile. Nous sommes ses gardiens.",
+            "L'inexpliqué doit rester inexpliqué.",
+            "Nous ne négocions pas avec les anomalies.",
+            "Nul n'est censé ignorer la loi.",
+            "Les anomalies existent. Nous les confinons.",
+            "La peur est notre arme la plus puissante.",
+            "Certains secrets doivent rester enfouis.",
+            "L'humanité n'est pas prête pour la vérité."
+        ];
+
+        // Hack Effect Phrases
+        const hackPhrases = [
+            "BYPASSING FIREWALL...",
+            "INJECTING EXPLOIT...",
+            "DECRYPTING RSA-4096...",
+            "ACCESSING KERNEL...",
+            "OVERRIDING SECURITY PROTOCOLS...",
+            "HACKING DATABASE...",
+            "ESTABLISHING BACKDOOR...",
+            "STEALING CREDENTIALS...",
+            "LAUNCHING MALWARE...",
+            "ROOT ACCESS GRANTED."
+        ];
+
+        // Pages Configuration
+        const pages = [
+            { id: 'page-1', duration: 3 },
+            { id: 'page-2', duration: 4 },
+            { id: 'page-3', duration: 3 },
+            { id: 'page-4', duration: 4 },
+            { id: 'page-5', duration: 3 },
+            { id: 'page-6', duration: 3 },
+            { id: 'page-7', duration: 4 },
+            { id: 'page-8', duration: 3 },
+            { id: 'page-9', duration: 3 },
+            { id: 'page-10', duration: 5 }
+        ];
+
+        let currentPage = 0;
+        let pageStartTime = Date.now();
+        let hackInterval;
+        let animationFrameId;
+
+        // Hack Effect Function
+        function startHackEffect() {
+            const hackEl = document.getElementById('hack-effect');
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?/\\";
+            
+            let phraseIndex = 0;
+            let charIndex = 0;
+            
+            if (hackInterval) clearInterval(hackInterval);
+            
+            hackInterval = setInterval(() => {
+                let randomStr = "";
+                for(let i = 0; i < 20; i++) {
+                    randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                
+                if (phraseIndex < hackPhrases.length) {
+                    hackEl.innerHTML = `> <span style="color: #fff;">${hackPhrases[phraseIndex]}</span> [${randomStr}]`;
+                    charIndex++;
+                    if (charIndex > 8) {
+                        charIndex = 0;
+                        phraseIndex++;
+                    }
+                } else {
+                    hackEl.innerHTML = `> <span style="color: #fff;">SYSTEM BREACH SUCCESSFUL.</span>`;
+                    clearInterval(hackInterval);
+                }
+            }, 100);
+        }
+
+        // Show Page Function
+        function showPage(index) {
+            if (index >= pages.length) {
+                // Loop back to first page
+                showPage(0);
+                return;
+            }
+            
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(el => {
+                el.classList.remove('active');
+                el.classList.add('exit');
+            });
+            
+            // Show current page
+            setTimeout(() => {
+                document.querySelectorAll('.page').forEach(el => el.classList.remove('exit'));
+                const pageEl = document.getElementById(pages[index].id);
+                if (pageEl) {
+                    pageEl.classList.add('active');
+                }
+                currentPage = index;
+                pageStartTime = Date.now();
+
+                // Trigger page-specific effects
+                if (pages[index].id === 'page-1') {
+                    startHackEffect();
+                }
+                if (pages[index].id === 'page-10') {
+                    const quoteEl = document.getElementById('final-quote');
+                    quoteEl.textContent = '"' + quotes[Math.floor(Math.random() * quotes.length)] + '"';
+                }
+            }, 300);
+        }
+
+        // Update Progress Function
+        function updateProgress() {
+            const now = Date.now();
+            const elapsed = (now - pageStartTime) / 1000;
+            const pageDuration = pages[currentPage].duration;
+            const progress = Math.min((elapsed / pageDuration) * 100, 100);
+
+            // Page 1: Boot
+            if (pages[currentPage].id === 'page-1') {
+                // Hack effect handled separately
+            }
+            
+            // Page 2: Scan
+            else if (pages[currentPage].id === 'page-2') {
+                document.getElementById('scan-progress').textContent = Math.floor(progress);
+                document.getElementById('scan-bar').style.width = progress + '%';
+                
+                if (progress > 25) document.getElementById('retina-status').textContent = "RECONNU";
+                if (progress > 50) document.getElementById('fingerprint-status').textContent = "VÉRIFIÉ";
+                if (progress > 75) document.getElementById('dna-status').textContent = "MATCH";
+                if (progress > 95) document.getElementById('id-status').textContent = "CONFIRMÉE";
+            }
+            
+            // Page 3: Clearance
+            else if (pages[currentPage].id === 'page-3') {
+                document.getElementById('clearance-progress').textContent = Math.floor(progress);
+                document.getElementById('clearance-bar').style.width = progress + '%';
+            }
+            
+            // Page 4: Loading
+            else if (pages[currentPage].id === 'page-4') {
+                document.getElementById('loading-progress').textContent = Math.floor(progress);
+                document.getElementById('loading-bar').style.width = progress + '%';
+                document.getElementById('memory').textContent = Math.floor(progress * 16.4);
+                document.getElementById('cache').textContent = Math.floor(progress * 8.2);
+                document.getElementById('threads').textContent = Math.floor(progress / 10) + 1;
+                
+                const subtext = document.getElementById('loading-subtext');
+                if (progress > 80) subtext.textContent = "> Finalisation de la session...";
+                else if (progress > 60) subtext.textContent = "> Synchronisation des bases de données...";
+                else if (progress > 40) subtext.textContent = "> Chargement des fichiers SCP-CLASSE-K...";
+                else if (progress > 20) subtext.textContent = "> Connexion au réseau sécurisé Intranet...";
+            }
+            
+            // Page 5: Database
+            else if (pages[currentPage].id === 'page-5') {
+                document.getElementById('db-progress').textContent = Math.floor(progress);
+                document.getElementById('db-bar').style.width = progress + '%';
+                document.getElementById('files-count').textContent = Math.floor(progress * 4.7);
+                document.getElementById('anomalies-count').textContent = Math.floor(progress * 3.2);
+                document.getElementById('incidents-count').textContent = Math.floor(progress * 5.1);
+                document.getElementById('sites-count').textContent = Math.floor(progress * 0.15) + 1;
+                document.getElementById('personnel-count').textContent = Math.floor(progress * 2.8);
+            }
+            
+            // Page 6: Anomaly
+            else if (pages[currentPage].id === 'page-6') {
+                document.getElementById('integrity-progress').textContent = Math.floor(progress);
+                document.getElementById('integrity-bar').style.width = progress + '%';
+            }
+            
+            // Page 7: Incident Log
+            else if (pages[currentPage].id === 'page-7') {
+                document.getElementById('log-progress').textContent = Math.floor(progress);
+                document.getElementById('log-bar').style.width = progress + '%';
+            }
+            
+            // Page 8: Network
+            else if (pages[currentPage].id === 'page-8') {
+                document.getElementById('latency').textContent = Math.floor(progress * 0.45);
+                document.getElementById('latency-bar').style.width = progress + '%';
+            }
+            
+            // Page 9: Personnel
+            else if (pages[currentPage].id === 'page-9') {
+                document.getElementById('admin-count').textContent = Math.floor(progress * 0.08);
+                document.getElementById('researcher-count').textContent = Math.floor(progress * 0.32);
+                document.getElementById('security-count').textContent = Math.floor(progress * 0.28);
+                document.getElementById('medical-count').textContent = Math.floor(progress * 0.18);
+                document.getElementById('tech-count').textContent = Math.floor(progress * 0.14);
+                const total = Math.floor(progress * 0.08) + Math.floor(progress * 0.32) + Math.floor(progress * 0.28) + Math.floor(progress * 0.18) + Math.floor(progress * 0.14);
+                document.getElementById('total-personnel').textContent = total;
+                document.getElementById('presence-rate').textContent = Math.floor(progress);
+                document.getElementById('presence-bar').style.width = progress + '%';
+            }
+
+            // Check if page duration exceeded
+            if (elapsed >= pageDuration && currentPage < pages.length - 1) {
+                showPage(currentPage + 1);
+            } else if (elapsed >= pageDuration && currentPage === pages.length - 1) {
+                // Loop back to start
+                showPage(0);
+            }
+
+            animationFrameId = requestAnimationFrame(updateProgress);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            showPage(0);
+            updateProgress();
+        });
+
+        // Fallback initialization
+        setTimeout(() => {
+            if (currentPage === 0 && !document.getElementById('page-1').classList.contains('active')) {
+                showPage(0);
+                updateProgress();
+            }
+        }, 100);
+    </script>
+</body>
+</html>
 
