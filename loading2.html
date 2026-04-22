@@ -65,6 +65,14 @@
         @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
         .footer { height: 40px; border-top: 1px solid var(--primary-dim); display: flex; align-items: center; padding: 0 20px; font-size: 0.6rem; color: var(--primary-dim); justify-content: space-between; }
+
+        /* Music Overlay */
+        #music-notice { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: var(--alert); color: white; padding: 10px 20px; font-size: 0.8rem; z-index: 2000; border-radius: 5px; animation: blink 1s infinite; }
+    </style>
+</head>
+<body>
+    <div class="vignette"></div>
+    <div id="music-notice">CLIQUEZ N'IMPORTE OÙ POUR ACTIVER L'AMBIANCE SONORE</div>
     
     <!-- Background Music (YouTube Embed Hidden) -->
     <div id="player" style="position: absolute; top: -9999px; left: -9999px;"></div>
