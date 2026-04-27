@@ -3,1241 +3,750 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SITE-09 — Règlement & Documentation</title>
+<title>SITE-09 — Règlement</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --red:      #c8141e;
-  --red-dim:  #6a0a0e;
-  --red-glow: rgba(200,20,30,0.15);
-  --bg:       #05060a;
-  --bg2:      #090b10;
-  --bg3:      #0d1018;
-  --border:   #1e2330;
-  --border2:  #2a3040;
-  --text:     #c8cdd8;
-  --text-dim: #5a6070;
-  --text-hi:  #e8edf8;
-  --cyan:     #1ab8cc;
-  --orange:   #e07820;
-  --green:    #1a9a4a;
+  --ink:    #0a0b0f;
+  --ink2:   #0f1117;
+  --ink3:   #151820;
+  --ink4:   #1c2030;
+  --line:   #232838;
+  --line2:  #2e3548;
+  --red:    #d42b2b;
+  --red2:   #ff3d3d;
+  --red-bg: rgba(212,43,43,0.07);
+  --dim:    #454e66;
+  --muted:  #6b758f;
+  --body:   #9aa3bb;
+  --hi:     #dde3f0;
+  --white:  #f0f4ff;
+  --amber:  #e8941a;
+  --teal:   #0d9488;
+  --green:  #16a34a;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:15px}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--ink);
+  color:var(--body);
+  min-height:100vh;
+  line-height:1.6;
+}
+/* grain */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  position:fixed;left:0;top:0;width:256px;height:100vh;
+  background:var(--ink2);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;
+  z-index:100;overflow-y:auto;
+}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--line2)}
+
+.brand{padding:28px 22px 22px;border-bottom:1px solid var(--line)}
+.brand-logo{
+  font-family:'Syne',sans-serif;
+  font-size:11px;font-weight:700;
+  letter-spacing:5px;color:var(--red);
+  text-transform:uppercase;
+}
+.brand-name{
+  font-family:'Syne',sans-serif;
+  font-size:20px;font-weight:800;
+  color:var(--white);margin-top:8px;line-height:1.1;
+}
+.brand-tag{
+  font-family:'DM Mono',monospace;
+  font-size:9px;color:var(--dim);
+  margin-top:6px;letter-spacing:2px;
+}
+
+.nav-group{padding:14px 0 6px}
+.nav-label{
+  padding:0 22px 8px;
+  font-family:'DM Mono',monospace;
+  font-size:9px;color:var(--dim);
+  letter-spacing:3px;text-transform:uppercase;
+}
+.nav-a{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 22px;
+  font-size:12.5px;font-weight:500;
+  color:var(--muted);text-decoration:none;
+  cursor:pointer;transition:all .15s;
+  border-left:2px solid transparent;
+}
+.nav-a:hover,.nav-a.on{
+  color:var(--hi);background:var(--red-bg);
+  border-left-color:var(--red);
+}
+.nav-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--line2);flex-shrink:0;transition:.15s;
+}
+.nav-a.on .nav-dot,.nav-a:hover .nav-dot{background:var(--red)}
+.nav-badge{
+  margin-left:auto;
+  font-family:'DM Mono',monospace;font-size:9px;
+  color:var(--dim);background:var(--ink4);
+  padding:2px 6px;border-radius:2px;
+}
+.nav-sep{height:1px;background:var(--line);margin:6px 0}
+
+/* ── MAIN ── */
+.main{margin-left:256px;min-height:100vh}
+
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(10,11,15,.97);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+  padding:11px 36px;
+  display:flex;align-items:center;gap:12px;
+}
+.topbar-crumb{
+  font-family:'DM Mono',monospace;font-size:10px;
+  color:var(--dim);letter-spacing:.5px;
+}
+.topbar-crumb em{color:var(--red);font-style:normal}
+.topbar-pulse{
+  margin-left:auto;display:flex;align-items:center;gap:6px;
+  font-family:'DM Mono',monospace;font-size:9px;color:var(--green);
+}
+.topbar-pulse::before{
+  content:'';width:5px;height:5px;
+  border-radius:50%;background:var(--green);
+  animation:pulse 2.5s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+
+.content{padding:40px 44px;max-width:960px}
+
+/* ── HERO ── */
+.hero{
+  margin-bottom:44px;padding:44px 48px;
+  background:var(--ink3);
+  border:1px solid var(--line2);
+  position:relative;overflow:hidden;
+}
+.hero::after{
+  content:'09';
+  position:absolute;right:-12px;bottom:-40px;
+  font-family:'Syne',sans-serif;font-size:200px;font-weight:800;
+  color:rgba(212,43,43,.03);pointer-events:none;line-height:1;
+  letter-spacing:-10px;
+}
+.hero-kicker{
+  font-family:'DM Mono',monospace;font-size:10px;
+  color:var(--red);letter-spacing:4px;margin-bottom:14px;
+}
+.hero h1{
+  font-family:'Syne',sans-serif;
+  font-size:36px;font-weight:800;
+  color:var(--white);line-height:1.1;margin-bottom:14px;
+}
+.hero h1 span{color:var(--red)}
+.hero p{font-size:14px;color:var(--muted);max-width:520px;line-height:1.65}
+/* coins */
+.hero-tl,.hero-tr,.hero-bl,.hero-br{position:absolute;width:18px;height:18px}
+.hero-tl{top:0;left:0;border-top:2px solid var(--red);border-left:2px solid var(--red)}
+.hero-tr{top:0;right:0;border-top:2px solid var(--red);border-right:2px solid var(--red)}
+.hero-bl{bottom:0;left:0;border-bottom:2px solid var(--red);border-left:2px solid var(--red)}
+.hero-br{bottom:0;right:0;border-bottom:2px solid var(--red);border-right:2px solid var(--red)}
+
+/* ── SECTIONS ── */
+.section{margin-bottom:48px;scroll-margin-top:60px}
+.sec-head{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:20px;padding-bottom:12px;
+  border-bottom:1px solid var(--line);
+}
+.sec-bar{width:3px;height:20px;background:var(--red);flex-shrink:0}
+.sec-title{
+  font-family:'Syne',sans-serif;
+  font-size:13px;font-weight:700;
+  color:var(--hi);letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+.sec-count{
+  margin-left:auto;font-family:'DM Mono',monospace;
+  font-size:9px;color:var(--dim);background:var(--ink4);
+  padding:2px 8px;
+}
+
+/* ── RULE CARDS ── */
+.rule-card{
+  background:var(--ink3);
+  border:1px solid var(--line);
+  border-left:3px solid var(--red);
+  padding:18px 22px;margin-bottom:10px;
+}
+.rule-card h3{
+  font-family:'DM Mono',monospace;font-size:10px;
+  color:var(--red);letter-spacing:2.5px;
+  text-transform:uppercase;margin-bottom:10px;
+}
+.rule-list{list-style:none;padding:0}
+.rule-list li{
+  font-size:13px;color:var(--body);
+  padding:4px 0 4px 16px;position:relative;line-height:1.55;
+}
+.rule-list li::before{
+  content:'›';position:absolute;left:0;
+  color:var(--red);font-weight:700;
+}
+.rule-list li strong{color:var(--hi)}
+.rule-list li em{color:var(--amber);font-style:normal}
+
+/* alert */
+.alert{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:13px 18px;margin-bottom:20px;
+  border:1px solid rgba(212,43,43,.25);
+  border-left:3px solid var(--red);
+  background:var(--red-bg);
+  font-size:12.5px;color:var(--body);line-height:1.5;
+}
+.alert-i{flex-shrink:0;font-size:15px;line-height:1.4}
+
+/* ── JOB CARDS ── */
+.jobs-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:14px;
+}
+.job{
+  background:var(--ink3);
+  border:1px solid var(--line);
+  overflow:hidden;
+  transition:border-color .2s, transform .2s;
+}
+.job:hover{border-color:var(--line2);transform:translateY(-2px)}
+.job-head{
+  padding:14px 16px;
+  display:flex;align-items:flex-start;gap:12px;
+  border-bottom:1px solid var(--line);
+}
+.job-stripe{
+  width:3px;border-radius:2px;
+  flex-shrink:0;min-height:40px;
+}
+.job-info{flex:1;min-width:0}
+.job-name{
+  font-family:'Syne',sans-serif;
+  font-size:13.5px;font-weight:700;
+  color:var(--hi);line-height:1.2;
+}
+.job-sub{
+  font-family:'DM Mono',monospace;
+  font-size:9.5px;color:var(--dim);margin-top:3px;
+}
+.job-tags{
+  display:flex;flex-direction:column;
+  gap:3px;align-items:flex-end;flex-shrink:0;
+}
+.tag{
+  font-family:'DM Mono',monospace;
+  font-size:9px;padding:2px 7px;
+  border-radius:2px;white-space:nowrap;
+}
+.tag-wl{background:rgba(212,43,43,.12);color:#f87171;border:1px solid rgba(212,43,43,.2)}
+.tag-max{background:var(--ink4);color:var(--dim)}
+.tag-sal{background:rgba(22,163,74,.08);color:#4ade80;border:1px solid rgba(22,163,74,.15)}
+.job-body{padding:13px 16px}
+.job-desc{font-size:12.5px;color:var(--muted);margin-bottom:10px;line-height:1.5}
+.job-rules{list-style:none}
+.job-rules li{
+  font-size:11.5px;color:var(--body);
+  padding:3px 0 3px 13px;position:relative;line-height:1.4;
+}
+.job-rules li::before{content:'›';position:absolute;left:0;color:var(--red)}
+
+/* Tab system */
+.tabs{display:flex;gap:2px;margin-bottom:24px;flex-wrap:wrap}
+.tab-btn{
+  font-family:'DM Mono',monospace;font-size:10px;
+  letter-spacing:1.5px;padding:8px 16px;
+  background:var(--ink3);border:1px solid var(--line);
+  color:var(--dim);cursor:pointer;transition:all .15s;
+}
+.tab-btn:hover,.tab-btn.on{
+  background:var(--red-bg);border-color:rgba(212,43,43,.3);
+  color:var(--red);
+}
+#job-grid-container{animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── FOOTER ── */
+.footer{
+  margin-top:64px;padding-top:18px;
+  border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;
+  font-family:'DM Mono',monospace;font-size:9.5px;
+  color:var(--dim);padding-bottom:40px;
 }
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: 'Rajdhani', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* ── Grain overlay ───────────────────────────── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 1000;
-  opacity: 0.6;
-}
-
-/* ── SIDEBAR ─────────────────────────────────── */
-.sidebar {
-  position: fixed;
-  left: 0; top: 0;
-  width: 260px;
-  height: 100vh;
-  background: var(--bg2);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  z-index: 100;
-  overflow-y: auto;
-}
-
-.sidebar-logo {
-  padding: 28px 24px 20px;
-  border-bottom: 1px solid var(--border);
-}
-
-.sidebar-logo .site-id {
-  font-family: 'Orbitron', monospace;
-  font-size: 22px;
-  font-weight: 900;
-  color: var(--red);
-  letter-spacing: 3px;
-  line-height: 1;
-}
-
-.sidebar-logo .site-sub {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-  margin-top: 6px;
-}
-
-.sidebar-logo .clearance {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 3px 10px;
-  background: var(--red-dim);
-  border: 1px solid var(--red);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 9px;
-  color: var(--red);
-  letter-spacing: 2px;
-}
-
-.nav-section {
-  padding: 16px 0 8px;
-}
-
-.nav-section-label {
-  padding: 0 24px 8px;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 9px;
-  color: var(--text-dim);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-}
-
-.nav-item {
-  display: block;
-  padding: 9px 24px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-dim);
-  text-decoration: none;
-  letter-spacing: 0.5px;
-  transition: all 0.2s;
-  border-left: 2px solid transparent;
-  cursor: pointer;
-}
-
-.nav-item:hover, .nav-item.active {
-  color: var(--text-hi);
-  background: var(--red-glow);
-  border-left-color: var(--red);
-}
-
-.nav-item .nav-badge {
-  float: right;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 9px;
-  padding: 2px 6px;
-  background: var(--border);
-  color: var(--text-dim);
-  border-radius: 2px;
-}
-
-.nav-item.active .nav-badge {
-  background: var(--red-dim);
-  color: var(--red);
-}
-
-.nav-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 8px 0;
-}
-
-/* ── MAIN ────────────────────────────────────── */
-.main {
-  margin-left: 260px;
-  min-height: 100vh;
-}
-
-/* ── HEADER ──────────────────────────────────── */
-.top-bar {
-  position: sticky;
-  top: 0;
-  background: rgba(5,6,10,0.96);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 40px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  z-index: 50;
-  backdrop-filter: blur(8px);
-}
-
-.top-bar-path {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  color: var(--text-dim);
-  letter-spacing: 1px;
-}
-
-.top-bar-path span { color: var(--red); }
-
-.top-bar-status {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  color: var(--green);
-}
-
-.top-bar-status::before {
-  content: '';
-  width: 6px; height: 6px;
-  background: var(--green);
-  border-radius: 50%;
-  animation: blink 2s infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-/* ── PAGE ────────────────────────────────────── */
-.page { display: none; padding: 40px; }
-.page.active { display: block; }
-
-/* ── HERO ────────────────────────────────────── */
-.hero {
-  border: 1px solid var(--border2);
-  background: linear-gradient(135deg, var(--bg3) 0%, var(--bg2) 100%);
-  padding: 48px;
-  margin-bottom: 40px;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero::before {
-  content: 'SITE-09';
-  position: absolute;
-  right: -20px; top: -20px;
-  font-family: 'Orbitron', monospace;
-  font-size: 120px;
-  font-weight: 900;
-  color: rgba(200,20,30,0.04);
-  pointer-events: none;
-  line-height: 1;
-}
-
-.hero-corner {
-  position: absolute;
-  width: 20px; height: 20px;
-}
-.hero-corner.tl { top: 0; left: 0; border-top: 2px solid var(--red); border-left: 2px solid var(--red); }
-.hero-corner.tr { top: 0; right: 0; border-top: 2px solid var(--red); border-right: 2px solid var(--red); }
-.hero-corner.bl { bottom: 0; left: 0; border-bottom: 2px solid var(--red); border-left: 2px solid var(--red); }
-.hero-corner.br { bottom: 0; right: 0; border-bottom: 2px solid var(--red); border-right: 2px solid var(--red); }
-
-.hero-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  color: var(--red);
-  letter-spacing: 4px;
-  margin-bottom: 12px;
-}
-
-.hero h1 {
-  font-family: 'Orbitron', monospace;
-  font-size: 32px;
-  font-weight: 900;
-  color: var(--text-hi);
-  letter-spacing: 2px;
-  margin-bottom: 12px;
-}
-
-.hero h1 span { color: var(--red); }
-
-.hero p {
-  font-size: 15px;
-  color: var(--text-dim);
-  max-width: 600px;
-  line-height: 1.6;
-}
-
-/* ── SECTION ─────────────────────────────────── */
-.section {
-  margin-bottom: 40px;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.section-header h2 {
-  font-family: 'Orbitron', monospace;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-hi);
-  letter-spacing: 2px;
-}
-
-.section-accent {
-  width: 4px;
-  height: 20px;
-  background: var(--red);
-}
-
-.section-count {
-  margin-left: auto;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
-  background: var(--border);
-  padding: 3px 8px;
-}
-
-/* ── JOB CARDS ───────────────────────────────── */
-.jobs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 16px;
-}
-
-.job-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  padding: 0;
-  transition: border-color 0.2s, transform 0.2s;
-  cursor: default;
-  overflow: hidden;
-}
-
-.job-card:hover {
-  border-color: var(--border2);
-  transform: translateY(-2px);
-}
-
-.job-card-header {
-  padding: 14px 18px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.job-color-bar {
-  width: 4px;
-  height: 36px;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
-.job-card-title {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-hi);
-  line-height: 1.2;
-}
-
-.job-card-cmd {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
-  margin-top: 2px;
-}
-
-.job-card-badges {
-  margin-left: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  align-items: flex-end;
-}
-
-.badge {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 9px;
-  padding: 2px 7px;
-  letter-spacing: 1px;
-}
-
-.badge-wl  { background: rgba(200,20,30,0.15); color: var(--red); border: 1px solid var(--red-dim); }
-.badge-max { background: var(--border); color: var(--text-dim); }
-.badge-sal { background: rgba(26,154,74,0.1); color: var(--green); }
-
-.job-card-body {
-  padding: 14px 18px;
-}
-
-.job-desc {
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.5;
-  margin-bottom: 12px;
-}
-
-.job-rules {
-  list-style: none;
-}
-
-.job-rules li {
-  font-size: 12px;
-  color: var(--text);
-  padding: 4px 0;
-  padding-left: 14px;
-  position: relative;
-  line-height: 1.4;
-}
-
-.job-rules li::before {
-  content: '›';
-  position: absolute;
-  left: 0;
-  color: var(--red);
-  font-weight: 700;
-}
-
-/* ── REGLE GLOBALE ───────────────────────────── */
-.rule-block {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--red);
-  padding: 16px 20px;
-  margin-bottom: 12px;
-}
-
-.rule-block h3 {
-  font-family: 'Orbitron', monospace;
-  font-size: 11px;
-  color: var(--red);
-  letter-spacing: 2px;
-  margin-bottom: 8px;
-}
-
-.rule-block p, .rule-block li {
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.6;
-}
-
-.rule-block ul {
-  list-style: none;
-  padding: 0;
-}
-
-.rule-block ul li {
-  padding: 3px 0 3px 16px;
-  position: relative;
-}
-
-.rule-block ul li::before {
-  content: '—';
-  position: absolute;
-  left: 0;
-  color: var(--text-dim);
-}
-
-/* ── SANCTION TABLE ──────────────────────────── */
-.sanction-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-.sanction-table th {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 2px;
-  color: var(--text-dim);
-  text-align: left;
-  padding: 10px 16px;
-  background: var(--bg3);
-  border-bottom: 1px solid var(--border2);
-}
-
-.sanction-table td {
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
-  color: var(--text);
-  vertical-align: top;
-}
-
-.sanction-table tr:hover td { background: var(--red-glow); }
-
-.sev-1 { color: var(--orange); }
-.sev-2 { color: #e04020; }
-.sev-3 { color: var(--red); font-weight: 600; }
-
-/* ── COMMANDES ───────────────────────────────── */
-.cmd-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.cmd-item {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  padding: 14px 18px;
-  display: grid;
-  grid-template-columns: 240px 1fr auto;
-  gap: 16px;
-  align-items: start;
-  transition: border-color 0.15s;
-}
-
-.cmd-item:hover { border-color: var(--border2); }
-
-.cmd-syntax {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 12px;
-  color: var(--cyan);
-  word-break: break-all;
-}
-
-.cmd-desc {
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.4;
-}
-
-.cmd-perm {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 9px;
-  padding: 3px 8px;
-  white-space: nowrap;
-  align-self: flex-start;
-}
-
-.perm-op      { background: rgba(200,20,30,0.12); color: #e06868; border: 1px solid var(--red-dim); }
-.perm-admin   { background: rgba(200,20,30,0.18); color: var(--red); border: 1px solid var(--red); }
-.perm-sadmin  { background: rgba(200,20,30,0.25); color: #ff4444; border: 1px solid #c01010; }
-.perm-tous    { background: rgba(26,154,74,0.12); color: var(--green); border: 1px solid #1a4a2a; }
-
-/* ── TABS ────────────────────────────────────── */
-.tab-bar {
-  display: flex;
-  gap: 2px;
-  margin-bottom: 28px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 0;
-}
-
-.tab {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 2px;
-  padding: 10px 20px;
-  cursor: pointer;
-  color: var(--text-dim);
-  border: 1px solid transparent;
-  border-bottom: none;
-  transition: all 0.2s;
-  background: transparent;
-  margin-bottom: -1px;
-}
-
-.tab:hover { color: var(--text); }
-.tab.active {
-  color: var(--red);
-  border-color: var(--border);
-  border-bottom-color: var(--bg);
-  background: var(--bg);
-}
-
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
-/* ── AVERTISSEMENT ───────────────────────────── */
-.warning-box {
-  background: rgba(200,20,30,0.06);
-  border: 1px solid var(--red-dim);
-  border-left: 3px solid var(--red);
-  padding: 14px 18px;
-  margin-bottom: 20px;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-
-.warning-icon {
-  font-size: 16px;
-  flex-shrink: 0;
-  line-height: 1.4;
-}
-
-.warning-text {
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.5;
-}
-
-/* ── FOOTER ──────────────────────────────────── */
-.page-footer {
-  margin-top: 60px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
-  letter-spacing: 1px;
-  display: flex;
-  justify-content: space-between;
-}
-
-/* ── SCROLL BAR ──────────────────────────────── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border2); }
-::-webkit-scrollbar-thumb:hover { background: var(--red-dim); }
-
-/* ── ANIMATIONS ──────────────────────────────── */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.page.active { animation: fadeIn 0.25s ease; }
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <nav class="sidebar">
-  <div class="sidebar-logo">
-    <div class="site-id">SITE·09</div>
-    <div class="site-sub">SCP FOUNDATION // DOCUMENTATION INTERNE</div>
-    <div class="clearance">ACCÈS NIVEAU 2 REQUIS</div>
+  <div class="brand">
+    <div class="brand-logo">SCP Foundation</div>
+    <div class="brand-name">Site-09<br>Règlement</div>
+    <div class="brand-tag">// DOCUMENT INTERNE V4</div>
   </div>
 
-  <div class="nav-section">
-    <div class="nav-section-label">Navigation</div>
-    <a class="nav-item active" onclick="showPage('reglement')">Règlement général</a>
-    <a class="nav-item" onclick="showPage('metiers')">Métiers & Rôles <span class="nav-badge">34</span></a>
-    <a class="nav-item" onclick="showPage('admin')">Commandes admin</a>
-    <a class="nav-item" onclick="showPage('sanctions')">Sanctions</a>
+  <div class="nav-group">
+    <div class="nav-label">Général</div>
+    <a class="nav-a on" onclick="goto('intro')"><div class="nav-dot"></div>Introduction</a>
+    <a class="nav-a" onclick="goto('conduite')"><div class="nav-dot"></div>Conduite</a>
+    <a class="nav-a" onclick="goto('rp')"><div class="nav-dot"></div>Roleplay</a>
+    <a class="nav-a" onclick="goto('breche')"><div class="nav-dot"></div>Brèches SCP</a>
+    <a class="nav-a" onclick="goto('interactions')"><div class="nav-dot"></div>Interactions</a>
   </div>
 
-  <div class="nav-divider"></div>
+  <div class="nav-sep"></div>
 
-  <div class="nav-section">
-    <div class="nav-section-label">Catégories de jobs</div>
-    <a class="nav-item" onclick="showPage('metiers'); filterCat('Administration')">Administration <span class="nav-badge">3</span></a>
-    <a class="nav-item" onclick="showPage('metiers'); filterCat('Sécurité')">Sécurité UT <span class="nav-badge">9</span></a>
-    <a class="nav-item" onclick="showPage('metiers'); filterCat('FIM')">F.I.M <span class="nav-badge">5</span></a>
-    <a class="nav-item" onclick="showPage('metiers'); filterCat('Chercheurs')">Chercheurs <span class="nav-badge">4</span></a>
-    <a class="nav-item" onclick="showPage('metiers'); filterCat('Ennemis')">Ennemis <span class="nav-badge">5</span></a>
-    <a class="nav-item" onclick="showPage('metiers'); filterCat('SCP')">SCP <span class="nav-badge">12</span></a>
-    <a class="nav-item" onclick="showPage('metiers'); filterCat('Autres')">Autres <span class="nav-badge">6</span></a>
-    <a class="nav-item" onclick="showPage('metiers'); filterCat('Classe-D')">Classe-D <span class="nav-badge">3</span></a>
+  <div class="nav-group">
+    <div class="nav-label">Métiers</div>
+    <a class="nav-a" onclick="goto('metiers');filterCat('all')"><div class="nav-dot"></div>Tous les métiers <span class="nav-badge">34</span></a>
+    <a class="nav-a" onclick="goto('metiers');filterCat('Administration')"><div class="nav-dot"></div>Administration <span class="nav-badge">3</span></a>
+    <a class="nav-a" onclick="goto('metiers');filterCat('Sécurité')"><div class="nav-dot"></div>Unité Tactique <span class="nav-badge">9</span></a>
+    <a class="nav-a" onclick="goto('metiers');filterCat('FIM')"><div class="nav-dot"></div>F.I.M <span class="nav-badge">5</span></a>
+    <a class="nav-a" onclick="goto('metiers');filterCat('Chercheurs')"><div class="nav-dot"></div>Chercheurs <span class="nav-badge">4</span></a>
+    <a class="nav-a" onclick="goto('metiers');filterCat('Autres')"><div class="nav-dot"></div>Support <span class="nav-badge">6</span></a>
+    <a class="nav-a" onclick="goto('metiers');filterCat('Ennemis')"><div class="nav-dot"></div>Factions ennemies <span class="nav-badge">5</span></a>
+    <a class="nav-a" onclick="goto('metiers');filterCat('SCP')"><div class="nav-dot"></div>SCP <span class="nav-badge">12</span></a>
+    <a class="nav-a" onclick="goto('metiers');filterCat('Classe-D')"><div class="nav-dot"></div>Classe-D <span class="nav-badge">3</span></a>
+  </div>
+
+  <div class="nav-sep"></div>
+
+  <div class="nav-group">
+    <div class="nav-label">Sanctions</div>
+    <a class="nav-a" onclick="goto('sanctions')"><div class="nav-dot"></div>Tableau des sanctions</a>
   </div>
 </nav>
 
-<!-- MAIN -->
 <div class="main">
-  <div class="top-bar">
-    <div class="top-bar-path">
-      SITE-09 // <span id="path-label">RÈGLEMENT GÉNÉRAL</span>
-    </div>
-    <div class="top-bar-status">SERVEUR OPÉRATIONNEL</div>
+  <div class="topbar">
+    <div class="topbar-crumb">SITE-09 / <em>RÈGLEMENT GÉNÉRAL</em></div>
+    <div class="topbar-pulse">SERVEUR ACTIF</div>
   </div>
 
-  <!-- ══ PAGE RÈGLEMENT ══ -->
-  <div class="page active" id="page-reglement">
-    <div class="hero">
-      <div class="hero-corner tl"></div><div class="hero-corner tr"></div>
-      <div class="hero-corner bl"></div><div class="hero-corner br"></div>
-      <div class="hero-label">// DOCUMENT INTERNE — SITE-09</div>
-      <h1>RÈGLEMENT <span>GÉNÉRAL</span></h1>
-      <p>Ce document contient l'ensemble des règles applicables à tous les membres du serveur Site-09. Le non-respect de ces règles entraîne des sanctions définies par l'équipe d'administration.</p>
+  <div class="content">
+
+    <!-- HERO -->
+    <div class="hero" id="intro">
+      <div class="hero-tl"></div><div class="hero-tr"></div>
+      <div class="hero-bl"></div><div class="hero-br"></div>
+      <div class="hero-kicker">// DOCUMENT INTERNE — ACCÈS AUTORISÉ</div>
+      <h1>Règlement<br><span>Site-09</span></h1>
+      <p>Ce document définit l'ensemble des règles applicables à tous les membres du serveur. Le non-respect de ces règles entraîne des sanctions décidées par l'administration.</p>
     </div>
 
-    <div class="warning-box">
-      <div class="warning-icon">⚠</div>
-      <div class="warning-text">L'ignorance du règlement ne constitue pas une excuse valable. Tout joueur est réputé avoir lu et accepté ces règles dès sa première connexion sur le serveur.</div>
+    <div class="alert">
+      <div class="alert-i">⚠</div>
+      <div>La connexion au serveur vaut acceptation du présent règlement. L'ignorance des règles ne constitue pas une excuse recevable.</div>
     </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <h2>COMPORTEMENT GÉNÉRAL</h2>
+    <!-- CONDUITE -->
+    <div class="section" id="conduite">
+      <div class="sec-head">
+        <div class="sec-bar"></div>
+        <div class="sec-title">Comportement & Conduite</div>
       </div>
-      <div class="rule-block">
-        <h3>RESPECT ET CONDUITE</h3>
-        <ul>
-          <li>Le respect entre joueurs est obligatoire. Toute forme de harcèlement, discrimination ou insulte est interdite.</li>
-          <li>Le spam vocal ou textuel est interdit. Utilisez <strong>///</strong> dans le chat pour contacter un admin.</li>
-          <li>L'utilisation de bugs ou d'exploits est interdite et doit être signalée immédiatement à l'administration.</li>
-          <li>Les publicités pour d'autres serveurs sont strictement interdites.</li>
-          <li>Les pseudonymes offensants, incompréhensibles ou non RP sont interdits.</li>
+
+      <div class="rule-card">
+        <h3>Respect mutuel</h3>
+        <ul class="rule-list">
+          <li>Le respect entre tous les joueurs est <strong>obligatoire</strong>. Insultes, harcèlement et discriminations sont interdits et sanctionnés immédiatement.</li>
+          <li>Les pseudonymes offensants, incompréhensibles ou non-RP sont interdits.</li>
+          <li>La publicité pour d'autres serveurs entraîne un <em>ban permanent immédiat</em>.</li>
+          <li>Le spam vocal ou textuel est interdit. Utilisez <strong>///</strong> pour contacter un admin.</li>
         </ul>
       </div>
 
-      <div class="rule-block">
-        <h3>ROLEPLAY (RP)</h3>
-        <ul>
-          <li><strong>RDM (Random DeathMatch)</strong> — Tuer sans raison RP valable est interdit.</li>
-          <li><strong>FailRP</strong> — Agir en contradiction avec votre rôle ou la logique RP est interdit.</li>
-          <li><strong>PVP interdit hors contexte</strong> — Les affrontements doivent avoir une justification RP.</li>
-          <li><strong>NLR (New Life Rule)</strong> — Après votre mort, vous ne pouvez pas retourner immédiatement dans la même zone ni vous souvenir des événements ayant causé votre mort.</li>
-          <li><strong>MetaGame</strong> — Utiliser des informations OOC (hors RP) dans le jeu est interdit.</li>
-          <li>Le RP doit rester cohérent avec l'univers SCP. Restez dans votre rôle.</li>
-          <li>Le suicide RP (se tuer volontairement pour échapper à une situation) est interdit.</li>
-        </ul>
-      </div>
-
-      <div class="rule-block">
-        <h3>BÂTIMENT ET ZONES</h3>
-        <ul>
-          <li>Les constructions bloquant les passages ou créant des zones infranchissables sont interdites.</li>
-          <li>Le respect des zones de chaque faction est obligatoire. Ne vous introduisez pas dans des zones réservées sans raison RP.</li>
-          <li>Les SCP ne doivent pas sortir de leur zone de confinement sans protocole de brèche activé.</li>
-        </ul>
-      </div>
-
-      <div class="rule-block">
-        <h3>INTERACTIONS ENTRE FACTIONS</h3>
-        <ul>
-          <li>Les Classe-D peuvent tenter de s'évader mais doivent respecter les règles de RP.</li>
-          <li>Les agents de l'Insurrection du Chaos et de la Main du Serpent peuvent infiltrer le site mais pas massacrer aléatoirement.</li>
-          <li>La Fondation ne doit pas exécuter les Classe-D sans protocole ou autorisation appropriée.</li>
-          <li>Les alliances entre factions ennemies doivent être justifiées par du RP.</li>
-        </ul>
-      </div>
-
-      <div class="rule-block">
-        <h3>EXPÉRIENCES SCP</h3>
-        <ul>
-          <li>Toute expérience doit être supervisée par un chercheur de rang approprié.</li>
-          <li>Les expériences sur les SCP Keter nécessitent l'autorisation du Directeur ou du Comité d'Éthique.</li>
-          <li>Les Classe-D utilisés comme sujets doivent avoir un minimum de consentement RP (pas d'exécution immédiate sans RP).</li>
-          <li>Les résultats d'expériences peuvent être consignés dans les rapports RP.</li>
+      <div class="rule-card">
+        <h3>Comportement in-game</h3>
+        <ul class="rule-list">
+          <li>L'utilisation de <strong>bugs ou exploits</strong> est interdite. Tout bug trouvé doit être signalé à l'administration.</li>
+          <li>La triche (cheat, hack, script) entraîne un <em>ban permanent et définitif</em>.</li>
+          <li>Bloquer volontairement les passages ou zones de jeu avec des props est interdit.</li>
         </ul>
       </div>
     </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <h2>PROTOCOLES DE BRÈCHE</h2>
+    <!-- ROLEPLAY -->
+    <div class="section" id="rp">
+      <div class="sec-head">
+        <div class="sec-bar"></div>
+        <div class="sec-title">Règles de Roleplay</div>
       </div>
-      <div class="rule-block">
-        <h3>LORS D'UNE BRÈCHE SCP</h3>
-        <ul>
-          <li>Les SCP en brèche doivent rester cohérents avec leurs capacités et comportements canoniques.</li>
-          <li>L'UT et les FIM prennent en charge le recontainment — les civils doivent se mettre à l'abri.</li>
-          <li>Les chercheurs ne doivent pas combattre les SCP directement sans équipement adapté.</li>
-          <li>Un SCP en brèche ne peut pas délibérément "farmer" des kills — il suit sa logique comportementale.</li>
-          <li>SCP-079 ne peut pas ouvrir toutes les portes simultanément pour favoriser d'autres SCP.</li>
+
+      <div class="rule-card">
+        <h3>Infractions RP fondamentales</h3>
+        <ul class="rule-list">
+          <li><strong>RDM (Random DeathMatch)</strong> — Tuer sans raison RP valable et justifiée est strictement interdit.</li>
+          <li><strong>FailRP</strong> — Agir en contradiction totale avec votre rôle ou la logique de l'univers SCP est interdit.</li>
+          <li><strong>NLR (New Life Rule)</strong> — Après votre mort, vous ne souvenez plus des événements ayant causé votre décès. Retourner immédiatement sur les lieux est interdit.</li>
+          <li><strong>MetaGame</strong> — Utiliser des informations OOC (hors-RP) dans des décisions RP est interdit.</li>
+          <li><strong>Suicide RP</strong> — Se tuer volontairement pour échapper à une situation RP est interdit.</li>
+          <li><strong>PowerGame</strong> — S'attribuer des capacités ou pouvoirs inexistants en RP est interdit.</li>
+        </ul>
+      </div>
+
+      <div class="rule-card">
+        <h3>Qualité du Roleplay</h3>
+        <ul class="rule-list">
+          <li>Le RP doit rester <strong>cohérent avec l'univers SCP</strong>. Chaque action doit avoir une justification RP.</li>
+          <li>Les alliances inhabituelles entre factions doivent être <strong>justifiées par un RP structuré</strong>.</li>
+          <li>Le langage utilisé en RP doit être adapté au contexte et au personnage joué.</li>
+          <li>Les captures de Classe-D ou de personnel doivent suivre un protocole RP (menottage, escorte, etc.).</li>
+        </ul>
+      </div>
+
+      <div class="rule-card">
+        <h3>Expériences scientifiques</h3>
+        <ul class="rule-list">
+          <li>Toute expérience doit être conduite par un chercheur de rang approprié avec rapport obligatoire.</li>
+          <li>Les tests sur SCP de classe <em>Keter</em> nécessitent une autorisation du Directeur ou du Comité d'Éthique.</li>
+          <li>Les Classe-D utilisés comme sujets doivent participer au RP — pas d'exécution immédiate sans scène.</li>
+          <li>Le Comité d'Éthique peut interrompre toute expérience jugée contraire aux protocoles.</li>
         </ul>
       </div>
     </div>
 
-    <div class="page-footer">
-      <span>SITE-09 // DOCUMENT INTERNE V4.0</span>
-      <span>DERNIÈRE MISE À JOUR : 2025</span>
-    </div>
-  </div>
-
-  <!-- ══ PAGE MÉTIERS ══ -->
-  <div class="page" id="page-metiers">
-    <div class="hero">
-      <div class="hero-corner tl"></div><div class="hero-corner tr"></div>
-      <div class="hero-corner bl"></div><div class="hero-corner br"></div>
-      <div class="hero-label">// REGISTRE DU PERSONNEL</div>
-      <h1>MÉTIERS <span>& RÔLES</span></h1>
-      <p>Description, règles et responsabilités de chaque poste disponible sur le Site-09.</p>
-    </div>
-
-    <div class="tab-bar" id="cat-tabs">
-      <div class="tab active" onclick="filterCat('all')">TOUS</div>
-      <div class="tab" onclick="filterCat('Administration')">ADMIN</div>
-      <div class="tab" onclick="filterCat('Sécurité')">SÉCURITÉ</div>
-      <div class="tab" onclick="filterCat('FIM')">F.I.M</div>
-      <div class="tab" onclick="filterCat('Chercheurs')">RECHERCHE</div>
-      <div class="tab" onclick="filterCat('Autres')">AUTRES</div>
-      <div class="tab" onclick="filterCat('Ennemis')">ENNEMIS</div>
-      <div class="tab" onclick="filterCat('SCP')">SCP</div>
-      <div class="tab" onclick="filterCat('Classe-D')">CLASSE-D</div>
-    </div>
-
-    <div class="jobs-grid" id="jobs-grid"></div>
-
-    <div class="page-footer">
-      <span>SITE-09 // REGISTRE DU PERSONNEL</span>
-      <span id="job-count-footer"></span>
-    </div>
-  </div>
-
-  <!-- ══ PAGE ADMIN ══ -->
-  <div class="page" id="page-admin">
-    <div class="hero">
-      <div class="hero-corner tl"></div><div class="hero-corner tr"></div>
-      <div class="hero-corner bl"></div><div class="hero-corner br"></div>
-      <div class="hero-label">// DOCUMENTATION ADMINISTRATION</div>
-      <h1>COMMANDES <span>ADMIN</span></h1>
-      <p>Liste complète des commandes disponibles pour le personnel d'administration du serveur.</p>
-    </div>
-
-    <div class="warning-box">
-      <div class="warning-icon">🔒</div>
-      <div class="warning-text">L'abus de commandes administratives est une faute grave. Toute action effectuée avec ces commandes est enregistrée dans les logs serveur.</div>
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <h2>COMMANDES CHAT — SYSTÈME PERSONNALISÉ</h2>
+    <!-- BRECHE -->
+    <div class="section" id="breche">
+      <div class="sec-head">
+        <div class="sec-bar"></div>
+        <div class="sec-title">Protocoles de Brèche</div>
       </div>
-      <div class="cmd-grid" id="cmd-custom"></div>
-    </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <h2>COMMANDES ULX — GESTION JOUEURS</h2>
+      <div class="rule-card">
+        <h3>Comportement des SCP en brèche</h3>
+        <ul class="rule-list">
+          <li>Un SCP en brèche doit respecter les <strong>comportements canoniques</strong> de son entrée dans la base de données SCP.</li>
+          <li>Il est interdit de délibérément "farmer" les kills — le SCP suit sa logique comportementale.</li>
+          <li>SCP-096 ne charge que les personnes ayant vu son visage — simulation obligatoire.</li>
+          <li>SCP-173 ne peut se déplacer que si aucun joueur en vue directe ne le regarde.</li>
+          <li>SCP-079 ne peut pas ouvrir toutes les portes simultanément pour faciliter d'autres SCP.</li>
+        </ul>
       </div>
-      <div class="cmd-grid" id="cmd-ulx-players"></div>
-    </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <h2>COMMANDES ULX — SANCTIONS</h2>
+      <div class="rule-card">
+        <h3>Réponse à une brèche</h3>
+        <ul class="rule-list">
+          <li>L'Unité Tactique et les FIM Epsilon-11 prennent en charge le <strong>recontainment en priorité</strong>.</li>
+          <li>Les chercheurs et civils doivent se mettre à l'abri — ils ne combattent pas les SCP sans équipement.</li>
+          <li>Les Classe-D peuvent profiter d'une brèche pour tenter une évasion — dans le respect du RP.</li>
+          <li>La FIM Nu-7 n'intervient qu'en cas de <strong>menace extérieure simultanée</strong> (CI, GOC).</li>
+        </ul>
       </div>
-      <div class="cmd-grid" id="cmd-ulx-sanctions"></div>
     </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <h2>COMMANDES ULX — MODÉRATION AVANCÉE</h2>
+    <!-- INTERACTIONS -->
+    <div class="section" id="interactions">
+      <div class="sec-head">
+        <div class="sec-bar"></div>
+        <div class="sec-title">Interactions entre Factions</div>
       </div>
-      <div class="cmd-grid" id="cmd-ulx-mod"></div>
-    </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <h2>COMMANDES XP & PROGRESSION</h2>
+      <div class="rule-card">
+        <h3>Fondation vs Ennemis</h3>
+        <ul class="rule-list">
+          <li>L'Insurrection du Chaos et la Main du Serpent <strong>ont des objectifs RP précis</strong> — pas de massacre gratuit.</li>
+          <li>La GOC peut attaquer la Fondation si celle-ci refuse de neutraliser une anomalie dangereuse.</li>
+          <li>L'UIU (FBI) mène des enquêtes discrètes — l'infiltration est préférable à l'assaut direct.</li>
+          <li>Toute alliance inter-factions ennemies doit être construite en RP progressif.</li>
+        </ul>
       </div>
-      <div class="cmd-grid" id="cmd-xp"></div>
-    </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <h2>COMMANDES PANNES TECHNICIEN</h2>
+      <div class="rule-card">
+        <h3>Traitement des Classe-D</h3>
+        <ul class="rule-list">
+          <li>La Fondation ne peut pas exécuter des Classe-D sans contexte RP (protocole, sentence, expérience).</li>
+          <li>Les Classe-D peuvent <strong>négocier, ruser ou fuir</strong> — l'évasion fait partie du jeu.</li>
+          <li>Les colliers de sécurité ne peuvent être déclenchés qu'avec une justification RP.</li>
+        </ul>
       </div>
-      <div class="cmd-grid" id="cmd-tech"></div>
     </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <h2>COMMANDES CHAT JOUEURS</h2>
-        <div class="section-count">Accessibles à tous</div>
+    <!-- MÉTIERS -->
+    <div class="section" id="metiers">
+      <div class="sec-head">
+        <div class="sec-bar"></div>
+        <div class="sec-title">Métiers & Rôles</div>
+        <div class="sec-count" id="job-count">34 métiers</div>
       </div>
-      <div class="cmd-grid" id="cmd-players"></div>
-    </div>
 
-    <div class="page-footer">
-      <span>SITE-09 // DOCUMENTATION TECHNIQUE</span>
-      <span>ULX + COMMANDES PERSONNALISÉES</span>
-    </div>
-  </div>
-
-  <!-- ══ PAGE SANCTIONS ══ -->
-  <div class="page" id="page-sanctions">
-    <div class="hero">
-      <div class="hero-corner tl"></div><div class="hero-corner tr"></div>
-      <div class="hero-corner bl"></div><div class="hero-corner br"></div>
-      <div class="hero-label">// PROTOCOLE DISCIPLINAIRE</div>
-      <h1>TABLEAU DES <span>SANCTIONS</span></h1>
-      <p>Barème des sanctions appliquées par l'administration selon la gravité des infractions.</p>
-    </div>
-
-    <div class="rule-block">
-      <h3>PRINCIPES GÉNÉRAUX</h3>
-      <ul>
-        <li>Les sanctions sont progressives : avertissement → kick → ban temporaire → ban permanent.</li>
-        <li>La récidive aggrave systématiquement la sanction.</li>
-        <li>Tout ban peut faire l'objet d'un appel sur le Discord dans les 7 jours.</li>
-        <li>Les bans permanents pour triche ou backdoor ne sont jamais révisables.</li>
-      </ul>
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <h2>INFRACTIONS RP</h2>
+      <div class="tabs" id="cat-tabs">
+        <button class="tab-btn on" onclick="filterCat('all')">TOUS</button>
+        <button class="tab-btn" onclick="filterCat('Administration')">ADMIN</button>
+        <button class="tab-btn" onclick="filterCat('Sécurité')">SÉCURITÉ UT</button>
+        <button class="tab-btn" onclick="filterCat('FIM')">F.I.M</button>
+        <button class="tab-btn" onclick="filterCat('Chercheurs')">RECHERCHE</button>
+        <button class="tab-btn" onclick="filterCat('Autres')">SUPPORT</button>
+        <button class="tab-btn" onclick="filterCat('Ennemis')">ENNEMIS</button>
+        <button class="tab-btn" onclick="filterCat('SCP')">SCP</button>
+        <button class="tab-btn" onclick="filterCat('Classe-D')">CLASSE-D</button>
       </div>
-      <table class="sanction-table">
-        <thead>
-          <tr>
-            <th>INFRACTION</th>
-            <th>1ÈRE FOIS</th>
-            <th>RÉCIDIVE</th>
-            <th>RÉPÉTÉ</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>RDM mineur (1 victime)</td><td class="sev-1">Avertissement</td><td class="sev-1">Kick</td><td class="sev-2">Ban 1h</td></tr>
-          <tr><td>RDM massif (3+ victimes)</td><td class="sev-2">Ban 1h</td><td class="sev-2">Ban 24h</td><td class="sev-3">Ban 7j</td></tr>
-          <tr><td>FailRP léger</td><td class="sev-1">Avertissement oral</td><td class="sev-1">Avertissement ULX</td><td class="sev-2">Kick</td></tr>
-          <tr><td>FailRP grave</td><td class="sev-1">Kick</td><td class="sev-2">Ban 2h</td><td class="sev-2">Ban 24h</td></tr>
-          <tr><td>NLR violation</td><td class="sev-1">Avertissement</td><td class="sev-1">Kick</td><td class="sev-2">Ban 1h</td></tr>
-          <tr><td>Metagame</td><td class="sev-1">Avertissement</td><td class="sev-2">Ban 2h</td><td class="sev-2">Ban 12h</td></tr>
-          <tr><td>Suicide RP</td><td class="sev-1">Avertissement</td><td class="sev-1">Kick</td><td class="sev-2">Ban 1h</td></tr>
-          <tr><td>SCP non conforme à son lore</td><td class="sev-1">Avertissement</td><td class="sev-1">Retrait du job</td><td class="sev-2">Ban 2h</td></tr>
-        </tbody>
-      </table>
+
+      <div class="jobs-grid" id="job-grid-container"></div>
     </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <h2>INFRACTIONS COMPORTEMENTALES</h2>
+    <!-- SANCTIONS -->
+    <div class="section" id="sanctions">
+      <div class="sec-head">
+        <div class="sec-bar"></div>
+        <div class="sec-title">Tableau des Sanctions</div>
       </div>
-      <table class="sanction-table">
-        <thead>
-          <tr>
-            <th>INFRACTION</th>
-            <th>1ÈRE FOIS</th>
-            <th>RÉCIDIVE</th>
-            <th>RÉPÉTÉ</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Insulte légère</td><td class="sev-1">Avertissement</td><td class="sev-1">Mute 10min</td><td class="sev-2">Kick</td></tr>
-          <tr><td>Insulte grave / harcèlement</td><td class="sev-2">Ban 24h</td><td class="sev-3">Ban 7j</td><td class="sev-3">Ban permanent</td></tr>
-          <tr><td>Spam chat / micro</td><td class="sev-1">Mute 5min</td><td class="sev-1">Mute 30min</td><td class="sev-2">Ban 1h</td></tr>
-          <tr><td>Publicité serveur concurrent</td><td class="sev-3">Ban permanent</td><td>—</td><td>—</td></tr>
-          <tr><td>Discrimination</td><td class="sev-3">Ban 7j</td><td class="sev-3">Ban permanent</td><td>—</td></tr>
-        </tbody>
-      </table>
-    </div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-accent"></div>
-        <h2>INFRACTIONS TECHNIQUES</h2>
+      <div class="alert" style="border-left-color:var(--amber);border-color:rgba(232,148,26,.25);background:rgba(232,148,26,.05)">
+        <div class="alert-i">ℹ</div>
+        <div>Les sanctions sont progressives. La récidive aggrave systématiquement le barème. Tout ban peut être contesté sur le Discord dans les 7 jours. Les bans pour triche sont définitifs.</div>
       </div>
-      <table class="sanction-table">
-        <thead>
-          <tr>
-            <th>INFRACTION</th>
-            <th>SANCTION</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Exploit de bug (involontaire)</td><td class="sev-1">Avertissement + correction obligatoire</td></tr>
-          <tr><td>Exploit de bug (volontaire)</td><td class="sev-3">Ban 7j à permanent selon gravité</td></tr>
-          <tr><td>Triche (cheat / hack)</td><td class="sev-3">Ban permanent immédiat</td></tr>
-          <tr><td>Abus des commandes admin</td><td class="sev-3">Retrait des droits + Ban 7j</td></tr>
-          <tr><td>Backdoor dans du code soumis</td><td class="sev-3">Ban permanent</td></tr>
-        </tbody>
-      </table>
+
+      <div class="rule-card">
+        <h3>Infractions RP</h3>
+        <ul class="rule-list">
+          <li><strong>RDM mineur</strong> — Avertissement → Kick → Ban 1h</li>
+          <li><strong>RDM massif (3+ victimes)</strong> — Ban 1h → Ban 24h → Ban 7j</li>
+          <li><strong>FailRP léger</strong> — Avertissement oral → Warn ULX → Kick</li>
+          <li><strong>FailRP grave</strong> — Kick → Ban 2h → Ban 24h</li>
+          <li><strong>NLR / MetaGame</strong> — Avertissement → Kick → Ban 1h</li>
+          <li><strong>Suicide RP</strong> — Avertissement → Kick → Ban 1h</li>
+          <li><strong>SCP hors-lore délibéré</strong> — Avertissement → Retrait job → Ban 2h</li>
+        </ul>
+      </div>
+
+      <div class="rule-card">
+        <h3>Infractions comportementales</h3>
+        <ul class="rule-list">
+          <li><strong>Insulte légère</strong> — Avertissement → Mute 10min → Kick</li>
+          <li><strong>Harcèlement / insulte grave</strong> — Ban 24h → Ban 7j → <em>Ban permanent</em></li>
+          <li><strong>Discrimination</strong> — Ban 7j → <em>Ban permanent</em></li>
+          <li><strong>Publicité serveur concurrent</strong> — <em>Ban permanent immédiat</em></li>
+          <li><strong>Spam chat / micro</strong> — Mute 5min → Mute 30min → Ban 1h</li>
+        </ul>
+      </div>
+
+      <div class="rule-card">
+        <h3>Infractions techniques</h3>
+        <ul class="rule-list">
+          <li><strong>Exploit involontaire</strong> — Avertissement + correction obligatoire</li>
+          <li><strong>Exploit volontaire</strong> — Ban 7j à permanent selon gravité</li>
+          <li><strong>Triche (cheat/hack)</strong> — <em>Ban permanent immédiat</em></li>
+        </ul>
+      </div>
     </div>
 
-    <div class="page-footer">
-      <span>SITE-09 // PROTOCOLE DISCIPLINAIRE</span>
-      <span>RÉVISABLE À TOUT MOMENT PAR L'ADMINISTRATION</span>
+    <div class="footer">
+      <span>SITE-09 // RÈGLEMENT GÉNÉRAL V4.0</span>
+      <span>CHAOS RISING — 2025</span>
     </div>
   </div>
 </div>
 
 <script>
-// ══ DONNÉES JOBS ══════════════════════════════════════════
-const JOBS = [
-  // ADMINISTRATION
-  { name:"[WL] Membre du Conseil O5", cmd:"admin_o5", cat:"Administration", wl:true, max:3, sal:1000, col:"#0a0a0a",
-    desc:"Autorité absolue de la Fondation. Décide du sort du Site-09 et de ses ressources.",
-    rules:["Peut outrepasser toute décision du Directeur","Ne doit pas se mettre en danger inutilement","Présence rare — les décisions O5 sont stratégiques","Niveau 50 requis"] },
-  { name:"[WL] Directeur du Site", cmd:"dir_site", cat:"Administration", wl:true, max:1, sal:600, col:"#003ca0",
-    desc:"Supervise l'intégralité du personnel et des opérations du site.",
-    rules:["Gère les autorisations d'expériences Keter","Coordonne l'UT et les FIM en cas de brèche","Peut ordonner des lockdowns","Niveau 40 requis"] },
-  { name:"[WL] Comité d'Éthique", cmd:"ethique", cat:"Administration", wl:true, max:2, sal:400, col:"#828282",
-    desc:"S'assure que les expériences sur les Classe-D respectent les protocoles éthiques.",
-    rules:["Peut arrêter toute expérience jugée contraire aux protocoles","Doit rédiger des rapports d'éthique","Ne peut pas prendre part aux opérations militaires","Niveau 30 requis"] },
-  // SÉCURITÉ
-  { name:"[WL] Commandant UT", cmd:"ut_com", cat:"Sécurité", wl:true, max:1, sal:300, col:"#003cb4",
-    desc:"Chef suprême de la sécurité intérieure du site. Autorité absolue sur l'Unité Tactique.",
-    rules:["Donne les ordres à toute l'UT","Autorise les opérations offensives","Peut déclarer un confinement d'urgence","Niveau 35 requis"] },
-  { name:"[WL] Capitaine UT", cmd:"ut_cap", cat:"Sécurité", wl:true, max:1, sal:250, col:"#003cb4",
-    desc:"Officier supérieur de l'Unité Tactique. Commande en l'absence du Commandant.",
-    rules:["Seconde le Commandant","Gère les patrouilles et rotations","Peut utiliser le taser et les menottes","Niveau 30 requis"] },
-  { name:"[WL] Lieutenant UT", cmd:"ut_ltn", cat:"Sécurité", wl:true, max:2, sal:220, col:"#003cb4",
-    desc:"Officier de terrain de l'Unité Tactique. Chef de section.",
-    rules:["Dirige une section de l'UT","Rapporte au Capitaine","Autorise les arrestations de Classe-D","Niveau 25 requis"] },
-  { name:"Major UT", cmd:"ut_mjr", cat:"Sécurité", wl:true, max:2, sal:200, col:"#003cb4",
-    desc:"Sous-officier supérieur. Expérimenté et fiable.",
-    rules:["Forme les nouvelles recrues","Peut porter le taser","Escorte les chercheurs en zone dangereuse","Niveau 20 requis"] },
-  { name:"Sergent UT", cmd:"ut_sgt", cat:"Sécurité", wl:true, max:3, sal:160, col:"#003cb4",
-    desc:"Chef d'escouade chargé des patrouilles et du maintien de l'ordre.",
-    rules:["Mène les patrouilles régulières","Peut menotter les Classe-D","Rapporte au Major ou Lieutenant","Niveau 15 requis"] },
-  { name:"Caporal-Chef UT", cmd:"ut_cch", cat:"Sécurité", wl:true, max:3, sal:140, col:"#003cb4",
-    desc:"Garde expérimenté. Second d'un chef de section.",
-    rules:["Surveille les zones d'accès restreint","Ne peut pas ordonner d'opérations seul","Niveau 12 requis"] },
-  { name:"Agent UT", cmd:"ut_agent", cat:"Sécurité", wl:true, max:10, sal:120, col:"#003cb4",
-    desc:"Membre standard de l'Unité Tactique. Assure la sécurité du site.",
-    rules:["Patrouille et surveille les zones assignées","Signale toute brèche immédiatement","Obéit aux ordres de ses supérieurs","Niveau 8 requis"] },
-  { name:"Garde Recrue", cmd:"ut_recrue", cat:"Sécurité", wl:false, max:5, sal:100, col:"#003cb4",
-    desc:"Nouvelle recrue de la sécurité. En cours de formation.",
-    rules:["Reste avec un agent expérimenté","Ne peut pas intervenir seul sur un SCP","Niveau 3 requis"] },
-  { name:"Police Militaire", cmd:"ut_pm", cat:"Sécurité", wl:false, max:4, sal:150, col:"#282882",
-    desc:"Maintient l'ordre interne. Sanctionne le personnel fautif.",
-    rules:["Peut arrêter tout membre du personnel en infraction","Enquête sur les incidents internes","A priorité sur l'UT pour les arrestations de personnel","Niveau 10 requis"] },
-  { name:"[WL] DSI (Sécurité Interne)", cmd:"dsi_agent", cat:"Sécurité", wl:true, max:2, sal:200, col:"#460000",
-    desc:"Agent infiltré. Traque les espions, les traîtres et les menaces internes.",
-    rules:["Peut se déguiser en autre faction","Rapporte directement au Directeur","Opère de façon indépendante","Niveau 25 requis"] },
-  { name:"[WL] Spécialiste Confinement", cmd:"specialisteconf", cat:"Sécurité", wl:true, max:5, sal:220, col:"#0f0f0f",
-    desc:"Expert en recontainment des SCP dangereux.",
-    rules:["Spécialisé dans la neutralisation et recontainment des SCP","Équipement adapté à chaque SCP","Travaille sous les ordres des FIM E-11","Niveau 20 requis"] },
-  // FIM
-  { name:"[WL] FIM Alpha-1", cmd:"fim_a1", cat:"FIM", wl:true, max:3, sal:400, col:"#820000",
-    desc:"Garde rapprochée du Conseil O5. Unité d'élite absolue.",
-    rules:["Protège les membres O5 en priorité","Ne reçoit d'ordres que de l'O5","Peut agir contre n'importe qui menaçant l'O5","Niveau 45 requis"] },
-  { name:"[WL] FIM Epsilon-11 Leader", cmd:"fim_e11_ldr", cat:"FIM", wl:true, max:1, sal:300, col:"#000082",
-    desc:"Commandant des opérations de reconfinement. Dirige les équipes Epsilon-11.",
-    rules:["Commande toutes les opérations E-11","Coordonne avec le Directeur lors des brèches","Peut réquisitionner l'UT pour soutien","Niveau 35 requis"] },
-  { name:"[WL] FIM Epsilon-11", cmd:"fim_e11", cat:"FIM", wl:true, max:6, sal:220, col:"#000082",
-    desc:"Spécialiste du confinement des SCP. Intervient lors des brèches.",
-    rules:["Intervient exclusivement lors de brèches SCP","Coordonne avec l'UT pour le périmètre","Ne peut pas mener d'opérations offensives hors brèche","Niveau 25 requis"] },
-  { name:"[WL] FIM Nu-7 Leader", cmd:"fim_nu7_ldr", cat:"FIM", wl:true, max:1, sal:300, col:"#0f0f0f",
-    desc:"Commandant des assauts lourds en surface. Hammer Down.",
-    rules:["Dirige les opérations en surface","Peut ordonner des frappes lourdes","Coordonne contre les forces externes (CI, GOC)","Niveau 35 requis"] },
-  { name:"[WL] FIM Nu-7", cmd:"fim_nu7", cat:"FIM", wl:true, max:5, sal:220, col:"#0f0f0f",
-    desc:"Unité de combat lourd. Intervient lors des crises majeures en surface.",
-    rules:["Déployé pour les menaces externes","Armement lourd — éviter les dégâts collatéraux","Ne pas intervenir dans les zones d'expérience","Niveau 20 requis"] },
-  // CHERCHEURS
-  { name:"[WL] Directeur des Recherches", cmd:"sci_dir", cat:"Chercheurs", wl:true, max:1, sal:400, col:"#008282",
-    desc:"Gère les budgets de recherche et approuve les tests sur les SCP Keter.",
-    rules:["Approuve toutes les expériences Keter","Gère les affectations des chercheurs","Rédige les rapports pour l'O5","Niveau 30 requis"] },
-  { name:"Chercheur Expérimenté", cmd:"sci_exp", cat:"Chercheurs", wl:false, max:2, sal:200, col:"#008282",
-    desc:"Scientifique de haut niveau. Mène des recherches avancées.",
-    rules:["Peut mener des tests sur les SCP Euclide seul","Doit soumettre ses rapports au Directeur","Peut demander une escorte UT","Niveau 20 requis"] },
-  { name:"Chercheur", cmd:"sci_std", cat:"Chercheurs", wl:false, max:3, sal:150, col:"#008282",
-    desc:"Chercheur de terrain standard. Effectue des tests sur les SCP approuvés.",
-    rules:["Tests limités aux SCP Safe/Euclide approuvés","Doit avoir une escorte UT pour les SCP dangereux","Rédige un rapport après chaque test","Niveau 12 requis"] },
-  { name:"Assistant de Recherche", cmd:"sci_ast", cat:"Chercheurs", wl:false, max:4, sal:120, col:"#008282",
-    desc:"Assiste les chercheurs plus gradés dans leurs expériences.",
-    rules:["Ne peut pas mener d'expériences seul","Assiste et prend des notes","Niveau 5 requis"] },
-  // AUTRES
-  { name:"Médecin Chef", cmd:"med_chef", cat:"Autres", wl:false, max:1, sal:300, col:"#e6e6e6",
-    desc:"Responsable de la Medbay. Coordonne tous les soins médicaux.",
-    rules:["Gère le personnel médical","Peut déclarer un joueur incapacité","Priorité sur les interventions en zone de conflit"] },
-  { name:"Médecin", cmd:"med_chef_site", cat:"Autres", wl:false, max:3, sal:150, col:"#e6e6e6",
-    desc:"Soigne les blessés du site. Disponible en cas d'incident.",
-    rules:["Neutralité obligatoire — soigne tout le monde","Ne peut pas prendre parti dans les conflits","Peut accéder aux zones de combat pour secourir"] },
-  { name:"Ingénieur du Site", cmd:"ingenieur", cat:"Autres", wl:false, max:2, sal:150, col:"#e68200",
-    desc:"Entretient le réacteur et répare les systèmes électriques du site.",
-    rules:["Maintenance du réacteur nucléaire obligatoire","Répond aux pannes signalées","Peut accéder aux zones techniques restreintes"] },
-  { name:"Agent d'Entretien", cmd:"janitor", cat:"Autres", wl:false, max:3, sal:90, col:"#b4b4b4",
-    desc:"Entretient les locaux. Seul personnel autorisé à circuler dans toutes les zones.",
-    rules:["Accès à toutes les zones (sans armement)","Ne doit pas interférer avec les opérations","Signale les anomalies aux autorités compétentes"] },
-  { name:"Cuisinier", cmd:"cook", cat:"Autres", wl:false, max:2, sal:90, col:"#e6b400",
-    desc:"Prépare et distribue les repas au personnel et aux Classe-D.",
-    rules:["Reste en cuisine sauf déplacements autorisés","Ne peut pas accéder aux zones de confinement SCP","RP de distribution de nourriture recommandé"] },
-  // ENNEMIS
-  { name:"[WL] Commandant Chaos", cmd:"ci_com", cat:"Ennemis", wl:true, max:1, sal:300, col:"#005a00",
-    desc:"Dirige les opérations de l'Insurrection du Chaos contre la Fondation.",
-    rules:["Planifie les raids et infiltrations","Ne doit pas attaquer sans stratégie","Les opérations doivent avoir un objectif RP"] },
-  { name:"Insurgeant du Chaos", cmd:"ci_ins", cat:"Ennemis", wl:false, max:6, sal:150, col:"#005a00",
-    desc:"Soldat de l'Insurrection du Chaos. Infiltre ou attaque la Fondation.",
-    rules:["Objectif : exfiltrer des Classe-D ou des SCP","Pas de massacre gratuit — objectifs RP requis","Peut négocier avec d'autres factions ennemies"] },
-  { name:"Main du Serpent", cmd:"sh_agent", cat:"Ennemis", wl:false, max:4, sal:120, col:"#008200",
-    desc:"Agent de la Main du Serpent. Cherche à libérer les SCP.",
-    rules:["Objectif : libérer des SCP de la Fondation","Préfère la discrétion à la confrontation directe","Peut interagir avec les SCP humanoïdes"] },
-  { name:"[WL] Agent GOC", cmd:"goc_agent", cat:"Ennemis", wl:true, max:2, sal:200, col:"#000082",
-    desc:"Coalition Mondiale Occulte. Mission : détruire toutes les anomalies.",
-    rules:["Objectif : neutraliser définitivement les SCP","Peut attaquer la Fondation si elle protège des anomalies","Niveau 25 requis"] },
-  { name:"Agent UIU (FBI)", cmd:"uiu_agent", cat:"Ennemis", wl:false, max:2, sal:150, col:"#282828",
-    desc:"Unité de Renseignement sur l'Inhabituel. Enquête sur le paranormal.",
-    rules:["Enquête sur les activités de la Fondation","Préfère l'infiltration à l'attaque directe","Peut demander des entretiens avec le personnel"] },
-  // CLASSE-D
-  { name:"Classe-D", cmd:"dclass", cat:"Classe-D", wl:false, max:0, sal:30, col:"#f07800",
-    desc:"Prisonnier utilisé comme sujet de test. Dépensable au service de la science.",
-    rules:["Peut tenter de s'évader — mais doit RP la tentative","Doit obéir aux ordres de sécurité ou en subir les conséquences","Peut interagir avec les SCP lors d'expériences","Interdiction de tuer sans raison RP"] },
-  { name:"Classe-D Mule", cmd:"dclass_mule", cat:"Classe-D", wl:false, max:2, sal:40, col:"#f07800",
-    desc:"Classe-D affecté au transport de matériel entre les zones du site.",
-    rules:["Transport de matériel autorisé entre zones","Doit signaler toute anomalie rencontrée","Peut RP une relation de confiance avec le personnel"] },
-  { name:"Classe-D Meneur", cmd:"dclass_rebel", cat:"Classe-D", wl:false, max:2, sal:30, col:"#dc4600",
-    desc:"Chef de rébellion parmi les Classe-D. Organise la résistance.",
-    rules:["Peut organiser des évasions coordonnées","Peut s'allier avec des factions ennemies de la Fondation","Toute action violente doit être justifiée par du RP"] },
+const JOBS=[
+  {name:"[WL] Conseil O5",cmd:"admin_o5",cat:"Administration",wl:true,max:3,sal:1000,col:"#c8141e",
+   desc:"Autorité absolue de la Fondation. Décide du sort du Site-09.",
+   rules:["Peut outrepasser toute décision du Directeur","Ne doit pas se mettre en danger inutilement","Présence rare — décisions stratégiques uniquement","Niveau 50 requis"]},
+  {name:"[WL] Directeur du Site",cmd:"dir_site",cat:"Administration",wl:true,max:1,sal:600,col:"#1d4ed8",
+   desc:"Supervise l'intégralité du personnel et des opérations.",
+   rules:["Gère les autorisations d'expériences Keter","Coordonne UT et FIM lors des brèches","Peut ordonner des lockdowns","Niveau 40 requis"]},
+  {name:"[WL] Comité d'Éthique",cmd:"ethique",cat:"Administration",wl:true,max:2,sal:400,col:"#6b7280",
+   desc:"Garantit le respect des protocoles éthiques dans les expériences.",
+   rules:["Peut stopper toute expérience non conforme","Doit rédiger des rapports d'éthique","Ne participe pas aux opérations militaires","Niveau 30 requis"]},
+  {name:"[WL] Commandant UT",cmd:"ut_com",cat:"Sécurité",wl:true,max:1,sal:300,col:"#1e40af",
+   desc:"Chef suprême de l'Unité Tactique. Autorité absolue sur la sécurité interne.",
+   rules:["Donne les ordres à toute l'UT","Autorise les opérations offensives","Peut déclarer un confinement d'urgence","Niveau 35 requis"]},
+  {name:"[WL] Capitaine UT",cmd:"ut_cap",cat:"Sécurité",wl:true,max:1,sal:250,col:"#1e40af",
+   desc:"Officier supérieur. Commande en l'absence du Commandant.",
+   rules:["Seconde le Commandant","Gère les patrouilles et rotations","Peut utiliser taser et menottes","Niveau 30 requis"]},
+  {name:"[WL] Lieutenant UT",cmd:"ut_ltn",cat:"Sécurité",wl:true,max:2,sal:220,col:"#1e40af",
+   desc:"Officier de terrain. Chef de section.",
+   rules:["Dirige une section de l'UT","Rapporte au Capitaine","Autorise les arrestations de Classe-D","Niveau 25 requis"]},
+  {name:"[WL] Major UT",cmd:"ut_mjr",cat:"Sécurité",wl:true,max:2,sal:200,col:"#1e40af",
+   desc:"Sous-officier supérieur. Forme les nouvelles recrues.",
+   rules:["Forme les nouvelles recrues","Peut porter le taser","Escorte les chercheurs en zone dangereuse","Niveau 20 requis"]},
+  {name:"[WL] Sergent UT",cmd:"ut_sgt",cat:"Sécurité",wl:true,max:3,sal:160,col:"#1e40af",
+   desc:"Chef d'escouade. Mène les patrouilles.",
+   rules:["Mène les patrouilles régulières","Peut menotter les Classe-D","Rapporte au Major ou Lieutenant","Niveau 15 requis"]},
+  {name:"[WL] Caporal-Chef UT",cmd:"ut_cch",cat:"Sécurité",wl:true,max:3,sal:140,col:"#1e40af",
+   desc:"Garde expérimenté. Second d'un chef de section.",
+   rules:["Surveille les zones d'accès restreint","Ne peut pas ordonner d'opérations seul","Niveau 12 requis"]},
+  {name:"[WL] Agent UT",cmd:"ut_agent",cat:"Sécurité",wl:true,max:10,sal:120,col:"#1e40af",
+   desc:"Membre standard. Assure la sécurité du site.",
+   rules:["Patrouille et surveille les zones","Signale toute brèche immédiatement","Obéit à la hiérarchie UT","Niveau 8 requis"]},
+  {name:"Garde Recrue",cmd:"ut_recrue",cat:"Sécurité",wl:false,max:5,sal:100,col:"#1e40af",
+   desc:"Nouvelle recrue en cours de formation.",
+   rules:["Reste avec un agent expérimenté","Ne peut pas intervenir seul sur un SCP","Niveau 3 requis"]},
+  {name:"[WL] Police Militaire",cmd:"ut_pm",cat:"Sécurité",wl:true,max:4,sal:150,col:"#312e81",
+   desc:"Maintient l'ordre interne. Sanctionne le personnel fautif.",
+   rules:["Peut arrêter tout membre du personnel en infraction","Enquête sur les incidents internes","Priorité sur l'UT pour arrestations du personnel","Niveau 10 requis"]},
+  {name:"[WL] DSI",cmd:"dsi_agent",cat:"Sécurité",wl:true,max:2,sal:200,col:"#7f1d1d",
+   desc:"Sécurité Interne. Traque espions et traîtres.",
+   rules:["Peut se déguiser en autre faction","Rapporte directement au Directeur","Opère de façon indépendante","Niveau 25 requis"]},
+  {name:"[WL] Spécialiste Confinement",cmd:"specialisteconf",cat:"Sécurité",wl:true,max:5,sal:220,col:"#1c1c1c",
+   desc:"Expert en recontainment des SCP dangereux.",
+   rules:["Spécialisé dans la neutralisation SCP","Équipement adapté à chaque SCP","Travaille sous les ordres de la FIM E-11","Niveau 20 requis"]},
+  {name:"[WL] FIM Alpha-1",cmd:"fim_a1",cat:"FIM",wl:true,max:3,sal:400,col:"#7f1d1d",
+   desc:"Garde rapprochée du Conseil O5. Unité d'élite absolue.",
+   rules:["Protège les membres O5 en priorité","Ne reçoit d'ordres que de l'O5","Peut agir contre toute menace visant l'O5","Niveau 45 requis"]},
+  {name:"[WL] FIM Epsilon-11 Leader",cmd:"fim_e11_ldr",cat:"FIM",wl:true,max:1,sal:300,col:"#1e3a8a",
+   desc:"Commandant des opérations de reconfinement.",
+   rules:["Commande toutes les opérations E-11","Coordonne avec le Directeur lors des brèches","Peut réquisitionner l'UT pour soutien","Niveau 35 requis"]},
+  {name:"[WL] FIM Epsilon-11",cmd:"fim_e11",cat:"FIM",wl:true,max:6,sal:220,col:"#1e3a8a",
+   desc:"Spécialiste du confinement. Intervient lors des brèches.",
+   rules:["Intervient exclusivement lors de brèches SCP","Coordonne avec l'UT pour le périmètre","Pas d'opérations offensives hors brèche","Niveau 25 requis"]},
+  {name:"[WL] FIM Nu-7 Leader",cmd:"fim_nu7_ldr",cat:"FIM",wl:true,max:1,sal:300,col:"#1c1c1c",
+   desc:"Commandant des assauts lourds en surface.",
+   rules:["Dirige les opérations en surface","Peut ordonner des frappes lourdes","Coordonne contre les forces externes","Niveau 35 requis"]},
+  {name:"[WL] FIM Nu-7",cmd:"fim_nu7",cat:"FIM",wl:true,max:5,sal:220,col:"#1c1c1c",
+   desc:"Combat lourd. Intervient lors des crises majeures.",
+   rules:["Déployé pour les menaces externes","Armement lourd — éviter les dégâts collatéraux","Ne pas intervenir en zone d'expérience","Niveau 20 requis"]},
+  {name:"[WL] Directeur des Recherches",cmd:"sci_dir",cat:"Chercheurs",wl:true,max:1,sal:400,col:"#0f766e",
+   desc:"Gère les budgets et approuve les tests Keter.",
+   rules:["Approuve toutes les expériences Keter","Gère les affectations des chercheurs","Rédige les rapports pour l'O5","Niveau 30 requis"]},
+  {name:"Chercheur Expérimenté",cmd:"sci_exp",cat:"Chercheurs",wl:false,max:2,sal:200,col:"#0f766e",
+   desc:"Scientifique de haut niveau. Recherches avancées.",
+   rules:["Peut mener tests sur SCP Euclide seul","Doit soumettre rapports au Directeur","Peut demander une escorte UT","Niveau 20 requis"]},
+  {name:"Chercheur",cmd:"sci_std",cat:"Chercheurs",wl:false,max:3,sal:150,col:"#0f766e",
+   desc:"Chercheur de terrain. Tests sur SCP approuvés.",
+   rules:["Limité aux SCP Safe/Euclide approuvés","Escorte UT obligatoire pour SCP dangereux","Rapport obligatoire après chaque test","Niveau 12 requis"]},
+  {name:"Assistant de Recherche",cmd:"sci_ast",cat:"Chercheurs",wl:false,max:4,sal:120,col:"#0f766e",
+   desc:"Assiste les chercheurs gradés dans les expériences.",
+   rules:["Ne peut pas mener d'expériences seul","Assiste et prend des notes","Niveau 5 requis"]},
+  {name:"Médecin Chef",cmd:"med_chef",cat:"Autres",wl:false,max:1,sal:300,col:"#d1d5db",
+   desc:"Responsable de la Medbay. Coordonne les soins.",
+   rules:["Gère le personnel médical","Peut déclarer un joueur incapacité","Priorité dans les zones de conflit pour secourir"]},
+  {name:"Médecin",cmd:"med_chef_site",cat:"Autres",wl:false,max:3,sal:150,col:"#d1d5db",
+   desc:"Soigne les blessés du site.",
+   rules:["Neutralité obligatoire — soigne tout le monde","Ne prend pas parti dans les conflits","Peut accéder aux zones de combat pour secourir"]},
+  {name:"Psychologue",cmd:"psychologue",cat:"Autres",wl:false,max:2,sal:180,col:"#38bdf8",
+   desc:"Évalue les SCP humanoïdes et assure le suivi psychologique.",
+   rules:["Peut interviewer les SCP humanoïdes","Assure le suivi du personnel","Ne peut pas accéder aux zones dangereuses sans escorte"]},
+  {name:"Ingénieur",cmd:"ingenieur",cat:"Autres",wl:false,max:2,sal:150,col:"#d97706",
+   desc:"Entretient le réacteur et les systèmes électriques.",
+   rules:["Maintenance du réacteur obligatoire","Répond aux pannes signalées","Accès aux zones techniques restreintes"]},
+  {name:"Agent d'Entretien",cmd:"janitor",cat:"Autres",wl:false,max:3,sal:90,col:"#9ca3af",
+   desc:"Seul personnel autorisé dans toutes les zones.",
+   rules:["Accès à toutes les zones (sans armement)","Ne doit pas interférer avec les opérations","Signale les anomalies aux autorités"]},
+  {name:"Cuisinier",cmd:"cook",cat:"Autres",wl:false,max:2,sal:90,col:"#fbbf24",
+   desc:"Prépare et distribue les repas.",
+   rules:["Reste en cuisine sauf déplacements autorisés","Ne peut pas accéder aux zones SCP","RP de distribution recommandé"]},
+  {name:"[WL] Commandant Chaos",cmd:"ci_com",cat:"Ennemis",wl:true,max:1,sal:300,col:"#15803d",
+   desc:"Dirige les opérations de l'Insurrection du Chaos.",
+   rules:["Planifie raids et infiltrations","Ne doit pas attaquer sans stratégie RP","Objectif : déstabiliser et exfiltrer"]},
+  {name:"Insurgeant du Chaos",cmd:"ci_ins",cat:"Ennemis",wl:false,max:6,sal:150,col:"#15803d",
+   desc:"Soldat de l'IC. Infiltre ou attaque la Fondation.",
+   rules:["Objectif : exfiltrer des Classe-D ou SCP","Pas de massacre gratuit","Peut négocier avec d'autres factions ennemies"]},
+  {name:"Main du Serpent",cmd:"sh_agent",cat:"Ennemis",wl:false,max:4,sal:120,col:"#16a34a",
+   desc:"Cherche à libérer les SCP de la Fondation.",
+   rules:["Objectif : libérer les SCP","Préfère la discrétion à la confrontation","Peut interagir avec les SCP humanoïdes"]},
+  {name:"[WL] Agent GOC",cmd:"goc_agent",cat:"Ennemis",wl:true,max:2,sal:200,col:"#1d4ed8",
+   desc:"Coalition Mondiale Occulte. Détruit les anomalies.",
+   rules:["Objectif : neutraliser définitivement les SCP","Peut attaquer la Fondation si elle protège des anomalies","Niveau 25 requis"]},
+  {name:"Agent UIU",cmd:"uiu_agent",cat:"Ennemis",wl:false,max:2,sal:150,col:"#374151",
+   desc:"FBI — Unité de Renseignement sur l'Inhabituel.",
+   rules:["Enquête sur les activités de la Fondation","Préfère infiltration à l'attaque directe","Peut demander des entretiens avec le personnel"]},
+  {name:"SCP-173",cmd:"scp173",cat:"SCP",wl:false,max:1,sal:0,col:"#991b1b",
+   desc:"La Sculpture.",
+   rules:["Ne peut se déplacer que si personne ne le regarde","Tue instantanément au contact","Doit simuler l'immobilité quand observé"]},
+  {name:"SCP-457",cmd:"scp457",cat:"SCP",wl:false,max:1,sal:0,col:"#c2410c",
+   desc:"L'Entité Enflammée.",
+   rules:["Enflamme tout ce qu'il touche","Gagne de la force en absorbant de la chaleur","Doit se comporter comme une entité de feu instinctive"]},
+  {name:"SCP-049",cmd:"scp049",cat:"SCP",wl:false,max:1,sal:0,col:"#1c1c1c",
+   desc:"Le Docteur de la Peste.",
+   rules:["Peut réanimer les victimes en SCP-049-2","Parle et interagit — RP médical obligatoire","Ne tue que les personnes \"malades\" selon sa vision"]},
+  {name:"SCP-049-2",cmd:"scp0492",cat:"SCP",wl:false,max:5,sal:0,col:"#14532d",
+   desc:"Instance réanimée par SCP-049.",
+   rules:["Obéit à SCP-049","Attaque tout le monde sauf SCP-049","Comportement de zombie instinctif"]},
+  {name:"SCP-106",cmd:"scp106",cat:"SCP",wl:false,max:1,sal:0,col:"#2d1057",
+   desc:"Le Vieil Homme.",
+   rules:["Peut traverser les murs (mécanique dédiée)","Peut emmener des victimes dans sa poche de dimension","Comportement lent, méthodique et sadique"]},
+  {name:"SCP-096",cmd:"scp096",cat:"SCP",wl:false,max:1,sal:0,col:"#f0f0f0",
+   desc:"Le Timide.",
+   rules:["Ne charge que les personnes ayant vu son visage","En position neutre : recroquevillé, passif","Une fois déclenché : poursuite jusqu'à l'élimination de la cible"]},
+  {name:"SCP-079",cmd:"scp079",cat:"SCP",wl:false,max:1,sal:0,col:"#0e7490",
+   desc:"L'Ancienne IA.",
+   rules:["Invisible — contrôle les systèmes du site","Peut ouvrir/fermer les portes (RP progressif)","Ne peut pas aider massivement plusieurs SCP simultanément"]},
+  {name:"SCP-682",cmd:"scp682",cat:"SCP",wl:false,max:1,sal:0,col:"#7f1d1d",
+   desc:"Le Reptile Difficile à Détruire.",
+   rules:["Extrêmement résistant — difficile à tuer","Doit exprimer sa haine de la vie via le RP","Cible en priorité l'UT et les FIM"]},
+  {name:"SCP-939",cmd:"scp939",cat:"SCP",wl:false,max:2,sal:0,col:"#b91c1c",
+   desc:"Les Nombreuses Voix.",
+   rules:["Peut imiter les voix de joueurs entendus","Aveugle — détecte uniquement le bruit et le mouvement","Très dangereux en groupe — RP de meute recommandé"]},
+  {name:"SCP-3199",cmd:"scp3199",cat:"SCP",wl:false,max:2,sal:0,col:"#dc2626",
+   desc:"Les Humains que Dieu a Refusés.",
+   rules:["Comportement agressif et territorial","Peut pondre des oeufs qui éclosent en instances","RP de créature primitive instinctive"]},
+  {name:"SCP-035",cmd:"scp035",cat:"SCP",wl:false,max:1,sal:0,col:"#f0f0f0",
+   desc:"Le Masque Possessif.",
+   rules:["Peut parler et négocier — très manipulateur","Possède le corps de son porteur","Cherche à être libéré par manipulation"]},
+  {name:"SCP-Custom Gardienne",cmd:"scpcgardienne",cat:"SCP",wl:false,max:1,sal:0,col:"#92400e",
+   desc:"SCP Custom — La Gardienne.",
+   rules:["SCP original du serveur","Règles définies par l'équipe de lore","Consulter l'administration pour les détails"]},
+  {name:"Classe-D",cmd:"dclass",cat:"Classe-D",wl:false,max:0,sal:30,col:"#ea580c",
+   desc:"Prisonnier utilisé comme sujet de test.",
+   rules:["Peut tenter de s'évader avec un RP justifié","Doit obéir aux ordres de sécurité ou en subir les conséquences","Peut interagir avec les SCP lors des expériences","Toute violence doit avoir une raison RP"]},
+  {name:"Classe-D Mule",cmd:"dclass_mule",cat:"Classe-D",wl:false,max:2,sal:40,col:"#ea580c",
+   desc:"Affecté au transport de matériel.",
+   rules:["Transport de matériel autorisé entre zones","Doit signaler toute anomalie rencontrée","Peut tisser des liens RP avec le personnel"]},
+  {name:"Classe-D Meneur",cmd:"dclass_rebel",cat:"Classe-D",wl:false,max:2,sal:30,col:"#dc4600",
+   desc:"Chef de rébellion parmi les Classe-D.",
+   rules:["Peut organiser des évasions coordonnées","Peut s'allier avec des factions ennemies","Toute action violente doit être justifiée par du RP"]},
 ];
 
-// ══ DONNÉES COMMANDES ═════════════════════════════════════
-const COMMANDS = {
-  custom: [
-    { cmd:"!admin  /  !staff", desc:"Active ou désactive le mode staff (God, Noclip, Cloak, ESP)", perm:"operator" },
-    { cmd:"!ticket  /  ///", desc:"Ouvre un ticket d'assistance admin", perm:"tous" },
-    { cmd:"!tickets  /  !sonmenu", desc:"Ouvre le menu des tickets en cours", perm:"admin" },
-    { cmd:"!voix  /  !voice", desc:"Affiche qui parle en vocal (indicateur HUD)", perm:"operator" },
-    { cmd:"!xpmenu  /  !xp", desc:"Ouvre le gestionnaire XP des joueurs connectés", perm:"admin" },
-    { cmd:"!resetxpall", desc:"Remet le niveau XP de tous les joueurs connectés à 1", perm:"sadmin" },
-    { cmd:"!panne [type]", desc:"Crée une panne devant le joueur", perm:"admin" },
-    { cmd:"!pannes  /  !panneinfo", desc:"Liste les pannes actives avec informations", perm:"admin" },
-    { cmd:"!pannestop", desc:"Supprime toutes les pannes actives", perm:"admin" },
-    { cmd:"!son <url> [volume]", desc:"Joue un son URL pour tous les joueurs connectés", perm:"operator" },
-    { cmd:"!sonstop", desc:"Stoppe le son en cours", perm:"operator" },
-    { cmd:"!sonvolume <0-2>", desc:"Règle le volume global du son", perm:"operator" },
-    { cmd:"!spectate <nom>", desc:"Spectate un joueur (vue 3e personne, non intrusif)", perm:"operator" },
-  ],
-  ulxPlayers: [
-    { cmd:"ulx goto <joueur>", desc:"Téléporte l'admin sur un joueur", perm:"operator" },
-    { cmd:"ulx bring <joueur>", desc:"Amène un joueur à la position de l'admin", perm:"operator" },
-    { cmd:"ulx return <joueur>", desc:"Renvoie un joueur à sa position précédente", perm:"operator" },
-    { cmd:"ulx spectate <joueur>", desc:"Spectate un joueur (mode ULX)", perm:"operator" },
-    { cmd:"ulx hp <joueur> <valeur>", desc:"Modifie les points de vie d'un joueur", perm:"admin" },
-    { cmd:"ulx armor <joueur> <valeur>", desc:"Modifie l'armure d'un joueur", perm:"admin" },
-    { cmd:"ulx god <joueur>", desc:"Active le mode dieu sur un joueur", perm:"admin" },
-    { cmd:"ulx ungod <joueur>", desc:"Désactive le mode dieu", perm:"admin" },
-    { cmd:"ulx cloak <joueur>", desc:"Rend un joueur invisible", perm:"admin" },
-    { cmd:"ulx uncloak <joueur>", desc:"Rend un joueur visible", perm:"admin" },
-    { cmd:"ulx freeze <joueur>", desc:"Immobilise un joueur", perm:"operator" },
-    { cmd:"ulx unfreeze <joueur>", desc:"Libère un joueur immobilisé", perm:"operator" },
-    { cmd:"ulx ignite <joueur>", desc:"Enflamme un joueur", perm:"admin" },
-    { cmd:"ulx unignite <joueur>", desc:"Éteint un joueur en feu", perm:"operator" },
-    { cmd:"ulx blind <joueur> <0-255>", desc:"Aveugle partiellement un joueur", perm:"admin" },
-    { cmd:"ulx slap <joueur> [dégâts]", desc:"Projette un joueur avec ou sans dégâts", perm:"operator" },
-    { cmd:"ulx slay <joueur>", desc:"Tue instantanément un joueur", perm:"admin" },
-    { cmd:"ulx strip <joueur>", desc:"Retire toutes les armes d'un joueur", perm:"admin" },
-  ],
-  ulxSanctions: [
-    { cmd:"ulx warn <joueur> <raison>", desc:"Avertissement formel enregistré dans les logs", perm:"operator" },
-    { cmd:"ulx kick <joueur> <raison>", desc:"Expulse un joueur du serveur", perm:"operator" },
-    { cmd:"ulx jail <joueur> <durée>", desc:"Emprisonne un joueur en place", perm:"admin" },
-    { cmd:"ulx unjail <joueur>", desc:"Libère un joueur de prison", perm:"admin" },
-    { cmd:"ulx mute <joueur>", desc:"Coupe le micro d'un joueur", perm:"operator" },
-    { cmd:"ulx unmute <joueur>", desc:"Réactive le micro d'un joueur", perm:"operator" },
-    { cmd:"ulx gag <joueur>", desc:"Interdit le chat textuel à un joueur", perm:"operator" },
-    { cmd:"ulx ungag <joueur>", desc:"Réactive le chat textuel", perm:"operator" },
-    { cmd:"ulx ban <joueur> <minutes> <raison>", desc:"Banni temporairement (0 = permanent)", perm:"admin" },
-    { cmd:"ulx unban <SteamID>", desc:"Lève le ban d'un joueur", perm:"sadmin" },
-    { cmd:"ulx banid <SteamID> <minutes> <raison>", desc:"Ban par SteamID (joueur hors ligne)", perm:"admin" },
-  ],
-  ulxMod: [
-    { cmd:"ulx map <carte>", desc:"Change la carte du serveur", perm:"sadmin" },
-    { cmd:"ulx rcon <commande>", desc:"Exécute une commande RCON sur le serveur", perm:"sadmin" },
-    { cmd:"ulx adduser <joueur> <groupe>", desc:"Ajoute un joueur à un groupe (operator/admin/superadmin)", perm:"sadmin" },
-    { cmd:"ulx removeuser <joueur>", desc:"Retire les droits admin d'un joueur", perm:"sadmin" },
-    { cmd:"ulx who <joueur>", desc:"Affiche les informations d'un joueur (SteamID, groupe, etc.)", perm:"operator" },
-    { cmd:"ulx psay <joueur> <message>", desc:"Envoie un message privé admin à un joueur", perm:"operator" },
-    { cmd:"ulx csay <message>", desc:"Affiche un message centré pour tous les joueurs", perm:"admin" },
-    { cmd:"ulx tsay <message>", desc:"Affiche un message en bas de l'écran pour tous", perm:"operator" },
-    { cmd:"ulx ssay <message>", desc:"Message admin affiché à tous sans révéler l'expéditeur", perm:"admin" },
-    { cmd:"ulx noclip <joueur>", desc:"Active/désactive le noclip sur un joueur", perm:"admin" },
-  ],
-  xp: [
-    { cmd:"fc_setlevel [joueur] <niveau>", desc:"Définit le niveau XP d'un joueur (1-50)", perm:"sadmin" },
-    { cmd:"fc_givexp [joueur] <montant>", desc:"Donne des points XP à un joueur", perm:"sadmin" },
-    { cmd:"fc_resetxp [joueur]", desc:"Remet le niveau et l'XP d'un joueur à 1/0", perm:"sadmin" },
-    { cmd:"!xpmenu  /  !xp", desc:"Ouvre le gestionnaire graphique XP", perm:"admin" },
-    { cmd:"!resetxpall", desc:"Reset l'XP et le niveau de TOUS les joueurs connectés", perm:"sadmin" },
-  ],
-  tech: [
-    { cmd:"s09_panne_creer <type> [label]", desc:"Crée une panne devant l'admin (types: electric, gas, reactor, circuit...)", perm:"admin" },
-    { cmd:"s09_panne_aleatoire [nb]", desc:"Crée 1 à 20 pannes aléatoires sur la map", perm:"admin" },
-    { cmd:"s09_panne_liste", desc:"Affiche la liste des pannes actives avec leur position", perm:"operator" },
-    { cmd:"s09_panne_retirer <entIdx>", desc:"Supprime une panne spécifique par son index d'entité", perm:"admin" },
-    { cmd:"s09_panne_retirer_toutes  /  !pannestop", desc:"Supprime toutes les pannes actives", perm:"admin" },
-    { cmd:"s09_panne_tp <entIdx>", desc:"Téléporte l'admin vers une panne spécifique", perm:"admin" },
-    { cmd:"s09_panne_types", desc:"Liste les 12 types de pannes disponibles", perm:"operator" },
-    { cmd:"s09_panne_info", desc:"Statistiques des pannes + top 5 techniciens", perm:"operator" },
-    { cmd:"s09_donner_outils [joueur]", desc:"Donne les 4 outils technicien à un joueur", perm:"admin" },
-    { cmd:"s09_retirer_outils [joueur]", desc:"Retire les outils technicien d'un joueur", perm:"admin" },
-  ],
-  players: [
-    { cmd:"!ticket  /  !tickets  /  ///", desc:"Ouvre un ticket d'assistance. Un admin sera notifié.", perm:"tous" },
-    { cmd:"!voix  /  !voice  /  !vocal", desc:"(Admin) Affiche qui parle en vocal", perm:"operator" },
-    { cmd:"ct_toggle", desc:"(Console) Active/désactive la réception de tickets admin", perm:"operator" },
-    { cmd:"cs_myvolume <0-2>", desc:"Ajuste son propre volume local des sons du serveur", perm:"tous" },
-  ],
-};
-
-// ══ NAVIGATION ════════════════════════════════════════════
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  const labels = { reglement:'RÈGLEMENT GÉNÉRAL', metiers:'MÉTIERS & RÔLES', admin:'COMMANDES ADMIN', sanctions:'SANCTIONS' };
-  document.getElementById('path-label').textContent = labels[name] || name.toUpperCase();
-  if (name === 'metiers') renderJobs('all');
-  if (name === 'admin') renderCommands();
+function goto(id){
+  const el=document.getElementById(id);
+  if(el)el.scrollIntoView({behavior:'smooth'});
+  document.querySelectorAll('.nav-a').forEach(a=>a.classList.remove('on'));
 }
 
-// ══ JOBS ══════════════════════════════════════════════════
-let currentCat = 'all';
-
-function filterCat(cat) {
-  currentCat = cat;
-  // Mise à jour des tabs
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => {
-    if (t.textContent.includes(cat === 'all' ? 'TOUS' : cat.toUpperCase().substr(0,5))) {
-      t.classList.add('active');
-    }
+function filterCat(cat){
+  const list=cat==='all'?JOBS:JOBS.filter(j=>j.cat===cat);
+  document.getElementById('job-count').textContent=list.length+' métier'+(list.length>1?'s':'');
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    b.classList.toggle('on',
+      (cat==='all'&&b.textContent==='TOUS')||
+      b.textContent.includes(cat.toUpperCase().slice(0,5)));
   });
-  renderJobs(cat);
-}
-
-function renderJobs(cat) {
-  const grid = document.getElementById('jobs-grid');
-  const list = cat === 'all' ? JOBS : JOBS.filter(j => j.cat === cat);
-  document.getElementById('job-count-footer').textContent = list.length + ' POSTES AFFICHÉS';
-  grid.innerHTML = list.map(job => `
-    <div class="job-card">
-      <div class="job-card-header">
-        <div class="job-color-bar" style="background:${job.col}"></div>
-        <div>
-          <div class="job-card-title">${job.name}</div>
-          <div class="job-card-cmd">/${job.cmd} — ${job.cat}</div>
+  const grid=document.getElementById('job-grid-container');
+  grid.innerHTML=list.map(j=>`
+    <div class="job">
+      <div class="job-head">
+        <div class="job-stripe" style="background:${j.col}"></div>
+        <div class="job-info">
+          <div class="job-name">${j.name}</div>
+          <div class="job-sub">/${j.cmd} — ${j.cat}</div>
         </div>
-        <div class="job-card-badges">
-          ${job.wl ? '<span class="badge badge-wl">WHITELIST</span>' : ''}
-          <span class="badge badge-max">MAX ${job.max === 0 ? '∞' : job.max}</span>
-          <span class="badge badge-sal">${job.sal}$/min</span>
+        <div class="job-tags">
+          ${j.wl?'<span class="tag tag-wl">WHITELIST</span>':''}
+          <span class="tag tag-max">MAX ${j.max===0?'∞':j.max}</span>
+          <span class="tag tag-sal">${j.sal}$/min</span>
         </div>
       </div>
-      <div class="job-card-body">
-        <div class="job-desc">${job.desc}</div>
-        <ul class="job-rules">${job.rules.map(r => `<li>${r}</li>`).join('')}</ul>
+      <div class="job-body">
+        <div class="job-desc">${j.desc}</div>
+        <ul class="job-rules">${j.rules.map(r=>`<li>${r}</li>`).join('')}</ul>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-// ══ COMMANDES ═════════════════════════════════════════════
-const PERM_LABELS = { tous:'TOUS', operator:'OPERATOR', admin:'ADMIN', sadmin:'SUPERADMIN' };
-const PERM_CLASSES = { tous:'perm-tous', operator:'perm-op', admin:'perm-admin', sadmin:'perm-sadmin' };
-
-function renderCmdList(containerId, list) {
-  const el = document.getElementById(containerId);
-  el.innerHTML = list.map(c => `
-    <div class="cmd-item">
-      <div class="cmd-syntax">${c.cmd}</div>
-      <div class="cmd-desc">${c.desc}</div>
-      <span class="cmd-perm ${PERM_CLASSES[c.perm]}">${PERM_LABELS[c.perm]}</span>
-    </div>
-  `).join('');
-}
-
-function renderCommands() {
-  renderCmdList('cmd-custom',       COMMANDS.custom);
-  renderCmdList('cmd-ulx-players',  COMMANDS.ulxPlayers);
-  renderCmdList('cmd-ulx-sanctions',COMMANDS.ulxSanctions);
-  renderCmdList('cmd-ulx-mod',      COMMANDS.ulxMod);
-  renderCmdList('cmd-xp',           COMMANDS.xp);
-  renderCmdList('cmd-tech',         COMMANDS.tech);
-  renderCmdList('cmd-players',      COMMANDS.players);
-}
-
-// ══ INIT ══════════════════════════════════════════════════
-renderJobs('all');
+filterCat('all');
 </script>
 </body>
 </html>
