@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SITE-09 — Test de Recrutement Staff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red:    #c8141e;
+  --red2:   #ff2d2d;
+  --red-bg: rgba(200,20,30,0.08);
+  --bg:     #04050a;
+  --bg2:    #07080f;
+  --bg3:    #0c0d16;
+  --s1:     #111525;
+  --s2:     #181c2e;
+  --line:   #1e2438;
+  --line2:  #2a3050;
+  --dim:    #3a4060;
+  --muted:  #5a6285;
+  --body:   #8892b0;
+  --hi:     #ccd6f6;
+  --white:  #e8f0ff;
+  --green:  #1a9a50;
+  --green2: #22c55e;
+  --amber:  #f0a020;
+  --cyan:   #0891b2;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{
+  font-family:'Rajdhani',sans-serif;
+  background:var(--bg);
+  color:var(--body);
+  min-height:100vh;
+  overflow-x:hidden;
+  cursor:default;
+  user-select:none;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(200,20,30,.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 80% 80%, rgba(8,145,178,.05) 0%, transparent 60%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── LOCK OVERLAY ── */
+#lock-overlay{
+  position:fixed;inset:0;
+  background:var(--bg);
+  z-index:9999;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:24px;
+  transition:opacity .6s;
+}
+#lock-overlay.hide{opacity:0;pointer-events:none}
+.lock-logo{
+  font-family:'Orbitron',monospace;
+  font-size:13px;font-weight:700;
+  color:var(--red);letter-spacing:6px;
+  animation:flicker 3s infinite;
+}
+@keyframes flicker{0%,98%,100%{opacity:1}99%{opacity:.3}}
+.lock-title{
+  font-family:'Orbitron',monospace;
+  font-size:32px;font-weight:900;
+  color:var(--white);text-align:center;
+  line-height:1.2;
+}
+.lock-title span{color:var(--red)}
+.lock-sub{
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;color:var(--muted);
+  letter-spacing:2px;text-align:center;
+  max-width:480px;line-height:1.8;
+}
+.lock-warn{
+  padding:14px 28px;
+  border:1px solid rgba(200,20,30,.3);
+  background:rgba(200,20,30,.06);
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;color:var(--red);
+  letter-spacing:1px;text-align:center;
+  max-width:500px;line-height:1.7;
+}
+.start-btn{
+  margin-top:8px;
+  padding:14px 48px;
+  background:transparent;
+  border:2px solid var(--red);
+  color:var(--white);
+  font-family:'Orbitron',monospace;
+  font-size:13px;font-weight:700;
+  letter-spacing:3px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  transition:all .3s;
+}
+.start-btn::before{
+  content:'';position:absolute;inset:0;
+  background:var(--red);
+  transform:translateX(-100%);
+  transition:transform .3s;
+  z-index:-1;
+}
+.start-btn:hover::before{transform:translateX(0)}
+.start-btn:hover{color:var(--white);border-color:var(--red2)}
+
+/* ── BLUR OVERLAY quand focus perdu ── */
+#focus-lost{
+  display:none;
+  position:fixed;inset:0;z-index:8000;
+  background:rgba(4,5,10,.95);
+  backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;
+  flex-direction:column;gap:20px;
+  text-align:center;
+}
+#focus-lost.show{display:flex}
+.focus-icon{font-size:60px;animation:shake .4s infinite}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.focus-title{
+  font-family:'Orbitron',monospace;font-size:22px;
+  font-weight:900;color:var(--red2);
+}
+.focus-sub{
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;color:var(--muted);
+  letter-spacing:1.5px;max-width:400px;line-height:1.8;
+}
+.focus-count{
+  font-family:'Orbitron',monospace;font-size:32px;
+  font-weight:900;color:var(--amber);
+}
+.focus-resume{
+  padding:10px 32px;
+  border:1px solid var(--amber);
+  background:transparent;
+  color:var(--amber);
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;letter-spacing:2px;
+  cursor:pointer;transition:all .2s;
+}
+.focus-resume:hover{background:rgba(240,160,32,.1)}
+
+/* ── HEADER ── */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(4,5,10,.96);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line2);
+  padding:12px 40px;
+  display:flex;align-items:center;gap:16px;
+}
+.header-logo{
+  font-family:'Orbitron',monospace;
+  font-size:11px;font-weight:700;
+  color:var(--red);letter-spacing:4px;
+}
+.header-title{
+  font-family:'Rajdhani',sans-serif;
+  font-size:15px;font-weight:600;
+  color:var(--hi);
+}
+.header-right{
+  margin-left:auto;display:flex;align-items:center;gap:20px;
+}
+.timer-display{
+  font-family:'Share Tech Mono',monospace;
+  font-size:13px;color:var(--amber);
+  display:flex;align-items:center;gap:6px;
+}
+.timer-display::before{
+  content:'';width:7px;height:7px;
+  border-radius:50%;background:var(--amber);
+  animation:pulse 1s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.progress-wrap{
+  display:flex;align-items:center;gap:8px;
+}
+.progress-bar-outer{
+  width:140px;height:6px;
+  background:var(--line2);border-radius:3px;overflow:hidden;
+}
+.progress-bar-inner{
+  height:100%;background:var(--red);
+  border-radius:3px;transition:width .5s ease;
+}
+.progress-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;color:var(--muted);
+}
+
+/* ── MAIN ── */
+.main{
+  max-width:820px;margin:0 auto;
+  padding:40px 24px 80px;
+  position:relative;z-index:1;
+}
+
+/* ── INTRO CARD ── */
+.intro-card{
+  border:1px solid var(--line2);
+  background:var(--bg2);
+  padding:36px 40px;
+  margin-bottom:40px;
+  position:relative;overflow:hidden;
+}
+.intro-card::before{
+  content:'S-09';
+  position:absolute;right:-10px;top:-30px;
+  font-family:'Orbitron',monospace;
+  font-size:110px;font-weight:900;
+  color:rgba(200,20,30,.03);
+  pointer-events:none;line-height:1;
+}
+.intro-kicker{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;color:var(--red);
+  letter-spacing:4px;margin-bottom:12px;
+}
+.intro-card h1{
+  font-family:'Orbitron',monospace;
+  font-size:24px;font-weight:900;
+  color:var(--white);line-height:1.2;
+  margin-bottom:14px;
+}
+.intro-card h1 span{color:var(--red)}
+.intro-card p{
+  font-size:14px;color:var(--body);
+  line-height:1.7;margin-bottom:10px;
+}
+.intro-rules{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  margin-top:18px;
+}
+.intro-rule{
+  display:flex;align-items:flex-start;gap:8px;
+  font-size:12.5px;color:var(--body);
+  padding:8px 12px;
+  background:var(--bg3);
+  border:1px solid var(--line);
+  border-left:3px solid var(--red);
+  line-height:1.4;
+}
+.intro-rule .r-icon{flex-shrink:0;font-size:14px;line-height:1.3}
+
+/* ── SECTION ── */
+.section{margin-bottom:12px}
+.section-head{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 20px;
+  background:var(--bg3);
+  border:1px solid var(--line2);
+  border-left:3px solid var(--red);
+  cursor:pointer;
+  transition:background .15s;
+}
+.section-head:hover{background:var(--s1)}
+.section-head.done{border-left-color:var(--green)}
+.section-head.done .s-icon{color:var(--green)}
+.section-num{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;color:var(--muted);
+  min-width:24px;
+}
+.section-title{
+  font-family:'Orbitron',monospace;
+  font-size:12px;font-weight:700;
+  color:var(--hi);letter-spacing:1px;
+  flex:1;
+}
+.s-icon{color:var(--red);font-size:13px;transition:.2s}
+.s-badge{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;padding:2px 8px;
+  background:var(--line);color:var(--muted);
+}
+.section-body{
+  background:var(--bg2);
+  border:1px solid var(--line2);
+  border-top:none;
+  padding:24px;
+  display:none;
+}
+.section-body.open{display:block}
+
+/* ── QUESTIONS ── */
+.question{margin-bottom:28px}
+.question:last-child{margin-bottom:0}
+.q-header{
+  display:flex;align-items:flex-start;gap:10px;
+  margin-bottom:12px;
+}
+.q-num{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:var(--muted);
+  background:var(--s2);
+  padding:3px 7px;margin-top:2px;
+  flex-shrink:0;
+}
+.q-text{
+  font-size:14px;font-weight:600;
+  color:var(--hi);line-height:1.5;
+  flex:1;
+}
+.q-tag{
+  font-family:'Share Tech Mono',monospace;
+  font-size:8px;padding:2px 7px;
+  flex-shrink:0;margin-top:3px;
+}
+.tag-qcm   {background:rgba(8,145,178,.15);color:var(--cyan);border:1px solid rgba(8,145,178,.2)}
+.tag-multi {background:rgba(240,160,32,.1);color:var(--amber);border:1px solid rgba(240,160,32,.2)}
+.tag-text  {background:rgba(200,20,30,.1);color:var(--red);border:1px solid rgba(200,20,30,.2)}
+.tag-vrai  {background:rgba(26,154,80,.1);color:var(--green2);border:1px solid rgba(26,154,80,.2)}
+
+/* Options */
+.options{display:flex;flex-direction:column;gap:7px}
+.option{
+  display:flex;align-items:flex-start;gap:11px;
+  padding:10px 14px;
+  background:var(--bg3);
+  border:1px solid var(--line);
+  cursor:pointer;
+  transition:all .15s;
+  position:relative;
+}
+.option:hover{border-color:var(--line2);background:var(--s1)}
+.option.selected{
+  border-color:rgba(200,20,30,.5);
+  background:rgba(200,20,30,.07);
+}
+.option.selected .opt-box{
+  background:var(--red);border-color:var(--red);
+}
+.option.correct{
+  border-color:rgba(34,197,94,.5)!important;
+  background:rgba(34,197,94,.06)!important;
+}
+.option.wrong{
+  border-color:rgba(239,68,68,.5)!important;
+  background:rgba(239,68,68,.06)!important;
+}
+.option.reveal-correct{
+  border-color:rgba(34,197,94,.3)!important;
+}
+.opt-box{
+  width:16px;height:16px;
+  border:2px solid var(--dim);
+  flex-shrink:0;margin-top:1px;
+  transition:all .15s;
+}
+.opt-box.round{border-radius:50%}
+.opt-label{
+  font-size:13px;color:var(--body);
+  line-height:1.4;flex:1;
+}
+.option.selected .opt-label{color:var(--hi)}
+
+/* Textarea */
+.q-textarea{
+  width:100%;min-height:90px;
+  background:var(--bg3);
+  border:1px solid var(--line2);
+  color:var(--hi);
+  font-family:'Rajdhani',sans-serif;
+  font-size:13px;
+  padding:12px 14px;
+  resize:vertical;
+  outline:none;
+  transition:border-color .2s;
+}
+.q-textarea:focus{border-color:rgba(200,20,30,.4)}
+.q-textarea::placeholder{color:var(--dim)}
+.char-count{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:var(--dim);
+  text-align:right;margin-top:4px;
+}
+
+/* Feedback */
+.q-feedback{
+  display:none;margin-top:10px;
+  padding:10px 14px;
+  font-size:12.5px;line-height:1.5;
+}
+.q-feedback.show{display:block}
+.q-feedback.ok{
+  background:rgba(34,197,94,.06);
+  border-left:3px solid var(--green2);
+  color:var(--green2);
+}
+.q-feedback.bad{
+  background:rgba(239,68,68,.06);
+  border-left:3px solid #ef4444;
+  color:#f87171;
+}
+
+/* Nav buttons */
+.nav-btns{
+  display:flex;gap:10px;justify-content:flex-end;
+  margin-top:24px;padding-top:18px;
+  border-top:1px solid var(--line);
+}
+.btn{
+  padding:10px 28px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;letter-spacing:2px;
+  cursor:pointer;border:1px solid;
+  transition:all .2s;background:transparent;
+}
+.btn-prev{border-color:var(--line2);color:var(--muted)}
+.btn-prev:hover{border-color:var(--dim);color:var(--body)}
+.btn-next{border-color:var(--red);color:var(--red)}
+.btn-next:hover{background:rgba(200,20,30,.12);color:var(--white)}
+.btn-submit{border-color:var(--green);color:var(--green)}
+.btn-submit:hover{background:rgba(26,154,80,.12);color:var(--white)}
+
+/* ── RESULTS ── */
+#results-screen{display:none;animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.result-hero{
+  text-align:center;padding:56px 40px;
+  background:var(--bg2);
+  border:1px solid var(--line2);
+  margin-bottom:28px;
+  position:relative;overflow:hidden;
+}
+.result-score-big{
+  font-family:'Orbitron',monospace;
+  font-size:80px;font-weight:900;
+  line-height:1;margin-bottom:8px;
+}
+.result-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;letter-spacing:3px;
+  margin-bottom:24px;
+}
+.result-verdict{
+  font-family:'Orbitron',monospace;
+  font-size:18px;font-weight:700;
+  padding:12px 36px;
+  display:inline-block;
+}
+.verdict-pass{
+  color:var(--green2);
+  border:2px solid var(--green2);
+  background:rgba(34,197,94,.06);
+}
+.verdict-fail{
+  color:var(--red2);
+  border:2px solid var(--red2);
+  background:rgba(200,20,30,.08);
+}
+.result-details{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  margin-bottom:28px;
+}
+.result-stat{
+  background:var(--bg2);border:1px solid var(--line2);
+  padding:20px;text-align:center;
+}
+.stat-num{
+  font-family:'Orbitron',monospace;
+  font-size:30px;font-weight:900;color:var(--hi);
+}
+.stat-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:var(--muted);
+  letter-spacing:2px;margin-top:4px;
+}
+.answer-review{
+  background:var(--bg2);border:1px solid var(--line2);padding:28px;
+}
+.answer-review h3{
+  font-family:'Orbitron',monospace;font-size:12px;
+  color:var(--hi);letter-spacing:2px;
+  margin-bottom:20px;padding-bottom:10px;
+  border-bottom:1px solid var(--line);
+}
+.review-item{
+  padding:12px 0;border-bottom:1px solid var(--line);
+}
+.review-item:last-child{border:none}
+.review-q{font-size:13px;font-weight:600;color:var(--hi);margin-bottom:6px}
+.review-a{font-size:12px;padding:4px 10px;display:inline-block}
+.review-a.ok{color:var(--green2);background:rgba(34,197,94,.07);border-left:2px solid var(--green2)}
+.review-a.bad{color:#f87171;background:rgba(239,68,68,.07);border-left:2px solid #ef4444}
+.review-correct{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* Misc */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--line2)}
+::-webkit-scrollbar-thumb:hover{background:var(--red)}
+</style>
+</head>
+<body>
+
+<!-- ════ OVERLAY DÉMARRAGE ════ -->
+<div id="lock-overlay">
+  <div class="lock-logo">SCP FOUNDATION // SITE-09</div>
+  <div class="lock-title">Test de Recrutement<br><span>Candidat Staff</span></div>
+  <div class="lock-sub">
+    Ce test évalue vos connaissances du règlement et des anomalies présentes sur le Site-09.<br>
+    Une fois commencé, <strong style="color:var(--hi)">vous ne pourrez pas quitter cette page</strong>.<br>
+    Toute tentative de changement de fenêtre sera enregistrée.
+  </div>
+  <div class="lock-warn">
+    ⚠ AVERTISSEMENT — Ce test surveille les changements de focus.<br>
+    Chaque sortie de la page est comptabilisée et visible dans vos résultats.<br>
+    Un nombre excessif de sorties peut invalider votre candidature.
+  </div>
+  <button class="start-btn" onclick="startTest()">COMMENCER LE TEST</button>
+</div>
+
+<!-- ════ OVERLAY FOCUS PERDU ════ -->
+<div id="focus-lost">
+  <div class="focus-icon">👁</div>
+  <div class="focus-title">VOUS AVEZ QUITTÉ LA PAGE</div>
+  <div class="focus-count" id="focus-count">0</div>
+  <div class="focus-sub">
+    TENTATIVES DE SORTIE DÉTECTÉES<br>
+    Cet incident est enregistré dans votre dossier de candidature.
+  </div>
+  <button class="focus-resume" onclick="resumeTest()">REPRENDRE LE TEST</button>
+</div>
+
+<!-- ════ HEADER ════ -->
+<div class="header" id="main-header" style="display:none">
+  <div class="header-logo">SITE·09</div>
+  <div class="header-title">Test Recrutement Staff — Candidature en cours</div>
+  <div class="header-right">
+    <div class="timer-display" id="timer-display">00:00</div>
+    <div class="progress-wrap">
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="progress-bar" style="width:0%"></div>
+      </div>
+      <div class="progress-label" id="progress-label">0 / 0</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MAIN ════ -->
+<div class="main" id="main-content" style="display:none">
+
+  <div class="intro-card">
+    <div class="intro-kicker">// DOSSIER DE CANDIDATURE — PERSONNEL D'ENCADREMENT</div>
+    <h1>Test de <span>Connaissances</span><br>Staff Site-09</h1>
+    <p>Ce test comporte <strong style="color:var(--hi)">30 questions</strong> réparties en 5 sections. Il évalue vos connaissances du règlement, des protocoles de gestion, des anomalies du site et votre capacité de jugement en situation de staff.</p>
+    <p style="color:var(--muted)">Score minimum requis pour valider la candidature : <strong style="color:var(--amber)">75%</strong>. Les réponses aux questions libres sont transmises à l'administration pour évaluation manuelle.</p>
+    <div class="intro-rules">
+      <div class="intro-rule"><span class="r-icon">⏱</span>Pas de limite de temps — prenez le temps de bien réfléchir.</div>
+      <div class="intro-rule"><span class="r-icon">👁</span>Les sorties de page sont enregistrées et visibles.</div>
+      <div class="intro-rule"><span class="r-icon">📋</span>Répondez à toutes les questions avant de soumettre.</div>
+      <div class="intro-rule"><span class="r-icon">🔒</span>Navigation arrière bloquée — aucun retour possible.</div>
+    </div>
+  </div>
+
+  <!-- SECTIONS GÉNÉRÉES EN JS -->
+  <div id="sections-container"></div>
+
+  <!-- RÉSULTATS -->
+  <div id="results-screen"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// DONNÉES — QUESTIONS
+// ════════════════════════════════════════════════════════════
+const SECTIONS = [
+  {
+    id: "s1",
+    title: "RÈGLEMENT GÉNÉRAL",
+    questions: [
+      {
+        type: "qcm",
+        text: "Qu'est-ce que le RDM (Random DeathMatch) ?",
+        options: [
+          "Tuer un joueur dans le cadre d'un RP justifié",
+          "Tuer un joueur sans raison RP valable",
+          "Mourir de façon aléatoire à cause d'un bug",
+          "Un mode de jeu spécial autorisant les kills"
+        ],
+        correct: [1],
+        feedback: "Le RDM consiste à tuer un joueur sans justification RP. C'est une infraction grave sanctionnée par un avertissement puis un ban."
+      },
+      {
+        type: "qcm",
+        text: "Qu'est-ce que la NLR (New Life Rule) ?",
+        options: [
+          "Interdit de revenir à sa base après un respawn",
+          "Oblige à changer de job après chaque mort",
+          "Après une mort, vous ne vous souvenez plus des événements qui l'ont causée et ne pouvez pas y retourner immédiatement",
+          "Règle interdisant de jouer le même personnage deux fois"
+        ],
+        correct: [2],
+        feedback: "La NLR signifie qu'après votre mort, vous incarnez un nouveau personnage. Vous ne vous souvenez plus de votre mort et ne pouvez pas retourner sur les lieux immédiatement."
+      },
+      {
+        type: "vrai_faux",
+        text: "Un joueur peut être excusé de ne pas connaître le règlement s'il joue pour la première fois.",
+        options: ["VRAI", "FAUX"],
+        correct: [1],
+        feedback: "FAUX. La connexion au serveur vaut acceptation du règlement. L'ignorance des règles n'est jamais une excuse valable."
+      },
+      {
+        type: "multi",
+        text: "Parmi les infractions suivantes, lesquelles entraînent un BAN PERMANENT immédiat ? (plusieurs réponses)",
+        options: [
+          "Triche (cheat/hack)",
+          "RDM d'un seul joueur",
+          "Publicité pour un serveur concurrent",
+          "FailRP léger",
+          "Discrimination"
+        ],
+        correct: [0, 2],
+        feedback: "La triche et la publicité entraînent un ban permanent immédiat. La discrimination peut mener à un ban permanent mais après récidive."
+      },
+      {
+        type: "qcm",
+        text: "Qu'est-ce que le MetaGame ?",
+        options: [
+          "Jouer à plusieurs jeux en même temps",
+          "Utiliser des informations OOC (hors-RP) pour prendre des décisions RP",
+          "Exploiter les bugs du jeu à son avantage",
+          "Discuter de stratégie dans le chat d'équipe"
+        ],
+        correct: [1],
+        feedback: "Le MetaGame consiste à utiliser des informations obtenues hors du RP (par exemple via Discord, le chat OOC) pour influencer des décisions in-game. C'est interdit."
+      },
+      {
+        type: "qcm",
+        text: "Un joueur vous insulte en vocal. Quelle est la procédure correcte en tant que staff ?",
+        options: [
+          "L'insulter en retour pour lui montrer l'exemple",
+          "Le tuer immédiatement avec ulx slay",
+          "Écouter, récupérer des preuves, appliquer le barème de sanctions (warn → mute → kick → ban)",
+          "Ignorer et continuer à jouer"
+        ],
+        correct: [2],
+        feedback: "En tant que staff, vous devez suivre le barème de sanctions progressives. Les preuves sont importantes pour justifier toute sanction."
+      }
+    ]
+  },
+  {
+    id: "s2",
+    title: "GESTION STAFF & COMMANDES",
+    questions: [
+      {
+        type: "qcm",
+        text: "Un joueur vous rapporte un RDM via !ticket. Quelle est la première chose que vous faites ?",
+        options: [
+          "Bannir immédiatement le suspect",
+          "Ignorer le ticket si vous êtes occupé",
+          "Aller voir le ticket, téléporter les parties impliquées, écouter les deux côtés avant de statuer",
+          "Demander au plaignant de régler le problème lui-même"
+        ],
+        correct: [2],
+        feedback: "La procédure correcte : accuser réception du ticket, écouter toutes les parties, vérifier les logs si possible, puis appliquer la sanction appropriée."
+      },
+      {
+        type: "qcm",
+        text: "Quelle commande ULX utilisez-vous pour envoyer un message visible uniquement par un joueur ?",
+        options: ["ulx csay", "ulx ssay", "ulx psay", "ulx tsay"],
+        correct: [2],
+        feedback: "ulx psay envoie un message privé à un joueur. csay = centré pour tous, tsay = bas d'écran pour tous, ssay = tous mais anonyme."
+      },
+      {
+        type: "qcm",
+        text: "Quelle est la différence entre ulx mute et ulx gag ?",
+        options: [
+          "Aucune différence, les deux font la même chose",
+          "mute coupe le vocal, gag coupe le chat textuel",
+          "mute coupe le chat textuel, gag coupe le vocal",
+          "mute est temporaire, gag est permanent"
+        ],
+        correct: [1],
+        feedback: "ulx mute coupe le microphone vocal. ulx gag coupe le chat textuel. Les deux peuvent être utilisés séparément."
+      },
+      {
+        type: "text",
+        text: "Un joueur a 3 warns et continue de faire du RDM. Décrivez en détail la procédure que vous appliquez et justifiez-la.",
+        placeholder: "Décrivez votre procédure complète...",
+        minLength: 80
+      },
+      {
+        type: "qcm",
+        text: "Vous suspectez un joueur de tricher (speedhack). Que faites-vous ?",
+        options: [
+          "Le bannir immédiatement sans preuve",
+          "L'observer en mode spectate sans l'informer, noter les preuves, consulter les logs, puis agir avec preuves",
+          "Lui demander directement s'il triche",
+          "Attendre qu'il tue 10 personnes pour être sûr"
+        ],
+        correct: [1],
+        feedback: "Il faut observer discrètement, accumuler des preuves solides avant d'agir. Un ban pour triche sans preuve est une faute grave de votre part."
+      },
+      {
+        type: "vrai_faux",
+        text: "Un admin peut utiliser ses commandes pour aider sa faction en jeu (se donner de l'armure, téléporter ses alliés en combat, etc.).",
+        options: ["VRAI — c'est un avantage du grade staff", "FAUX — abus de commandes, sanction immédiate"],
+        correct: [1],
+        feedback: "FAUX. L'abus de commandes admin à des fins personnelles ou pour avantager sa faction est une faute grave entraînant le retrait des droits et un ban."
+      }
+    ]
+  },
+  {
+    id: "s3",
+    title: "ANOMALIES SCP — CONNAISSANCES",
+    questions: [
+      {
+        type: "qcm",
+        text: "SCP-173 est immobile tant que :",
+        options: [
+          "Il fait nuit dans le site",
+          "Les lumières sont allumées",
+          "Au moins un joueur maintient un contact visuel direct avec lui",
+          "Il est dans sa cellule de confinement"
+        ],
+        correct: [2],
+        feedback: "SCP-173 (La Sculpture) se déplace uniquement lorsqu'il n'est pas observé. Un contact visuel constant l'immobilise complètement."
+      },
+      {
+        type: "qcm",
+        text: "Quelle est la classe de confinement de SCP-096 (Le Timide) ?",
+        options: ["Safe", "Keter", "Euclide", "Thaumiel"],
+        correct: [2],
+        feedback: "SCP-096 est classé Euclide. Il est relativement stable à l'état passif mais devient extrêmement dangereux si son visage est vu."
+      },
+      {
+        type: "multi",
+        text: "Quelles affirmations concernant SCP-049 (Le Médecin de la Peste) sont correctes ? (plusieurs réponses)",
+        options: [
+          "Il peut parler et tient des conversations",
+          "Il est aveugle et se déplace au son",
+          "Il peut réanimer ses victimes en SCP-049-2",
+          "Il est classé Safe",
+          "Son toucher tue instantanément ses victimes"
+        ],
+        correct: [0, 2, 4],
+        feedback: "SCP-049 peut parler et interagir, il tue au toucher et réanime ses victimes en SCP-049-2. Il est classé Euclide, pas Safe."
+      },
+      {
+        type: "qcm",
+        text: "SCP-106 (Le Vieil Homme) a la capacité de :",
+        options: [
+          "Lancer des projectiles à distance",
+          "Traverser les murs et entraîner ses victimes dans une poche de dimension",
+          "Contrôler les systèmes électroniques du site",
+          "Posséder le corps d'autres joueurs"
+        ],
+        correct: [1],
+        feedback: "SCP-106 peut traverser les surfaces solides et emmener ses victimes dans sa Poche de dimension. Il est extrêmement dangereux et lent."
+      },
+      {
+        type: "qcm",
+        text: "SCP-079 est décrit comme :",
+        options: [
+          "Un insecte géant capable de voler",
+          "Une ancienne IA confinée dans des systèmes informatiques, capable de contrôler les infrastructures",
+          "Un miroir qui tue quiconque se regarde dedans",
+          "Un humain ayant des capacités cognitives anormales"
+        ],
+        correct: [1],
+        feedback: "SCP-079 est une ancienne IA stockée dans du matériel informatique. Il peut contrôler les portes, caméras et systèmes du site à des fins stratégiques."
+      },
+      {
+        type: "vrai_faux",
+        text: "SCP-682 (Le Reptile Difficile à Détruire) peut être neutralisé définitivement par une exposition à SCP-173.",
+        options: ["VRAI", "FAUX — SCP-682 s'adapte et survit à toutes les tentatives de neutralisation"],
+        correct: [1],
+        feedback: "FAUX. SCP-682 est connu pour s'adapter à toutes les tentatives de neutralisation, y compris les expositions à d'autres SCP. Il ne peut pas être détruit."
+      }
+    ]
+  },
+  {
+    id: "s4",
+    title: "PROTOCOLES & SITUATIONS",
+    questions: [
+      {
+        type: "qcm",
+        text: "Une brèche de SCP-096 est déclarée. Quelle est la priorité absolue de l'UT ?",
+        options: [
+          "Tuer SCP-096 le plus vite possible avec toutes les armes disponibles",
+          "S'assurer qu'aucun joueur ne voit le visage de SCP-096, encercler et attendre les FIM E-11",
+          "Évacuer le site et laisser SCP-096 se calmer seul",
+          "Appeler les Classe-D pour servir d'appâts"
+        ],
+        correct: [1],
+        feedback: "L'UT doit créer un périmètre en s'assurant que personne ne voit le visage de SCP-096. Les FIM E-11 prennent en charge le reconfinement."
+      },
+      {
+        type: "qcm",
+        text: "L'Insurrection du Chaos infiltre le site. Quelle est leur condition d'action RP obligatoire ?",
+        options: [
+          "Tuer tous les membres de la Fondation qu'ils croisent",
+          "Avoir un objectif RP précis (exfiltration de Classe-D, récupération de données, etc.) — pas de massacre gratuit",
+          "Attendre l'autorisation de l'O5 pour entrer",
+          "Ne jamais s'allier avec d'autres factions"
+        ],
+        correct: [1],
+        feedback: "L'IC doit avoir des objectifs RP définis. Les massacres sans but RP sont du RDM et sont sanctionnés comme tels même pour les factions ennemies."
+      },
+      {
+        type: "text",
+        text: "Un Classe-D vous rapporte avoir été torturé de façon prolongée par un chercheur sans aucune expérience en cours. Décrivez votre réaction en tant que staff et la procédure.",
+        placeholder: "Décrivez votre procédure en détail...",
+        minLength: 100
+      },
+      {
+        type: "qcm",
+        text: "Pendant une expérience, un chercheur tue le Classe-D dès son entrée sans interaction RP. C'est :",
+        options: [
+          "Autorisé si le chercheur a un grade suffisant",
+          "Du FailRP — une expérience requiert un minimum de RP avec le sujet",
+          "Normal si l'expérience porte sur la résistance aux dégâts",
+          "Acceptable si le Classe-D a consenti"
+        ],
+        correct: [1],
+        feedback: "Tuer un Classe-D sans aucun RP est du FailRP. Les expériences doivent inclure une interaction minimale (annonce de l'expérience, protocole, etc.)."
+      },
+      {
+        type: "multi",
+        text: "Quels rôles peuvent légitimement arrêter un membre du personnel de la Fondation en infraction ? (plusieurs réponses)",
+        options: [
+          "Garde Recrue UT",
+          "Police Militaire (PM)",
+          "DSI (Sécurité Interne)",
+          "Chercheur standard",
+          "Directeur du Site"
+        ],
+        correct: [1, 2, 4],
+        feedback: "La PM a autorité sur le personnel interne. La DSI opère indépendamment. Le Directeur a l'autorité absolue. L'UT gère les Classe-D et menaces externes."
+      },
+      {
+        type: "qcm",
+        text: "Un joueur se déconnecte juste avant de recevoir une sanction (pour éviter le ban). Que faites-vous ?",
+        options: [
+          "Rien, il a réussi à éviter la sanction",
+          "Utiliser ulx banid avec son SteamID pour le bannir hors ligne",
+          "Attendre qu'il se reconnecte",
+          "Bannir aléatoirement quelqu'un pour compenser"
+        ],
+        correct: [1],
+        feedback: "ulx banid permet de bannir un joueur hors ligne via son SteamID. La déconnexion pour éviter une sanction aggrave son cas."
+      }
+    ]
+  },
+  {
+    id: "s5",
+    title: "JUGEMENT & CAS PRATIQUES",
+    questions: [
+      {
+        type: "text",
+        text: "Deux membres de votre équipe staff ont un conflit et vous demandent d'arbitrer. L'un est votre ami. Comment gérez-vous la situation ?",
+        placeholder: "Expliquez votre approche...",
+        minLength: 80
+      },
+      {
+        type: "qcm",
+        text: "Vous observez un admin utiliser ulx god sur lui-même pour jouer normalement sans mourir. C'est :",
+        options: [
+          "Normal si cet admin a le rang suffisant",
+          "Un abus de commande — le god mode ne doit pas être utilisé pendant le jeu actif sauf en mode staff",
+          "Autorisé le week-end uniquement",
+          "Acceptable si l'admin le fait rarement"
+        ],
+        correct: [1],
+        feedback: "Utiliser ses commandes pour avantager son gameplay personnel est un abus. Ces commandes existent uniquement pour la gestion du serveur."
+      },
+      {
+        type: "qcm",
+        text: "Un joueur accuse un autre de l'avoir tué en RDM mais les logs montrent que la victime avait attaqué en premier. Que décidez-vous ?",
+        options: [
+          "Sanctionner quand même le supposé attaquant car quelqu'un s'est plaint",
+          "Classer l'affaire sans suite et expliquer au plaignant que le kill était justifié en RP (légitime défense)",
+          "Bannir les deux pour éviter les problèmes",
+          "Ignorer les logs et croire la victime"
+        ],
+        correct: [1],
+        feedback: "Les logs sont vos preuves. Si les faits montrent que le kill était justifié (légitime défense RP), il faut l'expliquer au plaignant avec pédagogie."
+      },
+      {
+        type: "vrai_faux",
+        text: "Un staff peut refuser de traiter un ticket s'il est impliqué directement dans la situation signalée.",
+        options: ["VRAI — c'est même obligatoire pour éviter les conflits d'intérêt", "FAUX — il doit toujours tout traiter"],
+        correct: [0],
+        feedback: "VRAI. En cas de conflit d'intérêt direct (vous êtes impliqué), un autre staff doit traiter le ticket. L'impartialité est fondamentale."
+      },
+      {
+        type: "text",
+        text: "Rédigez en quelques lignes pourquoi vous souhaitez devenir staff sur le Site-09, et ce que vous pensez apporter à l'équipe.",
+        placeholder: "Votre motivation...",
+        minLength: 60
+      },
+      {
+        type: "qcm",
+        text: "Quel est l'objectif principal d'un staff sur un serveur DarkRP SCP ?",
+        options: [
+          "Avoir accès à des commandes et abuser de son pouvoir",
+          "Jouer en priorité et gérer les tickets en second plan",
+          "Assurer une expérience RP équitable, fluide et immersive pour tous les joueurs, en appliquant les règles avec impartialité",
+          "Se faire obéir par les joueurs"
+        ],
+        correct: [2],
+        feedback: "Le rôle de staff est un service rendu à la communauté. L'objectif est de maintenir un environnement sain et RP pour tous les joueurs."
+      }
+    ]
+  }
+];
+
+// ════════════════════════════════════════════════════════════
+// ÉTAT
+// ════════════════════════════════════════════════════════════
+let testStarted  = false;
+let startTime    = 0;
+let timerInt     = null;
+let focusLost    = 0;
+let answers      = {};  // {qId: value}
+let submitted    = false;
+
+// ── Anti-sortie de page ──────────────────────────────────────
+document.addEventListener('visibilitychange', () => {
+  if (!testStarted || submitted) return;
+  if (document.hidden) onFocusLost();
+});
+
+window.addEventListener('blur', () => {
+  if (!testStarted || submitted) return;
+  onFocusLost();
+});
+
+window.addEventListener('beforeunload', (e) => {
+  if (!testStarted || submitted) return;
+  e.preventDefault();
+  e.returnValue = '';
+});
+
+// Désactive le clic droit
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+// Bloque F5, Ctrl+R, etc.
+document.addEventListener('keydown', (e) => {
+  if (!testStarted) return;
+  if (e.key === 'F5' || (e.ctrlKey && e.key === 'r') ||
+      (e.ctrlKey && e.key === 'w') || e.key === 'F11') {
+    e.preventDefault();
+  }
+});
+
+function onFocusLost() {
+  focusLost++;
+  document.getElementById('focus-count').textContent = focusLost;
+  document.getElementById('focus-lost').classList.add('show');
+}
+
+function resumeTest() {
+  document.getElementById('focus-lost').classList.remove('show');
+}
+
+// ════════════════════════════════════════════════════════════
+// DÉMARRAGE
+// ════════════════════════════════════════════════════════════
+function startTest() {
+  testStarted = true;
+  startTime   = Date.now();
+
+  document.getElementById('lock-overlay').classList.add('hide');
+  setTimeout(() => {
+    document.getElementById('lock-overlay').style.display = 'none';
+    document.getElementById('main-header').style.display = 'flex';
+    document.getElementById('main-content').style.display = 'block';
+  }, 650);
+
+  buildSections();
+  updateProgress();
+  startTimer();
+
+  // Plein écran (tentative)
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// TIMER
+// ════════════════════════════════════════════════════════════
+function startTimer() {
+  timerInt = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    const s = String(elapsed % 60).padStart(2, '0');
+    document.getElementById('timer-display').textContent = m + ':' + s;
+  }, 1000);
+}
+
+// ════════════════════════════════════════════════════════════
+// BUILD
+// ════════════════════════════════════════════════════════════
+function buildSections() {
+  const container = document.getElementById('sections-container');
+  let totalQ = 0;
+  SECTIONS.forEach(s => totalQ += s.questions.length);
+  document.getElementById('progress-label').textContent = '0 / ' + totalQ;
+
+  SECTIONS.forEach((sec, si) => {
+    const div = document.createElement('div');
+    div.className = 'section';
+    div.id = 'sec-' + sec.id;
+
+    const head = document.createElement('div');
+    head.className = 'section-head';
+    head.innerHTML = `
+      <span class="section-num">0${si+1}</span>
+      <span class="section-title">${sec.title}</span>
+      <span class="s-badge">${sec.questions.length} QUESTIONS</span>
+      <span class="s-icon" id="icon-${sec.id}">›</span>
+    `;
+    head.onclick = () => toggleSection(sec.id);
+
+    const body = document.createElement('div');
+    body.className = 'section-body' + (si === 0 ? ' open' : '');
+    body.id = 'body-' + sec.id;
+
+    sec.questions.forEach((q, qi) => {
+      const qId = sec.id + '_q' + qi;
+      body.appendChild(buildQuestion(q, qId, qi + 1));
+    });
+
+    div.appendChild(head);
+    div.appendChild(body);
+    container.appendChild(div);
+  });
+
+  // Bouton submit en bas
+  const submitDiv = document.createElement('div');
+  submitDiv.style.cssText = 'text-align:center;margin-top:32px;padding:24px;background:var(--bg2);border:1px solid var(--line2)';
+  submitDiv.innerHTML = `
+    <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:16px">
+      TOUTES LES SECTIONS COMPLÉTÉES ? SOUMETTEZ VOTRE TEST.
+    </div>
+    <button class="btn btn-submit" onclick="submitTest()">SOUMETTRE LE TEST →</button>
+  `;
+  container.appendChild(submitDiv);
+}
+
+function buildQuestion(q, qId, num) {
+  const div = document.createElement('div');
+  div.className = 'question';
+  div.id = 'q-' + qId;
+
+  const tagMap = { qcm:'QCM', multi:'MULTI', text:'LIBRE', vrai_faux:'VRAI/FAUX' };
+  const tagClass = { qcm:'tag-qcm', multi:'tag-multi', text:'tag-text', vrai_faux:'tag-vrai' };
+
+  div.innerHTML = `
+    <div class="q-header">
+      <span class="q-num">Q.${String(num).padStart(2,'0')}</span>
+      <span class="q-text">${q.text}</span>
+      <span class="q-tag ${tagClass[q.type]}">${tagMap[q.type]}</span>
+    </div>
+  `;
+
+  const body = document.createElement('div');
+
+  if (q.type === 'text') {
+    const ta = document.createElement('textarea');
+    ta.className = 'q-textarea';
+    ta.placeholder = q.placeholder || 'Votre réponse...';
+    ta.id = 'ta-' + qId;
+    const cc = document.createElement('div');
+    cc.className = 'char-count';
+    cc.id = 'cc-' + qId;
+    cc.textContent = '0 / ' + (q.minLength || 50) + ' caractères minimum';
+    ta.oninput = () => {
+      const v = ta.value.trim();
+      answers[qId] = v;
+      cc.textContent = v.length + ' / ' + (q.minLength || 50) + ' caractères minimum';
+      cc.style.color = v.length >= (q.minLength || 50) ? 'var(--green2)' : 'var(--dim)';
+      updateProgress();
+    };
+    body.appendChild(ta);
+    body.appendChild(cc);
+  } else {
+    const opts = document.createElement('div');
+    opts.className = 'options';
+    q.options.forEach((opt, oi) => {
+      const o = document.createElement('div');
+      o.className = 'option';
+      o.id = 'opt-' + qId + '-' + oi;
+      const isRound = q.type === 'qcm' || q.type === 'vrai_faux';
+      o.innerHTML = `
+        <div class="opt-box ${isRound ? 'round' : ''}" id="box-${qId}-${oi}"></div>
+        <span class="opt-label">${opt}</span>
+      `;
+      o.onclick = () => selectOption(q, qId, oi);
+      opts.appendChild(o);
+    });
+    body.appendChild(opts);
+  }
+
+  // Feedback
+  const fb = document.createElement('div');
+  fb.className = 'q-feedback';
+  fb.id = 'fb-' + qId;
+  if (q.feedback) fb.textContent = q.feedback;
+  body.appendChild(fb);
+
+  div.appendChild(body);
+  return div;
+}
+
+function selectOption(q, qId, idx) {
+  if (submitted) return;
+
+  if (q.type === 'qcm' || q.type === 'vrai_faux') {
+    // Radio — désélectionne tout
+    q.options.forEach((_, i) => {
+      const o = document.getElementById('opt-' + qId + '-' + i);
+      const b = document.getElementById('box-' + qId + '-' + i);
+      if (o) { o.classList.remove('selected'); b.style.background = ''; b.style.borderColor = ''; }
+    });
+    const o = document.getElementById('opt-' + qId + '-' + idx);
+    const b = document.getElementById('box-' + qId + '-' + idx);
+    o.classList.add('selected');
+    b.style.background = 'var(--red)';
+    b.style.borderColor = 'var(--red)';
+    answers[qId] = [idx];
+  } else {
+    // Checkbox
+    const current = answers[qId] || [];
+    const pos = current.indexOf(idx);
+    if (pos === -1) current.push(idx);
+    else current.splice(pos, 1);
+    answers[qId] = current;
+    // Refresh visuel
+    q.options.forEach((_, i) => {
+      const o = document.getElementById('opt-' + qId + '-' + i);
+      const b = document.getElementById('box-' + qId + '-' + i);
+      if (!o) return;
+      const sel = current.includes(i);
+      o.classList.toggle('selected', sel);
+      b.style.background = sel ? 'var(--red)' : '';
+      b.style.borderColor = sel ? 'var(--red)' : '';
+    });
+  }
+  updateProgress();
+}
+
+function toggleSection(id) {
+  const body = document.getElementById('body-' + id);
+  const icon = document.getElementById('icon-' + id);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  icon.textContent = isOpen ? '›' : '‹';
+}
+
+// ════════════════════════════════════════════════════════════
+// PROGRESSION
+// ════════════════════════════════════════════════════════════
+function updateProgress() {
+  let total = 0, done = 0;
+  SECTIONS.forEach(s => {
+    s.questions.forEach((q, qi) => {
+      total++;
+      const qId = s.id + '_q' + qi;
+      const ans = answers[qId];
+      if (q.type === 'text') {
+        if (ans && ans.length >= (q.minLength || 50)) done++;
+      } else {
+        if (ans && ans.length > 0) done++;
+      }
+    });
+  });
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = done + ' / ' + total;
+}
+
+// ════════════════════════════════════════════════════════════
+// SOUMISSION
+// ════════════════════════════════════════════════════════════
+function submitTest() {
+  // Vérifie questions obligatoires non répondues
+  let missing = 0;
+  SECTIONS.forEach(s => {
+    s.questions.forEach((q, qi) => {
+      const qId = s.id + '_q' + qi;
+      const ans = answers[qId];
+      if (q.type === 'text') {
+        if (!ans || ans.length < (q.minLength || 50)) missing++;
+      } else {
+        if (!ans || ans.length === 0) missing++;
+      }
+    });
+  });
+
+  if (missing > 0) {
+    if (!confirm(`⚠ ${missing} question(s) sans réponse.\nVoulez-vous quand même soumettre ?`)) return;
+  }
+
+  submitted = true;
+  clearInterval(timerInt);
+
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+
+  // Calcul score (questions auto-évaluables)
+  let autoTotal = 0, autoCorrect = 0;
+  const reviewItems = [];
+
+  SECTIONS.forEach(s => {
+    s.questions.forEach((q, qi) => {
+      const qId = s.id + '_q' + qi;
+      const ans = answers[qId] || [];
+
+      if (q.type === 'text') {
+        reviewItems.push({ q: q.text, a: ans || '', type: 'text' });
+        return;
+      }
+
+      autoTotal++;
+      const userSet = [...ans].sort().join(',');
+      const corrSet = [...q.correct].sort().join(',');
+      const isRight = userSet === corrSet;
+      if (isRight) autoCorrect++;
+
+      // Marque les options
+      q.options.forEach((_, oi) => {
+        const el = document.getElementById('opt-' + qId + '-' + oi);
+        if (!el) return;
+        el.onclick = null;
+        const inCorrect = q.correct.includes(oi);
+        const inUser    = ans.includes(oi);
+        if (inCorrect) el.classList.add('reveal-correct', 'correct');
+        else if (inUser && !inCorrect) el.classList.add('wrong');
+      });
+
+      // Affiche feedback
+      const fb = document.getElementById('fb-' + qId);
+      if (fb && q.feedback) {
+        fb.classList.add('show', isRight ? 'ok' : 'bad');
+      }
+
+      // Section marker
+      const head = document.querySelector('#sec-' + s.id + ' .section-head');
+      if (head && !head.classList.contains('done')) {
+        const allRight = s.questions.filter(qq => qq.type !== 'text').every((qq, qqi) => {
+          const qid2 = s.id + '_q' + s.questions.indexOf(qq);
+          const a2 = answers[qid2] || [];
+          return [...a2].sort().join(',') === [...qq.correct].sort().join(',');
+        });
+      }
+
+      reviewItems.push({
+        q: q.text,
+        a: ans.map(i => q.options[i]).join(', '),
+        correct: q.correct.map(i => q.options[i]).join(', '),
+        ok: isRight,
+        type: 'auto'
+      });
+    });
+  });
+
+  const pct = autoTotal > 0 ? Math.round(autoCorrect / autoTotal * 100) : 0;
+  const pass = pct >= 75;
+
+  // Cache les sections
+  document.getElementById('sections-container').style.display = 'none';
+
+  // Affiche résultats
+  showResults(pct, pass, autoCorrect, autoTotal, elapsed, reviewItems);
+}
+
+function showResults(pct, pass, correct, total, elapsed, items) {
+  const m = String(Math.floor(elapsed / 60)).padStart(2,'0');
+  const s = String(elapsed % 60).padStart(2,'0');
+
+  const screen = document.getElementById('results-screen');
+  screen.style.display = 'block';
+
+  const col = pass ? 'var(--green2)' : 'var(--red2)';
+
+  let reviewHtml = '';
+  items.forEach(it => {
+    if (it.type === 'text') {
+      reviewHtml += `
+        <div class="review-item">
+          <div class="review-q">${it.q}</div>
+          <div class="review-a" style="color:var(--cyan);background:rgba(8,145,178,.07);border-left:2px solid var(--cyan)">
+            ${it.a || '<em style="color:var(--dim)">Non répondu</em>'}
+          </div>
+          <div class="review-correct" style="color:var(--muted);font-style:italic">→ Évaluation manuelle requise par l'administration</div>
+        </div>`;
+    } else {
+      reviewHtml += `
+        <div class="review-item">
+          <div class="review-q">${it.q}</div>
+          <div class="review-a ${it.ok ? 'ok' : 'bad'}">${it.a || 'Non répondu'}</div>
+          ${!it.ok ? `<div class="review-correct">Réponse correcte : ${it.correct}</div>` : ''}
+        </div>`;
+    }
+  });
+
+  screen.innerHTML = `
+    <div class="result-hero">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:4px;margin-bottom:16px">// RÉSULTATS DU TEST</div>
+      <div class="result-score-big" style="color:${col}">${pct}<span style="font-size:40px">%</span></div>
+      <div class="result-label" style="color:var(--muted)">${correct} / ${total} QUESTIONS AUTOMATIQUES CORRECTES</div>
+      <div class="result-verdict ${pass ? 'verdict-pass' : 'verdict-fail'}">
+        ${pass ? '✔  SEUIL VALIDÉ — CANDIDATURE RETENUE' : '✕  SEUIL NON ATTEINT — CANDIDATURE REFUSÉE'}
+      </div>
+      ${focusLost > 0 ? `<div style="margin-top:12px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--amber)">⚠ ${focusLost} sortie(s) de page détectée(s)</div>` : ''}
+    </div>
+
+    <div class="result-details">
+      <div class="result-stat">
+        <div class="stat-num" style="color:${col}">${pct}%</div>
+        <div class="stat-label">SCORE AUTO</div>
+      </div>
+      <div class="result-stat">
+        <div class="stat-num">${m}:${s}</div>
+        <div class="stat-label">DURÉE</div>
+      </div>
+      <div class="result-stat">
+        <div class="stat-num" style="color:${focusLost > 2 ? 'var(--red2)' : 'var(--amber)'}">${focusLost}</div>
+        <div class="stat-label">SORTIES PAGE</div>
+      </div>
+    </div>
+
+    <div class="answer-review">
+      <h3>DÉTAIL DES RÉPONSES</h3>
+      ${reviewHtml}
+    </div>
+
+    <div style="text-align:center;padding:28px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;border:1px solid var(--line2);background:var(--bg2);margin-top:14px">
+      ${pass
+        ? 'VOTRE CANDIDATURE EST VALIDÉE SUR LA PARTIE AUTOMATIQUE.<br>L\'ADMINISTRATION ÉVALUERA LES RÉPONSES LIBRES MANUELLEMENT.<br>CONTACTEZ UN ADMINISTRATEUR SUR LE DISCORD.'
+        : 'LE SEUIL MINIMUM DE 75% N\'A PAS ÉTÉ ATTEINT.<br>VOUS POUVEZ REPRENDRE LE TEST APRÈS UNE PÉRIODE D\'ATTENTE.<br>RELISEZ ATTENTIVEMENT LE RÈGLEMENT ET LES ENTRÉES SCP.'}
+    </div>
+  `;
+
+  screen.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
