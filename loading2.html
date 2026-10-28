@@ -3,175 +3,206 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#080a0e">
-<title>Nova Rising — DarkRP</title>
+<title>Nova Rising — Chargement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #080a0e;
-    --panel: #0e1118;
-    --text: #f4f5f7;
-    --muted: #858b98;
-    --red: #e52b3c;
-    --red-soft: rgba(229, 43, 60, .16);
-    --line: rgba(255,255,255,.09);
-  }
-  * { box-sizing: border-box; }
-  html, body { width: 100%; height: 100%; margin: 0; }
-  body {
-    overflow: hidden;
-    color: var(--text);
-    background:
-      radial-gradient(ellipse at 50% 44%, rgba(31, 39, 54, .38) 0%, transparent 48%),
-      radial-gradient(ellipse at 82% 16%, rgba(229, 43, 60, .075) 0%, transparent 28%),
-      var(--bg);
-    font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-  /* Décor intégralement dessiné en CSS : aucune image de fond, aucune dépendance. */
-  body::before {
-    content: ""; position: fixed; inset: 0; pointer-events: none;
-    background-image: linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: radial-gradient(ellipse at center, black 8%, transparent 78%);
-    opacity: .42;
-  }
-  body::after {
-    content: ""; position: fixed; left: 50%; top: 50%; width: min(68vw, 760px); aspect-ratio: 1;
-    transform: translate(-50%, -50%); border: 1px solid rgba(255,255,255,.035); border-radius: 50%;
-    box-shadow: 0 0 0 72px rgba(255,255,255,.012), 0 0 0 144px rgba(255,255,255,.009);
-    pointer-events: none;
-  }
-  .screen { position: relative; z-index: 1; width: 100%; height: 100%; min-height: 430px; display: flex; flex-direction: column; padding: clamp(22px, 4vw, 54px); }
-  .topbar, .footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
-  .brand-mini { display: flex; align-items: center; gap: 12px; }
-  .mark { width: 39px; height: 39px; display: grid; place-items: center; border: 1px solid rgba(229,43,60,.65); color: #fff; font-size: 12px; font-weight: 800; letter-spacing: -.06em; position: relative; }
-  .mark::after { content: ""; position: absolute; width: 5px; height: 5px; right: -3px; bottom: -3px; background: var(--red); box-shadow: 0 0 16px var(--red); }
-  .mini-name { font-size: 12px; letter-spacing: .19em; font-weight: 750; text-transform: uppercase; }
-  .mini-sub { margin-top: 4px; font-size: 9px; letter-spacing: .28em; color: var(--muted); text-transform: uppercase; }
-  .server-tag { color: #a4a9b3; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; text-align: right; }
-  .server-tag span { display: block; margin-top: 6px; color: #5e6470; font-size: 9px; letter-spacing: .2em; }
-  main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 35px 0; }
-  .hero { width: min(690px, 100%); text-align: center; transform: translateY(-1.5%); animation: reveal .9s cubic-bezier(.2,.7,.2,1) both; }
-  .eyebrow { display: inline-flex; align-items: center; gap: 10px; color: #a0a5af; font-size: 10px; font-weight: 650; letter-spacing: .3em; text-transform: uppercase; }
-  .eyebrow::before, .eyebrow::after { content: ""; width: 24px; height: 1px; background: var(--red); opacity: .8; }
-  h1 { margin: 22px 0 0; font-size: clamp(39px, 7.1vw, 82px); font-weight: 280; letter-spacing: .13em; line-height: 1.04; text-transform: uppercase; }
-  h1 .accent { color: var(--red); font-weight: 650; }
-  .subtitle { margin-top: 17px; color: #9ca2ad; font-size: clamp(10px, 1.4vw, 12px); letter-spacing: .34em; text-transform: uppercase; }
-  .separator { width: 42px; height: 2px; background: var(--red); margin: 28px auto 31px; box-shadow: 0 0 18px rgba(229,43,60,.4); }
-  .loading { width: min(430px, 100%); margin: 0 auto; text-align: left; }
-  .loading-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
-  .loading-label { color: #dfe1e6; font-size: 10px; font-weight: 650; letter-spacing: .19em; text-transform: uppercase; }
-  .percent { color: #fff; font-variant-numeric: tabular-nums; font-size: 11px; letter-spacing: .12em; }
-  .track { height: 3px; width: 100%; background: rgba(255,255,255,.11); overflow: hidden; }
-  .fill { width: 0%; height: 100%; background: linear-gradient(90deg, #b91e2e, var(--red)); box-shadow: 0 0 14px rgba(229,43,60,.65); transition: width .42s ease; position: relative; }
-  .fill::after { content: ""; position: absolute; right: 0; top: -3px; width: 22px; height: 9px; background: rgba(255,255,255,.55); filter: blur(7px); }
-  .status { min-height: 17px; margin-top: 12px; color: #747b88; font-size: 10px; letter-spacing: .04em; }
-  .status::before { content: ""; display: inline-block; width: 5px; height: 5px; margin: 0 9px 1px 0; border-radius: 50%; background: var(--red); box-shadow: 0 0 9px var(--red); animation: pulse 1.8s ease-in-out infinite; }
-  .footer { padding-top: 22px; border-top: 1px solid var(--line); }
-  .discord { color: #e7e8eb; font-size: 11px; letter-spacing: .12em; text-decoration: none; }
-  .discord b { color: var(--red); font-weight: 700; }
-  .footer-note { color: #626875; font-size: 9px; letter-spacing: .18em; text-transform: uppercase; text-align: right; }
-  .footer-note::before { content: ""; display: inline-block; vertical-align: middle; width: 5px; height: 5px; margin-right: 9px; background: #49b783; border-radius: 50%; box-shadow: 0 0 8px rgba(73,183,131,.5); }
-  @keyframes pulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
-  @keyframes reveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(-1.5%); } }
-  @media (max-width: 560px) {
-    .screen { padding: 20px; }
-    .server-tag { font-size: 8px; letter-spacing: .12em; }
-    .server-tag span { font-size: 8px; }
-    h1 { letter-spacing: .075em; }
-    .subtitle { letter-spacing: .18em; }
-    .footer-note { max-width: 130px; line-height: 1.7; }
-  }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+/* Écran de chargement Nova Rising — style « NOVA cartoon premium » (le même que les addons du serveur).
+   Volontairement simple : pas de variables CSS ni de JavaScript moderne, pour marcher aussi sur les anciens
+   navigateurs intégrés de Garry's Mod. Toutes les images sont dans le dossier assets/. */
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+body {
+  background: #2a1e6e url("assets/fond.png") center bottom / cover no-repeat;
+  color: #ffffff;
+  font-family: "Nunito", "Segoe UI", Arial, sans-serif;
+  font-weight: 800;
+}
+/* la ville respire doucement */
+.city { position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: url("assets/fond.png") center bottom / cover no-repeat;
+  -webkit-animation: respire 24s ease-in-out infinite; animation: respire 24s ease-in-out infinite; }
+@-webkit-keyframes respire { 0%,100% { -webkit-transform: scale(1); } 50% { -webkit-transform: scale(1.04); } }
+@keyframes respire { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+
+/* nuages, voitures et pigeons : de vraies images qui bougent */
+.nuage { z-index: 2; position: fixed; width: 300px; -webkit-animation: vent linear infinite; animation: vent linear infinite; }
+.n1 { top: 2%; -webkit-animation-duration: 70s; animation-duration: 70s; }
+.n2 { top: 40%; width: 210px; -webkit-animation-duration: 95s; animation-duration: 95s; -webkit-animation-delay: -40s; animation-delay: -40s; }
+.n3 { top: 47%; width: 170px; -webkit-animation-duration: 120s; animation-duration: 120s; -webkit-animation-delay: -80s; animation-delay: -80s; }
+@-webkit-keyframes vent { from { left: -340px; } to { left: 105%; } }
+@keyframes vent { from { left: -340px; } to { left: 105%; } }
+.voiture { z-index: 3; position: fixed; width: 150px; bottom: 9.5%; -webkit-animation: rouler linear infinite; animation: rouler linear infinite; }
+.v1 { -webkit-animation-duration: 14s; animation-duration: 14s; }
+.v2 { bottom: 4%; width: 170px; -webkit-transform: scaleX(-1); transform: scaleX(-1); -webkit-animation-name: rouler2; animation-name: rouler2; -webkit-animation-duration: 18s; animation-duration: 18s; -webkit-animation-delay: -6s; animation-delay: -6s; }
+@-webkit-keyframes rouler { from { left: -200px; } to { left: 105%; } }
+@keyframes rouler { from { left: -200px; } to { left: 105%; } }
+@-webkit-keyframes rouler2 { from { left: 105%; } to { left: -200px; } }
+@keyframes rouler2 { from { left: 105%; } to { left: -200px; } }
+.pigeon { z-index: 2; position: fixed; width: 64px; top: 42%; -webkit-animation: voler 26s linear infinite; animation: voler 26s linear infinite; }
+.p2 { top: 45%; width: 48px; -webkit-animation-delay: -9s; animation-delay: -9s; }
+@-webkit-keyframes voler { 0% { left: 105%; margin-top: 0; } 25% { margin-top: -30px; } 50% { margin-top: 10px; } 75% { margin-top: -20px; } 100% { left: -100px; margin-top: 0; } }
+@keyframes voler { 0% { left: 105%; margin-top: 0; } 25% { margin-top: -30px; } 50% { margin-top: 10px; } 75% { margin-top: -20px; } 100% { left: -100px; margin-top: 0; } }
+
+/* en-tête : logo et étiquette du serveur */
+.top { position: fixed; left: 36px; top: 30px; right: 36px; z-index: 5; }
+.marque { float: left; }
+.marque img { width: 74px; height: 74px; float: left; -webkit-animation: tangue 3s ease-in-out infinite; animation: tangue 3s ease-in-out infinite; }
+@-webkit-keyframes tangue { 0%,100% { -webkit-transform: rotate(-6deg); } 50% { -webkit-transform: rotate(6deg); } }
+@keyframes tangue { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+.marque .nom { float: left; margin: 8px 0 0 14px; }
+.marque .nom b { display: block; font-family: "Lilita One", "Arial Black", "Nunito", Arial, sans-serif; font-weight: 400; font-size: 30px; letter-spacing: 1px; text-shadow: 3px 4px 0 #241640; }
+.marque .nom span { display: block; font-size: 14px; color: #FFE68C; text-shadow: 2px 2px 0 #241640; }
+.etiquette { float: right; background: #FFC83C; color: #241640; padding: 10px 22px; border-radius: 24px; font-size: 15px; box-shadow: 4px 6px 0 #8A5A08; }
+
+/* le titre */
+.titre { position: fixed; left: 0; right: 0; top: 17%; text-align: center; z-index: 5; }
+.titre h1 { margin: 0; font-family: "Lilita One", "Arial Black", "Nunito", Arial, sans-serif; font-weight: 400; font-size: 96px; line-height: 1; letter-spacing: 2px;
+  color: #ffffff; text-shadow: 6px 8px 0 #241640; -webkit-animation: rebond 2.6s ease-in-out infinite; animation: rebond 2.6s ease-in-out infinite; }
+.titre h1 span { color: #FFC83C; }
+.titre p { margin: 14px 0 0; font-size: 22px; color: #ffffff; text-shadow: 3px 3px 0 #241640; }
+@-webkit-keyframes rebond { 0%,100% { -webkit-transform: translateY(0); } 50% { -webkit-transform: translateY(-8px); } }
+@keyframes rebond { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+/* en bas au milieu : l'astuce du moment, puis la carte de chargement */
+.bas { position: fixed; left: 50%; bottom: 22%; width: 640px; margin-left: -320px; z-index: 5; }
+.astuce { position: relative; background: #ffffff; color: #241640; border-radius: 24px; padding: 18px 22px 18px 96px; min-height: 92px;
+  box-shadow: 5px 7px 0 #7A4AB4; margin-bottom: 22px; -webkit-transition: opacity .35s, -webkit-transform .35s; transition: opacity .35s, transform .35s; }
+.astuce.cache { opacity: 0; -webkit-transform: translateY(10px); transform: translateY(10px); }
+.astuce img { position: absolute; left: 18px; top: 50%; width: 62px; height: 62px; margin-top: -31px; }
+.astuce small { display: block; font-size: 13px; color: #C8467A; letter-spacing: 1px; }
+.astuce div { font-size: 18px; line-height: 1.3; margin-top: 3px; }
+.carte { background: #2E2A6E; border-radius: 26px; padding: 20px 24px 22px; box-shadow: 6px 8px 0 #FFC83C; }
+.ligne { overflow: hidden; margin-bottom: 12px; }
+.ligne .etat { float: left; font-size: 16px; max-width: 470px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ligne .pc { float: right; font-family: "Lilita One", "Arial Black", "Nunito", Arial, sans-serif; font-weight: 400; font-size: 26px; color: #FFC83C; }
+.rail { height: 22px; background: #4A3C96; border-radius: 12px; overflow: hidden; }
+.plein { height: 100%; width: 0%; background: #46DCA0; border-radius: 12px; -webkit-transition: width .5s ease; transition: width .5s ease; }
+.infos { margin-top: 14px; overflow: hidden; }
+.pastille { float: left; margin-right: 10px; background: #4A3C96; color: #ffffff; font-size: 14px; padding: 7px 16px; border-radius: 18px; }
+.pastille.or { background: #FFC83C; color: #241640; }
+.discord { z-index: 5; position: fixed; left: 50%; bottom: 3.5%; width: 340px; margin-left: -170px; text-align: center; background: #5865F2; color: #ffffff;
+  padding: 12px 18px; border-radius: 24px; font-size: 16px; box-shadow: 4px 6px 0 #2E3699; }
+
+/* petits écrans */
+@media (max-width: 760px) {
+  .titre h1 { font-size: 58px; } .titre p { font-size: 16px; }
+  .bas { width: 92%; margin-left: -46%; bottom: 20%; } .etiquette { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .city, .nuage, .voiture, .pigeon, .titre h1, .marque img { -webkit-animation: none; animation: none; } }
 </style>
 </head>
 <body>
-<div class="screen">
-  <header class="topbar">
-    <div class="brand-mini">
-      <div class="mark" aria-hidden="true">CR</div>
-      <div><div class="mini-name">Nova Rising</div><div class="mini-sub">Roleplay experience</div></div>
-    </div>
-    <div class="server-tag">Garry's Mod <span>DarkRP · Connexion sécurisée</span></div>
-  </header>
+<div class="city"></div>
+<img class="nuage n1" src="assets/nuage.png" alt="">
+<img class="nuage n2" src="assets/nuage.png" alt="">
+<img class="nuage n3" src="assets/nuage.png" alt="">
+<img class="pigeon" src="assets/pigeon.png" alt="">
+<img class="pigeon p2" src="assets/pigeon.png" alt="">
+<img class="voiture v1" src="assets/voiture.png" alt="">
+<img class="voiture v2" src="assets/voiture.png" alt="">
 
-  <main>
-    <section class="hero" aria-label="Chargement du serveur">
-      <div class="eyebrow">Bienvenue sur le serveur</div>
-      <h1>Nova <span class="accent">Rising</span></h1>
-      <div class="subtitle">Une ville. Des histoires. Votre rôle.</div>
-      <div class="separator"></div>
-      <div class="loading">
-        <div class="loading-head"><span class="loading-label">Connexion en cours</span><span class="percent" id="percent">0%</span></div>
-        <div class="track" role="progressbar" aria-label="Progression du chargement" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressbar"><div class="fill" id="fill"></div></div>
-        <div class="status" id="status">Préparation de votre arrivée...</div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="discord">DISCORD <b>·</b> discord.gg/razJsGPPp</div>
-    <div class="footer-note">Préparation de la session</div>
-  </footer>
+<div class="top">
+  <div class="marque"><img src="assets/logo.png" alt=""><div class="nom"><b>Nova Rising</b><span>Roleplay français</span></div></div>
+  <div class="etiquette">Garry's Mod · DarkRP</div>
 </div>
+
+<div class="titre">
+  <h1>Nova <span>Rising</span></h1>
+  <p>Une ville. Des histoires. Ton rôle.</p>
+</div>
+
+<div class="bas">
+  <div class="astuce" id="astuce"><img id="astuce-img" src="assets/parler.png" alt=""><small>LE SAVAIS-TU ?</small><div id="astuce-txt">Ici, on parle avant de tirer : maintiens G en regardant quelqu'un.</div></div>
+  <div class="carte">
+    <div class="ligne"><span class="etat" id="etat">Préparation de ton arrivée…</span><span class="pc" id="pc">0 %</span></div>
+    <div class="rail"><div class="plein" id="plein"></div></div>
+    <div class="infos"><span class="pastille or" id="carte">Ville de Nova</span><span class="pastille" id="fichiers">Connexion…</span></div>
+  </div>
+</div>
+
+<div class="discord">Discord · discord.gg/razJsGPPp</div>
+
 <script>
-(() => {
-  const fill = document.getElementById('fill');
-  const percent = document.getElementById('percent');
-  const status = document.getElementById('status');
-  const bar = document.getElementById('progressbar');
-  let total = 0, needed = 0, current = 0, gotRealProgress = false;
-  let previewTimer = null;
+/* Les fonctions appelées par Garry's Mod pendant le chargement (JavaScript « à l'ancienne », compatible partout). */
+(function () {
+  var plein = document.getElementById("plein"), pc = document.getElementById("pc"), etat = document.getElementById("etat");
+  var carte = document.getElementById("carte"), fichiers = document.getElementById("fichiers");
+  var total = 0, restants = 0, actuel = 0, vrai = false;
 
-  function setProgress(value) {
-    const n = Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
-    current = Math.max(current, n);
-    fill.style.width = current + '%';
-    percent.textContent = current + '%';
-    bar.setAttribute('aria-valuenow', String(current));
-    if (current >= 100) status.textContent = 'Connexion terminée. Bon jeu !';
+  function progression(v) {
+    var n = Math.max(0, Math.min(100, Math.round(Number(v) || 0)));
+    if (n < actuel) return;
+    actuel = n;
+    plein.style.width = n + "%";
+    pc.innerHTML = n + " %";
+    if (n >= 100) etat.innerHTML = "C'est parti ! Bienvenue en ville.";
   }
-  function setStatus(value) {
-    if (typeof value === 'string' && value.trim()) status.textContent = value;
+  function texte(t) { if (typeof t === "string" && t.replace(/\s/g, "") !== "") etat.innerHTML = t.replace(/</g, "&lt;"); }
+  function fichiersMaj() {
+    if (total > 0) {
+      progression(((total - restants) / total) * 100);
+      fichiers.innerHTML = (total - restants) + " / " + total + " fichiers";
+    }
   }
-
-  // Callbacks utilisés par l'écran de chargement de Garry's Mod.
-  window.SetFilesTotal = function(value) { gotRealProgress = true; total = Math.max(0, Number(value) || 0); updateFiles(); };
-  window.SetFilesNeeded = function(value) { gotRealProgress = true; needed = Math.max(0, Number(value) || 0); updateFiles(); };
-  window.DownloadingFile = function(file) {
-    gotRealProgress = true;
-    if (typeof file === 'string' && file.length) setStatus('Téléchargement : ' + file.split('/').pop());
-    else setStatus('Téléchargement des ressources...');
+  window.GameDetails = function (serveur, url, map, maxjoueurs) {
+    vrai = true;
+    if (map) carte.innerHTML = String(map).replace(/</g, "&lt;");
+    texte("Connexion à la ville…");
   };
-  window.SetStatusChanged = function(value) { gotRealProgress = true; setStatus(value); };
-  window.GameDetails = function(servername, serverurl, mapname) {
-    gotRealProgress = true;
-    setStatus(mapname ? 'Chargement de la carte : ' + mapname : 'Connexion au serveur...');
+  window.SetFilesTotal = function (v) { vrai = true; total = Math.max(0, Number(v) || 0); fichiersMaj(); };
+  window.SetFilesNeeded = function (v) { vrai = true; restants = Math.max(0, Number(v) || 0); fichiersMaj(); };
+  window.DownloadingFile = function (f) {
+    vrai = true;
+    var nom = (typeof f === "string" && f.length) ? f.split("/").pop() : "";
+    texte(nom ? "Téléchargement : " + nom : "Téléchargement des ressources…");
   };
-  window.SetLoadingProgress = function(value) { gotRealProgress = true; setProgress(value <= 1 ? value * 100 : value); };
+  window.SetStatusChanged = function (t) {
+    vrai = true;
+    var traduit = {
+      "Workshop Complete": "Collection Workshop prête !",
+      "Client info sent!": "Infos envoyées au serveur…",
+      "Received all Lua files we needed!": "Tous les scripts sont reçus !",
+      "No files to request!": "Rien de plus à télécharger.",
+      "Sending client info...": "Envoi de tes infos…",
+      "Starting Lua...": "Démarrage des scripts…",
+      "Retrieving server info...": "Récupération des infos du serveur…"
+    };
+    texte(traduit[t] || t);
+  };
+  window.SetLoadingProgress = function (v) { vrai = true; progression(v <= 1 ? v * 100 : v); };
 
-  function updateFiles() {
-    if (total > 0) setProgress(((total - needed) / total) * 100);
-    else if (needed === 0 && total === 0) setStatus('Préparation des ressources...');
-  }
+  /* Les astuces : elles tournent toutes les 6 secondes (et parlent des vrais systèmes du serveur) */
+  var astuces = [
+    ["parler.png", "Ici, on parle avant de tirer : maintiens G en regardant quelqu'un."],
+    ["colombe.png", "Une bavure ? Excuse-toi (roue G) pour récupérer ta réputation."],
+    ["chat.png", "Le Bureau des petits boulots paie pour sauver les chats perchés."],
+    ["plaque.png", "Gare ta voiture devant la préfecture pour l'immatriculer."],
+    ["cle.png", "En panne ? Le dépanneur voit la pièce cassée et la répare en mini-jeu."],
+    ["rdv.png", "Petites annonces : réponds, et donnez-vous rendez-vous en ville."],
+    ["pigeon.png", "Un pigeon voyageur s'est échappé ? Approche-toi doucement…"],
+    ["logo.png", "Les Citoyens modèles touchent une prime toutes les 20 minutes."]
+  ];
+  var i = 0, boite = document.getElementById("astuce"), img = document.getElementById("astuce-img"), txt = document.getElementById("astuce-txt");
+  setInterval(function () {
+    boite.className = "astuce cache";
+    setTimeout(function () {
+      i = (i + 1) % astuces.length;
+      img.src = "assets/" + astuces[i][0];
+      txt.innerHTML = astuces[i][1];
+      boite.className = "astuce";
+    }, 380);
+  }, 6000);
 
-  // En aperçu navigateur, animation discrète. En jeu, les callbacks réels prennent le relais.
-  function startPreview() {
-    let preview = 0;
-    previewTimer = window.setInterval(() => {
-      if (gotRealProgress) { window.clearInterval(previewTimer); return; }
-      if (preview < 91) {
-        preview += preview < 55 ? 2 : preview < 78 ? 1 : .35;
-        setProgress(preview);
-        if (preview < 25) setStatus('Initialisation du serveur...');
-        else if (preview < 58) setStatus('Chargement des ressources...');
-        else if (preview < 82) setStatus('Préparation de votre arrivée...');
-        else setStatus('Finalisation de la connexion...');
-      }
-    }, 180);
-  }
-  startPreview();
+  /* Dans un navigateur (aperçu GitHub), une petite progression pour voir le rendu ; en jeu, Garry's Mod prend le relais. */
+  var apercu = 0;
+  var minuteur = setInterval(function () {
+    if (vrai) { clearInterval(minuteur); return; }
+    if (apercu < 92) {
+      apercu += apercu < 50 ? 2 : (apercu < 80 ? 1 : 0.3);
+      progression(apercu);
+      texte(apercu < 30 ? "Initialisation du serveur…" : (apercu < 60 ? "Chargement des ressources…" : (apercu < 85 ? "Préparation de ton arrivée…" : "Presque prêt…")));
+    }
+  }, 180);
 })();
 </script>
 </body>
