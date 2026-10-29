@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bip ! Révision SSUAP – BSP 200.2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rouge:#C8102E; --rouge-fonce:#9E0B23;
+  --marine:#14213D; --marine-2:#1E3260;
+  --jaune:#FFC72C; --vert:#12A36B; --vert-clair:#D9F5E8; --rouge-clair:#FCE1E5;
+  --fond:#F2F5FA; --surface:#FFFFFF; --texte:#14213D; --texte-doux:#4A5878;
+  --ligne:#DCE3EF; --ombre:0 10px 30px rgba(20,33,61,.14);
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --corps:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --fond:#0E1628; --surface:#172440; --texte:#EEF2FA; --texte-doux:#A9B6D3;
+    --ligne:#2A3A61; --vert-clair:#113A2C; --rouge-clair:#47141E;
+    --ombre:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{margin:0;min-height:100%}
+body{background:var(--fond);color:var(--texte);font-family:var(--corps);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--jaune);outline-offset:3px;border-radius:12px}
+.wrap{max-width:860px;margin:0 auto;padding:18px 16px 60px}
+.hidden{display:none!important}
+
+/* ---------- Moniteur (élément signature) ---------- */
+.moniteur{background:var(--marine);color:#fff;border-radius:22px;padding:18px 20px 14px;position:relative;overflow:hidden;box-shadow:var(--ombre)}
+.moniteur .haut{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.titre{font-family:var(--display);font-weight:800;font-size:clamp(40px,9vw,68px);line-height:.92;letter-spacing:.5px;margin:0}
+.titre small{display:block;font-size:.42em;font-weight:600;color:var(--jaune);letter-spacing:1px;margin-top:6px}
+.constantes{display:flex;gap:10px}
+.cst{background:var(--marine-2);border-radius:14px;padding:8px 12px;min-width:84px;text-align:right}
+.cst b{display:block;font-family:var(--display);font-size:32px;line-height:1;font-weight:800}
+.cst span{font-size:13px;color:#C9D4EE}
+.cst.v b{color:#5BF0A8}.cst.j b{color:var(--jaune)}.cst.r b{color:#FF8A9B}
+.ecg{display:block;width:100%;height:70px;margin-top:8px}
+.ecg path{fill:none;stroke:#5BF0A8;stroke-width:3;stroke-linejoin:round;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(91,240,168,.7))}
+.ecg.plat path{stroke:#FF4D67;filter:drop-shadow(0 0 6px rgba(255,77,103,.8))}
+.balayage{animation:balaye 2.4s linear infinite}
+@keyframes balaye{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.beat{animation:beat .45s ease-out}
+@keyframes beat{0%{transform:scale(1)}35%{transform:scale(1.035)}100%{transform:scale(1)}}
+
+/* ---------- Accueil ---------- */
+.intro{margin:22px 4px 8px;font-size:18px;color:var(--texte-doux);max-width:62ch}
+h2{font-family:var(--display);font-weight:800;font-size:30px;margin:28px 4px 12px;line-height:1.05}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.mode{background:var(--surface);border:0;border-radius:20px;padding:16px 16px 18px;text-align:left;box-shadow:var(--ombre);position:relative;transition:transform .15s ease}
+.mode:hover{transform:translateY(-3px)}
+.mode .ico{font-size:38px;line-height:1}
+.mode h3{font-family:var(--display);font-size:26px;margin:8px 0 2px;font-weight:800}
+.mode p{margin:0;color:var(--texte-doux);font-size:15px}
+.mode[aria-pressed="true"]{background:var(--rouge);color:#fff}
+.mode[aria-pressed="true"] p{color:#FFE3E8}
+.themes{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:0;border-radius:999px;padding:9px 14px;background:var(--surface);box-shadow:0 2px 8px rgba(20,33,61,.10);font-size:15px;display:flex;align-items:center;gap:8px;transition:transform .12s ease}
+.chip:active{transform:scale(.96)}
+.chip[aria-pressed="true"]{background:var(--marine);color:#fff}
+.chip .n{font-size:12px;opacity:.75}
+.chip .maitrise{width:34px;height:6px;border-radius:9px;background:var(--ligne);overflow:hidden;display:inline-block}
+.chip .maitrise i{display:block;height:100%;background:var(--vert)}
+.nombre{display:flex;gap:8px;flex-wrap:wrap}
+.depart{margin-top:26px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{border:0;border-radius:16px;padding:15px 24px;font-weight:700;font-size:18px;background:var(--rouge);color:#fff;box-shadow:0 6px 0 var(--rouge-fonce);transition:transform .1s ease,box-shadow .1s ease}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--rouge-fonce)}
+.btn.sec{background:var(--marine);box-shadow:0 6px 0 #0A1426}
+.btn.sec:active{box-shadow:0 2px 0 #0A1426}
+.btn.jaune{background:var(--jaune);color:var(--marine);box-shadow:0 6px 0 #C99A12}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;color:var(--texte-doux);font-size:15px}
+.stats b{color:var(--texte)}
+.lien{background:none;border:0;color:var(--texte-doux);text-decoration:underline;padding:4px;font-size:14px}
+
+/* ---------- Quiz ---------- */
+.barre{display:flex;align-items:center;gap:10px;margin:14px 2px 12px;flex-wrap:wrap}
+.prog{flex:1;min-width:140px;height:12px;background:var(--ligne);border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--jaune);border-radius:99px;transition:width .35s ease}
+.pastille{background:var(--surface);border-radius:999px;padding:6px 12px;font-weight:700;font-size:15px;box-shadow:0 2px 8px rgba(20,33,61,.1);white-space:nowrap}
+.pastille.feu{color:var(--rouge)}
+.quitter{background:none;border:0;font-size:22px;padding:4px 8px;color:var(--texte-doux)}
+.fenetre{background:var(--surface);border-radius:24px;box-shadow:var(--ombre);overflow:hidden;animation:entre .32s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes entre{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.fenetre .tete{background:var(--marine);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.fenetre .tete .th{font-family:var(--display);font-size:20px;font-weight:600;letter-spacing:.3px}
+.fenetre .tete .num{color:var(--jaune);font-family:var(--display);font-size:20px;font-weight:800}
+.chrono{height:6px;background:var(--marine-2)}
+.chrono i{display:block;height:100%;background:var(--jaune);width:100%}
+.corps{padding:20px 18px 18px}
+.question{font-size:clamp(19px,4.4vw,23px);font-weight:700;line-height:1.35;margin:0 0 18px;max-width:60ch}
+.reponses{display:grid;gap:10px}
+.rep{border:0;text-align:left;background:var(--fond);border-radius:16px;padding:14px 14px 14px 60px;position:relative;font-size:17px;line-height:1.4;min-height:56px;transition:transform .12s ease,background .2s ease}
+.rep:hover:not(:disabled){transform:translateX(4px)}
+.rep .lettre{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:12px;background:var(--marine);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:20px}
+.rep:disabled{cursor:default}
+.rep.bonne{background:var(--vert-clair)}
+.rep.bonne .lettre{background:var(--vert)}
+.rep.fausse{background:var(--rouge-clair);animation:secoue .4s}
+.rep.fausse .lettre{background:var(--rouge)}
+.rep.eteinte{opacity:.5}
+@keyframes secoue{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.explic{margin-top:16px;border-radius:18px;padding:16px 16px 14px;background:var(--vert-clair);animation:entre .3s ease}
+.explic.ko{background:var(--rouge-clair)}
+.explic h4{margin:0 0 6px;font-family:var(--display);font-size:24px;font-weight:800;line-height:1.1}
+.explic p{margin:0 0 8px}
+.explic .ref{font-size:14px;color:var(--texte-doux)}
+.suite{display:flex;justify-content:flex-end;margin-top:14px}
+.raccourcis{font-size:13px;color:var(--texte-doux);margin-top:10px;text-align:center}
+.confetti{position:fixed;pointer-events:none;font-size:24px;z-index:50;animation:vole 1s ease-out forwards}
+@keyframes vole{to{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}
+
+/* ---------- Fin ---------- */
+.resultat{text-align:center;padding:26px 18px}
+.grosnote{font-family:var(--display);font-weight:800;font-size:clamp(70px,18vw,120px);line-height:.9;color:var(--rouge)}
+.verdict{font-size:20px;font-weight:700;margin:10px 0 4px}
+.sous{color:var(--texte-doux);margin:0}
+.bilan-th{display:grid;gap:8px;margin-top:18px;text-align:left}
+.ligne-th{display:grid;grid-template-columns:1fr 110px 52px;gap:10px;align-items:center;font-size:15px}
+.jauge{height:10px;background:var(--ligne);border-radius:99px;overflow:hidden}
+.jauge i{display:block;height:100%;background:var(--vert);border-radius:99px}
+.erreurs{display:grid;gap:12px;margin-top:10px}
+.err{background:var(--surface);border-radius:18px;padding:14px 16px;box-shadow:var(--ombre)}
+.err .q{font-weight:700;margin:0 0 6px}
+.err .ok{color:var(--vert);font-weight:700}
+.err p{margin:4px 0}
+.badge{display:inline-block;font-size:44px;animation:rebond 1s ease infinite alternate}
+@keyframes rebond{to{transform:translateY(-8px) rotate(-6deg)}}
+.son{position:absolute;top:12px;right:14px;background:var(--marine-2);border:0;border-radius:12px;padding:6px 10px;color:#fff;font-size:18px}
+@media (max-width:520px){
+  .constantes{width:100%;justify-content:space-between}
+  .cst{flex:1;min-width:0}
+  .ligne-th{grid-template-columns:1fr 70px 44px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="moniteur" id="moniteur">
+    <button class="son" id="btnSon" aria-label="Activer ou couper le son" title="Son">🔈</button>
+    <div class="haut">
+      <h1 class="titre">Bip ! Révision SSUAP<small>Secours et soins d’urgence aux personnes – BSP 200.2</small></h1>
+      <div class="constantes" aria-live="polite">
+        <div class="cst v"><b id="cScore">0</b><span>points</span></div>
+        <div class="cst j"><b id="cSerie">0</b><span>série 🔥</span></div>
+        <div class="cst r"><b id="cVies">–</b><span id="cViesLbl">vies</span></div>
+      </div>
+    </div>
+    <svg class="ecg" id="ecg" viewBox="0 0 800 70" preserveAspectRatio="none" aria-hidden="true">
+      <g class="balayage" id="trace">
+        <path id="tracePath" d=""/>
+      </g>
+    </svg>
+  </header>
+
+  <!-- ===== ACCUEIL ===== -->
+  <main id="ecranAccueil">
+    <p class="intro">Toutes les questions et explications viennent du BSP 200.2. Choisis ton mode, tes chapitres, et c’est parti pour la garde.</p>
+
+    <h2>Ton mode de jeu</h2>
+    <div class="modes" role="group" aria-label="Mode de jeu">
+      <button class="mode" data-mode="entrainement" aria-pressed="true">
+        <div class="ico">🚒</div><h3>Entraînement</h3>
+        <p>À ton rythme, explication après chaque réponse.</p>
+      </button>
+      <button class="mode" data-mode="chrono" aria-pressed="false">
+        <div class="ico">⏱️</div><h3>Départ réflexe</h3>
+        <p>25 secondes par question. Le temps, c’est du cerveau.</p>
+      </button>
+      <button class="mode" data-mode="survie" aria-pressed="false">
+        <div class="ico">❤️</div><h3>3 vies</h3>
+        <p>Trois erreurs et c’est l’arrêt. Jusqu’où tiens-tu ?</p>
+      </button>
+    </div>
+
+    <h2>Les chapitres</h2>
+    <div class="themes" id="themes" role="group" aria-label="Chapitres"></div>
+
+    <h2>Nombre de questions</h2>
+    <div class="nombre" role="group" aria-label="Nombre de questions">
+      <button class="chip" data-n="10" aria-pressed="false">10</button>
+      <button class="chip" data-n="20" aria-pressed="true">20</button>
+      <button class="chip" data-n="40" aria-pressed="false">40</button>
+      <button class="chip" data-n="0" aria-pressed="false">Toutes</button>
+    </div>
+
+    <div class="depart">
+      <button class="btn" id="btnGo">Lancer l’intervention</button>
+      <button class="btn sec hidden" id="btnFaibles">Réviser mes points faibles</button>
+    </div>
+    <div class="stats" id="stats"></div>
+  </main>
+
+  <!-- ===== QUIZ ===== -->
+  <section id="ecranQuiz" class="hidden" aria-live="polite">
+    <div class="barre">
+      <button class="quitter" id="btnQuitter" aria-label="Retour à l’accueil" title="Retour à l’accueil">✕</button>
+      <div class="prog" aria-hidden="true"><i id="progBar"></i></div>
+      <span class="pastille" id="progTxt">1 / 20</span>
+    </div>
+    <article class="fenetre" id="fenetre"></article>
+    <p class="raccourcis">Clavier : touches 1 à 4 pour répondre, Entrée pour continuer</p>
+  </section>
+
+  <!-- ===== FIN ===== -->
+  <section id="ecranFin" class="hidden"></section>
+
+</div>
+
+<script>
+/* =========================================================
+   Banque de questions – tirée exclusivement du BSP 200.2 v3.3
+   o[0] = bonne réponse (les choix sont mélangés à l’affichage)
+   ========================================================= */
+const THEMES = {
+  org:  {nom:"Principes et organisation", ico:"🏛️"},
+  semio:{nom:"Sémiologie", ico:"🩺"},
+  bilan:{nom:"Les bilans", ico:"📋"},
+  neuro:{nom:"Détresses neurologiques", ico:"🧠"},
+  resp: {nom:"Détresses respiratoires", ico:"🫁"},
+  circ: {nom:"Circulatoire et arrêt cardiaque", ico:"❤️"},
+  infec:{nom:"Infections et hygiène", ico:"🧼"},
+  patho:{nom:"Pathologies diverses", ico:"🍬"},
+  intox:{nom:"Intoxications", ico:"☠️"},
+  circo:{nom:"Atteintes liées aux circonstances", ico:"⚡"},
+  peau: {nom:"Plaies et brûlures", ico:"🔥"},
+  mater:{nom:"Grossesse et nouveau-né", ico:"👶"},
+  trauma:{nom:"Trauma, routier, relevage", ico:"🚗"},
+  novi: {nom:"Nombreuses victimes", ico:"🚨"},
+  pedia:{nom:"Pédiatrie", ico:"🧸"},
+  gestes:{nom:"Fiches techniques", ico:"🧰"}
+};
+
+const Q = [
+/* ---------- 1. Principes et organisation ---------- */
+{t:"org",q:"Quel est le premier maillon de la chaîne des secours ?",o:["La sécurité","L’alerte des services de secours","Les gestes de secours par un témoin","La médicalisation pré-hospitalière"],e:"La chaîne compte 6 maillons : sécurité, alerte, gestes du témoin, prise en charge par les sapeurs-pompiers, médicalisation pré-hospitalière, prise en charge hospitalière. La sécurité vient en premier pour éviter le suraccident et de nouvelles victimes.",r:"Chap. 1.1 A"},
+{t:"org",q:"Quel numéro permet de joindre directement le Samu ?",o:["Le 15","Le 18","Le 17","Le 114"],e:"Le 18 joint les services d’incendie et de secours (BSPP, SDIS, BMPM), le 17 la police ou la gendarmerie, le 15 le Samu. Le 112, numéro d’urgence européen, permet aussi de joindre ces centres.",r:"Chap. 1.1 A.2"},
+{t:"org",q:"Après avoir transmis son message d’alerte, que doit faire l’appelant ?",o:["Attendre les instructions avant de raccrocher","Raccrocher pour libérer la ligne","Rappeler 5 minutes plus tard","Retourner auprès de la victime sans prévenir"],e:"Le message achevé, l’appelant attend les instructions des services d’urgence avant d’interrompre la communication. Un dialogue peut s’instaurer pour préciser le nombre de victimes, les gestes faits et les risques persistants.",r:"Chap. 1.1 A.2"},
+{t:"org",q:"Quel secteur la BSPP défend-elle ?",o:["Paris, les départements 92, 93 et 94 et les aéroports de Roissy, Orly et du Bourget","Paris et toute l’Île-de-France","Paris uniquement","Paris, le 77 et le 78"],e:"Forte de 8 500 militaires et commandée par un général, la BSPP défend Paris, les Hauts-de-Seine, la Seine-Saint-Denis, le Val-de-Marne et les plateformes aéroportuaires de Roissy, d’Orly et du Bourget.",r:"Chap. 1.1 B.6"},
+{t:"org",q:"Que prévoit le statut de « citoyen sauveteur » créé par la loi du 3 juillet 2020 ?",o:["Il exonère le citoyen de sa responsabilité civile, sauf faute intentionnelle ou caractérisée","Il oblige tout citoyen à suivre une formation annuelle","Il réserve l’usage du défibrillateur aux secouristes diplômés","Il donne au citoyen le statut de sapeur-pompier volontaire"],e:"Le citoyen sauveteur porte bénévolement assistance à une personne en péril grave et imminent. Il devient collaborateur occasionnel du service public, sa responsabilité pénale est atténuée et il est exonéré de responsabilité civile, sauf faute intentionnelle ou caractérisée.",r:"Chap. 1.1 B.1"},
+{t:"org",q:"Quelles associations peuvent assurer un dispositif prévisionnel de secours (DPS) ?",o:["Celles détenant un agrément de sécurité civile de type D","Toutes les associations loi 1901","Uniquement la Croix-Rouge","Celles agréées par la BSPP"],e:"Seules les associations titulaires d’un agrément de sécurité civile de type D peuvent assurer un DPS. La BSPP n’est en principe pas missionnée pour des DPS, sauf grands rassemblements sur demande du préfet de police.",r:"Chap. 1.1 C"},
+{t:"org",q:"Qui est le commandant des opérations de secours (COS) sur une intervention ?",o:["Le premier chef d’agrès présent sur les lieux","Le médecin de l’équipe médicale","L’officier de garde du centre de secours","Le plus ancien sapeur-pompier de l’équipe"],e:"Le COS est le 1er chef d’agrès présent sur les lieux. Il commande jusqu’à être relevé par une autorité de la chaîne de commandement. Les moyens médicaux gardent l’autorité technique pour l’état de la victime.",r:"Chap. 1.4 D"},
+{t:"org",q:"Le sapeur-pompier de Paris réalise-t-il un diagnostic médical ?",o:["Non, il réalise un bilan secouriste mais ne pose pas de diagnostic","Oui, dès qu’il est chef d’agrès","Oui, s’il est seul sur les lieux","Oui, après accord du centre opérationnel"],e:"Le sapeur-pompier réalise un bilan secouriste mais n’établit pas de diagnostic médical. Les signes recueillis permettent au médecin coordinateur d’établir son diagnostic.",r:"Chap. 1.2"},
+{t:"org",q:"Dans quels cas le secret professionnel peut-il être levé ?",o:["Pour dénoncer un crime ou un délit connu dans l’exercice de ses fonctions, ou pour prouver son innocence","Dès qu’un proche de la victime le demande","Pour informer l’employeur de la victime","Jamais, il est absolu sans aucune exception"],e:"Le secret est général et absolu sauf deux cas : l’obligation pour les agents publics de dénoncer les crimes et délits connus en service, et la nécessité de révéler une information pour prouver son innocence.",r:"Chap. 1.4 D"},
+{t:"org",q:"Sur les zones aéroportuaires d’Orly et de Roissy, le contact avec la coordination médicale est :",o:["Systématique","Facultatif","Réservé aux urgences vitales","Remplacé par un contact avec la police aux frontières"],e:"Sur Orly et Roissy-Charles-de-Gaulle, le contact à la coordination médicale doit être systématique, sans exception de non-contact.",r:"Chap. 1.4 D"},
+{t:"org",q:"Pourquoi la fiche bilan doit-elle être rédigée personnellement par le chef d’agrès avec la plus grande attention ?",o:["C’est une pièce médico-légale et le support d’informations pour le médecin des urgences","C’est uniquement une statistique pour la Brigade","Elle sert à facturer l’intervention","Elle remplace le contact avec la coordination médicale"],e:"La fiche bilan constitue une pièce médico-légale et surtout le seul support des informations recueillies par le chef d’agrès pour le médecin de la structure des urgences.",r:"Chap. 1.4 D"},
+{t:"org",q:"Lors du stationnement de l’engin, une marche arrière doit être :",o:["Systématiquement guidée","Guidée uniquement la nuit","Évitée en toutes circonstances","Signalée au CSO par radio"],e:"Le chef d’agrès choisit l’emplacement de l’engin pour éviter le suraccident. Toute marche arrière doit être systématiquement guidée.",r:"Chap. 1.4 C"},
+{t:"org",q:"Qui a écrit « l’Éthique du sapeur-pompier » ?",o:["Le général Casso","Le médecin-commandant Cot","Le général Boutinaud","Louis Pasteur"],e:"L’« Éthique du sapeur-pompier » a été écrite par le général Casso, qui a commandé la BSPP de 1963 à 1970.",r:"Chap. 1.3"},
+{t:"org",q:"Selon le BSP, l’empathie consiste à :",o:["Comprendre les émotions de la victime en trouvant la bonne distance, ni trop proche ni trop détachée","Partager pleinement la douleur de la victime","Garder une distance froide pour rester efficace","Raconter à la victime une expérience similaire"],e:"L’empathie permet de percevoir et comprendre les émotions d’une personne pour mieux répondre à ses besoins, en se mettant à sa place sans confusion avec sa propre vie : la « bonne distance ».",r:"Chap. 1.3 A"},
+{t:"org",q:"Lors d’une réanimation, la présence d’un proche :",o:["Peut être acceptée si elle est souhaitée et ne gêne pas les gestes","Est toujours interdite","Est obligatoire pour des raisons légales","Est acceptée seulement si un policier est présent"],e:"En cas de manœuvres de réanimation, la présence d’un proche peut être acceptée si elle est souhaitée et ne gêne pas les gestes de secours.",r:"Chap. 1.3 B"},
+
+/* ---------- 3. Sémiologie ---------- */
+{t:"semio",q:"Entre quelles valeurs varie le score de Glasgow ?",o:["3 et 15","0 et 15","1 et 10","0 et 20"],e:"Le score additionne l’ouverture des yeux (4 à 1), la réponse verbale (5 à 1) et la réponse motrice (6 à 1). Il va donc de 3 (coma profond) à 15 (personne consciente).",r:"Chap. 3.2 B"},
+{t:"semio",q:"Quelle est la cotation maximale de la réponse motrice (M) dans le score de Glasgow ?",o:["6","5","4","3"],e:"Y est coté de 4 à 1, V de 5 à 1 et M de 6 à 1. M6 correspond à une réponse adaptée aux ordres simples.",r:"Chap. 3.2 B.3"},
+{t:"semio",q:"Quelle est la seule méthode autorisée pour la stimulation douloureuse ?",o:["Le roulement appuyé d’un stylo sur le lit de l’ongle","Le pincement du trapèze","La friction du sternum","Le pincement du lobe de l’oreille"],e:"La douleur se déclenche uniquement par le roulement appuyé d’un stylo à la base de l’ongle, à l’exclusion de toute autre méthode. Elle sert à estimer la profondeur du coma, pas à réveiller la victime.",r:"Chap. 3.2 B.2"},
+{t:"semio",q:"À partir de quel score de Glasgow la victime doit-elle être mise en PLS systématiquement ?",o:["Inférieur ou égal à 10","Inférieur ou égal à 8","Inférieur ou égal à 13","Inférieur à 5"],e:"La PLS est systématique dès un Glasgow ≤ 10 (sauf arrêt cardiaque ou respiratoire, ou traumatisé laissé sur le dos). Au-dessus, le chef d’agrès décide s’il craint une aggravation.",r:"Chap. 3.2 B.4"},
+{t:"semio",q:"Lors de la stimulation douloureuse, les avant-bras se mettent en flexion sur les bras. Quelle cotation motrice ?",o:["M3 (décortication)","M2 (décérébration)","M4","M5"],e:"La flexion des avant-bras (décortication) est cotée M3. L’extension des bras avec rotation interne (décérébration) est cotée M2. Ces réponses traduisent le plus souvent une atteinte cérébrale gravissime.",r:"Chap. 3.2 B.3"},
+{t:"semio",q:"Dans le score AVPU (EVDA en français), que signifie la lettre P ?",o:["Réactive à la douleur (Pain)","Pupilles réactives","Pouls présent","Paralysie"],e:"A : éveillée, V : réactive à la voix, P : réactive à la douleur, U : aréactive. La profondeur du coma augmente de V à U.",r:"Chap. 3.2 B.4"},
+{t:"semio",q:"Chez une personne hémiplégique, comment évalue-t-on la réponse motrice ?",o:["Du côté non paralysé","Du côté paralysé","On ne l’évalue pas","Sur les membres inférieurs uniquement"],e:"Chez l’hémiplégique, la réponse motrice est évaluée du côté non paralysé.",r:"Chap. 3.2 B.4"},
+{t:"semio",q:"Une victime est considérée en arrêt respiratoire si sa fréquence respiratoire est :",o:["Inférieure ou égale à 6 par minute ou avec des pauses de 10 secondes ou plus","Inférieure à 12 par minute","Inférieure à 10 par minute","Supérieure à 40 par minute"],e:"Quel que soit l’âge (sauf nouveau-né à la naissance), une FR ≤ 6 mouvements/min ou des pauses respiratoires ≥ 10 secondes font considérer la victime en arrêt respiratoire.",r:"Chap. 3.3 B.4"},
+{t:"semio",q:"Quelles sont les valeurs normales de la fréquence respiratoire chez l’adulte au repos ?",o:["12 à 20 par minute","20 à 30 par minute","8 à 12 par minute","30 à 40 par minute"],e:"Adulte 12 à 20, enfant 20 à 30, nourrisson 30 à 40, nouveau-né 40 à 60 mouvements par minute.",r:"Chap. 3.3 B.4"},
+{t:"semio",q:"Quelles sont les valeurs normales de la fréquence respiratoire chez le nouveau-né ?",o:["40 à 60 par minute","30 à 40 par minute","20 à 30 par minute","60 à 80 par minute"],e:"Le tableau du BSP donne 40 à 60 mouvements par minute chez le nouveau-né.",r:"Chap. 3.3 B.4"},
+{t:"semio",q:"Une victime ne parvient pas à compter jusqu’à 5 sans reprendre sa respiration. Qu’en conclure ?",o:["Elle présente une détresse respiratoire","Elle présente un simple trouble respiratoire","Sa respiration est normale","Elle est en arrêt respiratoire"],e:"Jusqu’à 10 ou phrases complètes : pas de trouble. Reprise d’air entre 5 et 10 : trouble. Incapable d’atteindre 5 ou de dire plus de cinq mots : détresse.",r:"Chap. 3.3 B.2"},
+{t:"semio",q:"Quel est le premier signe de détresse respiratoire chez le nourrisson et l’enfant en bas âge ?",o:["Le battement des ailes du nez","La cyanose des lèvres","Le balancement thoraco-abdominal","Les sueurs"],e:"Le battement des ailes du nez, ouverture et fermeture des narines, est le premier signe qui apparaît chez le nourrisson et le jeune enfant.",r:"Chap. 3.3 B.3"},
+{t:"semio",q:"Une sensation de « crépitation neigeuse » à la palpation du haut du thorax évoque :",o:["Un emphysème sous-cutané","Un œdème aigu du poumon","Une fracture de côte simple","Une hypothermie"],e:"L’emphysème sous-cutané résulte du passage d’air de l’arbre respiratoire vers le tissu sous-cutané, donnant au toucher une crépitation neigeuse.",r:"Chap. 3.3 B.5"},
+{t:"semio",q:"À partir de quelle valeur la SpO2 est-elle considérée comme normale ?",o:["95 %","90 %","85 %","98 %"],e:"Une saturation en oxygène est considérée comme normale à partir de 95 %. Normalement, elle est proche de 100 %.",r:"Chap. 3.3 B.4.2"},
+{t:"semio",q:"Pourquoi la SpO2 est-elle trompeuse en cas d’intoxication au CO ou aux fumées ?",o:["L’appareil ne distingue pas le CO de l’O2 sur les globules rouges et affiche des valeurs faussement rassurantes","Le CO bloque l’affichage de l’appareil","Le CO fait chuter artificiellement la valeur affichée","Elle est fiable, il n’y a aucun piège"],e:"La technologie du multiparamétrique ne différencie pas le CO de l’oxygène fixé sur les globules rouges : la saturation donne à tort des chiffres rassurants.",r:"Chap. 3.3 B.4.2"},
+{t:"semio",q:"Quelles sont les valeurs normales de la fréquence cardiaque chez l’adulte au repos ?",o:["60 à 100 par minute","50 à 80 par minute","70 à 140 par minute","100 à 140 par minute"],e:"Adulte 60 à 100, enfant 70 à 140, nourrisson 100 à 140, nouveau-né 120 à 160 battements par minute.",r:"Chap. 3.4 B.1.2"},
+{t:"semio",q:"Lors d’une prise de pouls carotidien, la victime est en arrêt cardiaque si aucun battement n’est perçu pendant :",o:["10 secondes","5 secondes","30 secondes","1 minute"],e:"Aucun battement perçu sur 10 secondes au pouls carotidien signe l’arrêt cardiaque. Chez le nouveau-né à la naissance, un rythme inférieur à 60/min suffit.",r:"Chap. 3.4 B.1.2"},
+{t:"semio",q:"Hors grossesse, à partir de quelle pression systolique parle-t-on d’hypotension artérielle ?",o:["Inférieure ou égale à 100 mmHg","Inférieure à 120 mmHg","Inférieure à 80 mmHg","Inférieure à 90 mmHg"],e:"Hypotension : systolique ≤ 100 mmHg. Hypertension : systolique > 160 mmHg au repos. La mesure est recontrôlée du même côté 3 à 5 minutes après.",r:"Chap. 3.4 B.2"},
+{t:"semio",q:"Après la première mesure, quand et comment recontrôle-t-on la pression artérielle ?",o:["Du même côté, 3 à 5 minutes après","De l’autre côté, immédiatement","Du même côté, 15 minutes après","Aux deux bras simultanément"],e:"La mesure de la pression artérielle doit être systématiquement contrôlée du même côté 3 à 5 minutes après la première.",r:"Chap. 3.4 B.2"},
+{t:"semio",q:"Quel est le temps de recoloration cutanée (TRC) normal chez l’adulte de plus de 65 ans ?",o:["≤ 3 secondes","≤ 2 secondes","≤ 5 secondes","≤ 1 seconde"],e:"Le TRC est mesuré après une compression de 5 secondes du lit de l’ongle. Il est ≤ 2 s chez l’enfant et l’adulte jeune, ≤ 3 s après 65 ans.",r:"Chap. 3.4 B.3"},
+{t:"semio",q:"Chez une personne à la peau noire, où rechercher une décoloration en cas de détresse circulatoire ?",o:["Au niveau des conjonctives (face interne des paupières inférieures)","Sur le front","Sur la paume des mains uniquement","Sur la langue"],e:"En abaissant la paupière inférieure, les conjonctives doivent être roses ; elles se décolorent en cas de détresse. Cette recherche est essentielle quand la pâleur cutanée ne peut pas être appréciée.",r:"Chap. 3.4 B.3"},
+{t:"semio",q:"Des marbrures bleu violacé au niveau des genoux et de l’abdomen traduisent :",o:["Une altération très grave de la fonction circulatoire","Une simple réaction au froid sans gravité","Une allergie cutanée","Une hyperthermie"],e:"Les marbrures sont liées à la stagnation du sang dans le réseau veineux et traduisent une altération très grave de la circulation.",r:"Chap. 3.4 B.3"},
+{t:"semio",q:"À partir de quelle température parle-t-on d’hyperthermie ?",o:["Au-dessus de 37,5 °C","Au-dessus de 38,5 °C","Au-dessus de 39 °C","Au-dessus de 37 °C"],e:"Hyperthermie au-dessus de 37,5 °C, hypothermie en dessous de 35 °C. Au-dessus de 42 °C le pronostic vital est engagé ; en dessous de 28 °C une fibrillation ventriculaire peut survenir à tout moment.",r:"Chap. 3.6"},
+{t:"semio",q:"Dans l’analyse d’une plainte (PQRST), à quoi correspond la lettre P ?",o:["Provoqué par : circonstances et facteurs déclenchants","Pouls","Position de la victime","Pression artérielle"],e:"PQRST : Provoqué par, Qualités, Région du corps atteinte, Sévérité, Temps de la plainte.",r:"Chap. 3.1 A.1"},
+{t:"semio",q:"Dans la recherche des antécédents MHTA, que signifie la lettre H ?",o:["Hospitalisation","Hérédité","Hypertension","Heure du début"],e:"MHTA : Maladies ou malaises, Hospitalisations, Traitements médicaux, Allergies.",r:"Chap. 3.1 B"},
+{t:"semio",q:"Avec l’échelle numérique de la douleur, que demande-t-on à la victime ?",o:["Une note de 0 (aucune douleur) à 10 (douleur maximale imaginable)","Une note de 1 à 5","De comparer à la pire douleur vécue","De choisir un visage sur une réglette"],e:"On demande une note de 0 à 10 avec des consignes claires et neutres, sans faire appel aux souvenirs. Le chef d’agrès ne change pas d’échelle en cours d’intervention.",r:"Chap. 3.1 A.2"},
+{t:"semio",q:"En cas de doute sur la catégorie d’âge (enfant ou adulte), la victime est considérée comme :",o:["Un enfant","Un adulte","Un nourrisson","Le chef d’agrès demande l’âge exact"],e:"La puberté s’apprécie sur l’aspect général au premier regard. Dès qu’il y a un doute, la victime est considérée automatiquement comme un enfant.",r:"Chap. 3"},
+{t:"semio",q:"Pour le secouriste, le nourrisson est défini comme :",o:["De 1 semaine à 1 an","De la naissance à 1 an","De 1 mois à 2 ans","De 1 semaine à 2 ans"],e:"Nouveau-né : moins d’1 semaine. Nourrisson : 1 semaine à 1 an. Enfant : 1 an à la puberté. Adulte : à partir de la puberté.",r:"Chap. 3 et 20.1"},
+
+/* ---------- 4. Les bilans ---------- */
+{t:"bilan",q:"Quel est le but du bilan primaire ?",o:["Rechercher une détresse vitale qui menace immédiatement la vie","Recueillir les antécédents de la victime","Préparer la fiche bilan","Évaluer les risques de l’environnement"],e:"Le bilan primaire est un zoom sur la victime pour détecter une détresse vitale imposant des gestes rapides. En une dizaine de secondes, on doit savoir si l’état est critique.",r:"Chap. 4.3"},
+{t:"bilan",q:"Dans quel ordre se déroulent les quatre étapes du bilan primaire ?",o:["Sauvegarde immédiate, conscience, respiration, circulation","Conscience, sauvegarde, circulation, respiration","Respiration, circulation, conscience, sauvegarde","Circulation, respiration, conscience, sauvegarde"],e:"Les quatre étapes indispensables : ❶ sauvegarde immédiate ❷ conscience ❸ respiration ❹ circulation.",r:"Chap. 4.3 A"},
+{t:"bilan",q:"Chez une victime inconsciente, comment recherche-t-on la respiration et la circulation ?",o:["Simultanément, sur 10 secondes au maximum","Successivement, 10 secondes chacune","La respiration sur 30 secondes puis le pouls","Uniquement la respiration"],e:"Respiration et pouls carotidien sont recherchés simultanément sur 10 s maximum, car après un arrêt circulatoire la respiration peut sembler normale quelques dizaines de secondes avant de devenir des gasps.",r:"Chap. 4.3 A.3"},
+{t:"bilan",q:"Le pouls carotidien est mal perçu ou douteux. Que faire ?",o:["Considérer la victime en arrêt cardiaque","Reprendre le pouls pendant 30 secondes","Demander à un équipier de vérifier","Mettre la victime en PLS"],e:"Un pouls douteux fait considérer la victime en arrêt cardiaque. L’idée même de demander à un équipier de vérifier le pouls doit faire conclure à un arrêt cardiaque.",r:"Chap. 4.3 B"},
+{t:"bilan",q:"Les circonstances sont inconnues et la victime est inconsciente. Elle est considérée comme :",o:["Traumatisée","Malade","Intoxiquée","En arrêt cardiaque"],e:"Dans le doute ou lorsque les circonstances ne sont pas connues, toute victime inconsciente est considérée comme traumatisée.",r:"Chap. 4.3 B.3"},
+{t:"bilan",q:"Une victime consciente présente un pouls radial non perçu, sans détresse respiratoire. Quel geste immédiat ?",o:["L’allonger","L’asseoir","La mettre en PLS","Lui surélever la tête"],e:"Une victime présentant une détresse circulatoire évidente (pouls radial absent) sans détresse respiratoire est allongée immédiatement : cette position améliore la circulation, notamment cérébrale.",r:"Chap. 4.3 B.1"},
+{t:"bilan",q:"Victime inconsciente qui respire, suspecte de traumatisme : quel matériel est posé systématiquement ?",o:["Un collier cervical","Une attelle à dépression","Un garrot","Une couverture de survie"],e:"Chez la victime inconsciente traumatisée qui respire, on maintient la tête et on place systématiquement un collier cervical. La PLS d’un blessé inconscient se fait à deux.",r:"Chap. 4.3 B.3"},
+{t:"bilan",q:"Face à une victime en arrêt respiratoire, que fait-on du casque de protection ?",o:["On le retire systématiquement","On le laisse toujours en place","On le retire uniquement à l’hôpital","On ouvre seulement la visière"],e:"En arrêt respiratoire ou cardiaque, le retrait du casque de protection est systématique pour libérer les voies aériennes et réaliser les gestes.",r:"Chap. 4.3 B.4"},
+{t:"bilan",q:"La victime présente des gasps. Comment l’interpréter ?",o:["Comme un arrêt respiratoire, donc un arrêt cardiaque","Comme une respiration normale","Comme une détresse respiratoire simple","Comme un signe de réveil"],e:"Il ne faut pas confondre les gasps avec des mouvements respiratoires : en cas de gasps ou de respiration anormale, la victime est considérée en arrêt respiratoire, donc en arrêt cardiaque.",r:"Chap. 4.3 B.4"},
+{t:"bilan",q:"Que comprend la partie systématique du bilan secondaire ?",o:["L’interrogatoire (PQRST, MHTA) et les éléments neurologiques, respiratoires et circulatoires","Uniquement la recherche de lésions","La transmission du bilan au CSO","Uniquement la prise de température"],e:"Elle comprend l’analyse de la plainte (PQRST), les antécédents (MHTA), le Glasgow, la respiration (FR, amplitude, SpO2), la circulation (FC, pression artérielle) et l’examen de la tête aux pieds.",r:"Chap. 4.4 B"},
+{t:"bilan",q:"Quand le contact avec la coordination médicale a-t-il un intérêt ?",o:["Au moment de la prise en charge de la victime","Une fois la victime transportée","À la fin de la garde","Seulement en cas de décès"],e:"Le contact n’a d’intérêt que s’il est réalisé pendant la prise en charge, et non après le transport, où il ne serait qu’une formalité sans sa finalité principale.",r:"Chap. 4.6 B"},
+
+/* ---------- 5. Neurologique ---------- */
+{t:"neuro",q:"Qu’est-ce qu’une syncope ?",o:["Une perte de connaissance brève avec perte du tonus et retour rapide à la conscience","Un coma prolongé","Une crise convulsive","Un malaise sans perte de connaissance"],e:"La syncope est une perte de connaissance brève, d’installation progressive ou brutale, avec chute fréquente et retour rapide à une conscience normale. Elle est due à une baisse passagère de la perfusion du cerveau.",r:"Chap. 5.2 A"},
+{t:"neuro",q:"Quelle est la proportion des AVC de type ischémique ?",o:["85 %","15 %","50 %","70 %"],e:"Les AVC ischémiques (obstruction par un caillot ou spasme) représentent 85 %, les AVC hémorragiques 15 %.",r:"Chap. 5.4 A"},
+{t:"neuro",q:"Combien de neurones sont détruits par minute lors d’un AVC ischémique non traité ?",o:["1,9 million","190 000","19 millions","19 000"],e:"Si le caillot persiste, les neurones meurent en quelques minutes : 1,9 million sont détruits par minute. D’où l’extrême urgence de la filière AVC.",r:"Chap. 5.4 A"},
+{t:"neuro",q:"Combien de signes spécifiques évocateurs faut-il pour suspecter un AVC ?",o:["Un seul suffit","Au moins deux","Trois","Les quatre"],e:"Un seul signe suffit : déficit de la motricité, anomalie de la parole, asymétrie du visage ou déficit visuel brutal.",r:"Chap. 5.4 A.1"},
+{t:"neuro",q:"En cas de suspicion d’AVC, dans quelle position place-t-on la victime ?",o:["Horizontale stricte","Demi-assise","Assise","Jambes surélevées"],e:"La victime est allongée en position horizontale stricte pour améliorer l’apport de sang au cerveau, et brancardée à l’horizontale.",r:"Chap. 5.4 A.2"},
+{t:"neuro",q:"Suspicion d’AVC : quand administre-t-on de l’oxygène ?",o:["Si la SpO2 est inférieure à 95 %","Systématiquement à 15 l/min","Jamais","Uniquement si la victime est inconsciente"],e:"Pour l’AVC, l’O2 par inhalation n’est donné que si la SpO2 est < 95 %. Il n’y a pas d’administration systématique d’O2 pour les AVC.",r:"Chap. 5.4 A.2 et FT 20.1"},
+{t:"neuro",q:"Pour un AVC, que signifie « l’heure de survenue » à transmettre ?",o:["L’heure du dernier moment où l’état neurologique était encore normal","L’heure de l’appel au 18","L’heure d’arrivée des secours","L’heure du premier symptôme remarqué par la famille au réveil"],e:"L’heure de survenue est l’heure du dernier moment où l’état neurologique de la victime était encore normal, d’après elle ou les témoins.",r:"Chap. 5.4 A.1"},
+{t:"neuro",q:"Quelle mesure permet d’écarter un piège qui peut ressembler à un AVC ?",o:["La glycémie","La température","La SpO2","La fréquence respiratoire"],e:"L’hypoglycémie peut donner des signes ressemblant à un AVC : la glycémie fait partie des recherches.",r:"Chap. 5.4 A.1"},
+{t:"neuro",q:"Lequel n’est PAS un facteur favorisant une crise chez un épileptique connu ?",o:["Une alimentation trop riche en sucre","Le manque de sommeil","La rupture du traitement","Les stimulations lumineuses intermittentes"],e:"Les facteurs favorisants cités sont : manque de sommeil, alcool, rupture du traitement et stimulations lumineuses intermittentes (stroboscope, jeux vidéo).",r:"Chap. 5.4 B.1"},
+{t:"neuro",q:"Les secours arrivent après la phase convulsive. Quel premier geste ?",o:["Mettre en PLS après vérification simultanée de la respiration et de la circulation","Maintenir les membres pour éviter les mouvements","Mettre un objet entre les dents","Asseoir la victime"],e:"Après vérification de la respiration et de la circulation, la victime est mise en PLS, puis O2 si nécessaire et équipe médicale en cas d’état de mal épileptique.",r:"Chap. 5.4 B.3"},
+{t:"neuro",q:"Les mouvements musculaires lors d’une syncope durent généralement :",o:["Moins d’une minute","Plus de 5 minutes","Entre 2 et 5 minutes","Il n’y en a jamais"],e:"Une syncope peut s’accompagner de mouvements cloniques rappelant l’épilepsie, mais de courte durée (moins d’une minute), sans morsure de langue.",r:"Chap. 5.2 B"},
+
+/* ---------- 6. Respiratoire ---------- */
+{t:"resp",q:"Adulte conscient, obstruction totale des voies aériennes. Premier geste ?",o:["1 à 5 claques vigoureuses dans le dos","5 compressions abdominales","Une RCP immédiate","Lui donner à boire"],e:"On laisse la victime debout ou assise, on donne 1 à 5 claques dans le dos, puis 1 à 5 compressions abdominales en cas d’inefficacité, et on répète.",r:"Chap. 6.2 B.3"},
+{t:"resp",q:"Où et comment donne-t-on les claques dans le dos ?",o:["Entre les omoplates, avec le talon de la main, vigoureusement","Au milieu du dos, main à plat, doucement","Sur la nuque, avec le poing","Sur les reins, du plat de la main"],e:"Pour être efficaces, les claques sont données entre les omoplates, avec le talon de la main, de façon vigoureuse, la victime penchée en avant.",r:"FT 9.1"},
+{t:"resp",q:"Chez une femme enceinte avec obstruction totale, les compressions abdominales sont remplacées par :",o:["Des compressions thoraciques","Des claques supplémentaires","Une aspiration","Rien, on attend le médecin"],e:"Quand les compressions abdominales sont impossibles (obésité, grossesse, handicap), on réalise des compressions thoraciques.",r:"Chap. 6.2 B.3"},
+{t:"resp",q:"Chez le nourrisson, en complément des claques dans le dos, on réalise :",o:["Des compressions thoraciques","Des compressions abdominales","Une aspiration buccale","Une ventilation au ballon"],e:"Chez le nourrisson, les compressions abdominales sont remplacées par des compressions thoraciques.",r:"Chap. 6.2 B.3"},
+{t:"resp",q:"Dans quelle direction s’exercent les compressions abdominales (Heimlich) ?",o:["Vers l’arrière et vers le haut, en mouvement de virgule","Vers le bas","Uniquement vers l’arrière","Latéralement"],e:"Les compressions sont dirigées vers l’arrière et vers le haut en mouvement de virgule, pour un effet piston sur le diaphragme.",r:"FT 9.2"},
+{t:"resp",q:"La victime d’une obstruction devient inconsciente. Que faire ?",o:["L’allonger et débuter immédiatement la RCP par les compressions, sans refaire de bilan primaire","Continuer les claques dans le dos","La mettre en PLS","Tenter les compressions abdominales au sol"],e:"On allonge la victime et on débute immédiatement la RCP par les compressions, quel que soit l’âge : 30/2 chez l’adulte, 15/2 chez l’enfant, le nourrisson et le nouveau-né.",r:"Chap. 6.2"},
+{t:"resp",q:"Quel arrêt respiratoire n’est PAS traité comme un arrêt cardiaque ?",o:["Celui dû à une overdose aux opiacés","Celui dû à une noyade","Celui dû à un corps étranger","Celui dû à un traumatisme crânien"],e:"À l’exception d’un arrêt respiratoire dû à une overdose aux opiacés, tout arrêt respiratoire est traité comme un arrêt cardiaque.",r:"Chap. 6.3"},
+{t:"resp",q:"Quelle position d’attente pour une victime consciente en détresse respiratoire ?",o:["Assise","Allongée à plat","En PLS","Jambes surélevées"],e:"La position d’attente est assise, avec maintien de la tête dans l’axe du tronc si la victime est épuisée.",r:"Chap. 6.4 A"},
+{t:"resp",q:"Une mousse rosée aux lèvres traduit :",o:["Une forme majeure d’œdème aigu du poumon","Une crise d’asthme","Une hypoglycémie","Une intoxication alcoolique"],e:"La mousse aux lèvres, plus ou moins rosée, traduit une forme majeure d’OAP : une véritable « noyade interne ».",r:"Chap. 3.3 B.5"},
+{t:"resp",q:"Quel signe caractérise la crise d’asthme ?",o:["Un sifflement et un effort à l’expiration","Un effort à l’inspiration seulement","Une fièvre élevée","Une mousse rosée"],e:"L’asthme associe bronchoconstriction, inflammation et mucus : on recherche un sifflement et un effort expiratoire.",r:"Chap. 6.4 B"},
+
+/* ---------- 7. Circulatoire et ACR ---------- */
+{t:"circ",q:"Quelle proportion d’arrêts cardiaques débute par une fibrillation ventriculaire ?",o:["80 %","20 %","50 %","95 %"],e:"80 % des ACR débutent par une FV, rythme identifié par le défibrillateur qui délivre un choc pour resynchroniser les fibres du myocarde.",r:"Chap. 7.2 A"},
+{t:"circ",q:"Quelle est la tolérance du cerveau à l’anoxie ?",o:["2 à 4 minutes","15 à 30 minutes","30 à 45 minutes","40 à 80 minutes"],e:"Cerveau 2 à 4 min, cœur 15 à 30 min, rein 30 à 45 min, foie 40 à 80 min.",r:"Chap. 7.2 A.3"},
+{t:"circ",q:"Comment appelle-t-on le temps où le cœur est arrêté et non massé ?",o:["No flow","Low flow","Gasp","Temps de recoloration"],e:"No flow : cœur arrêté et non massé, pas de circulation. Low flow : cœur massé, circulation ralentie.",r:"Chap. 7.2 A.3"},
+{t:"circ",q:"Dans le message 4C-N, que signifie le N ?",o:["No flow","Numéro de l’engin","Nombre de victimes","Niveau de conscience"],e:"4C-N : Confirmation de l’ACR, Comorbidités, Contexte, Chocs, No flow. C’est un message radio rapide pour décider de l’envoi de l’ECMO.",r:"Chap. 7.2 C.1.2"},
+{t:"circ",q:"Femme enceinte en ACR avec utérus au niveau de l’ombilic : quelle manœuvre ?",o:["Refouler l’utérus vers la gauche pendant la RCP","Refouler l’utérus vers la droite","Surélever les jambes","Ne pas masser"],e:"Dès le 5e mois, un équipier refoule l’utérus vers la gauche pour éviter la compression des gros vaisseaux par le fœtus et faciliter la circulation pendant le massage.",r:"Chap. 7.2 C.1.3"},
+{t:"circ",q:"Chez le nouveau-né à la naissance, quel rythme de RCP ?",o:["3 compressions pour 1 insufflation, environ 120 compressions/min","30 compressions pour 2 insufflations","15 compressions pour 2 insufflations","5 compressions pour 1 insufflation"],e:"Chez le nouveau-né à la naissance, un pouls < 60/min impose une RCP en 3/1 à une fréquence proche de 120 compressions par minute.",r:"Chap. 7.2 C.1.3"},
+{t:"circ",q:"Combien d’insufflations au maximum par cycle avant de reprendre les compressions ?",o:["2","3","5","Autant que nécessaire"],e:"Il ne faut pas tenter plus de 2 insufflations par cycle. Si elles sont inefficaces, on contrôle la bouche et la bascule de la tête avant le cycle suivant.",r:"Chap. 7.2 C.1.3"},
+{t:"circ",q:"Sapeur-pompier isolé, sans témoin, face à un enfant en ACR : que faire avant d’alerter ?",o:["10 cycles de 15/2 ou 5 cycles de 30/2","Alerter immédiatement","1 minute de massage seul","2 cycles de 30/2"],e:"Pour un nouveau-né, un nourrisson, un enfant ou un noyé sans témoin pour alerter, on pratique 10 cycles de RCP 15/2 ou 5 cycles 30/2 avant d’alerter.",r:"Chap. 7.2 C.2"},
+{t:"circ",q:"Quel cycle de RCP le sapeur-pompier utilise-t-il chez l’enfant et le nourrisson ?",o:["15/2","30/2","5/1","3/1"],e:"Les sapeurs-pompiers, professionnels entraînés, gardent le cycle 15/2 chez l’enfant, le nourrisson et le nouveau-né, contrairement au grand public. L’adulte reste en 30/2.",r:"Chap. 7.2 C.2"},
+{t:"circ",q:"Profondeur et fréquence des compressions thoraciques chez l’adulte ?",o:["5 à 6 cm, 100 à 120 par minute","3 à 4 cm, 80 à 100 par minute","6 à 8 cm, 120 à 140 par minute","Le tiers du thorax, 60 par minute"],e:"Chez l’adulte : 5 à 6 cm, à 100-120/min, bras tendus et verticaux. Chez l’enfant et le nourrisson : le tiers de l’épaisseur du thorax.",r:"FT 22.1"},
+{t:"circ",q:"Quel débit cardiaque apportent des compressions thoraciques bien réalisées ?",o:["20 à 30 % du débit normal","60 à 70 %","90 à 100 %","5 %"],e:"Les compressions apportent 20 à 30 % du débit cardiaque normal, suffisant pour garder le cerveau en vie quelques minutes jusqu’au choc ou à la réanimation médicamenteuse.",r:"FT 22.1"},
+{t:"circ",q:"Le DAE recommande un choc. Quand le délivrer ?",o:["Sans attendre la fin du message vocal, puis reprendre immédiatement la RCP","Après la fin du message et une vérification du pouls","Après 2 insufflations","Après accord du médecin"],e:"On n’attend pas la fin du message vocal pour délivrer le choc (critère de qualité), puis on reprend immédiatement la RCP sans attendre l’annonce du DSA.",r:"FT 23.1"},
+{t:"circ",q:"Sur un enfant, seuls des patchs adultes sont disponibles. Peut-on les utiliser ?",o:["Oui, c’est autorisé","Non, jamais","Seulement après 8 ans","Seulement sur avis médical"],e:"Les patchs pédiatriques sont préférables, mais le sapeur-pompier qui ne dispose que de patchs adultes est autorisé à les utiliser sur un enfant, un nourrisson ou un nouveau-né.",r:"FT 23.1"},
+{t:"circ",q:"Victime en ACR sur une surface conductrice (plaques d’égout, tôle). Avant le DAE :",o:["La déplacer ou l’isoler","Mouiller la surface","Coller les patchs normalement","Ne pas utiliser le DAE"],e:"Une victime sur une surface mouillée ou conductrice doit être déplacée ou isolée ; une poitrine mouillée est séchée avant la pose des patchs.",r:"FT 23.1"},
+{t:"circ",q:"Une victime porteuse d’une Life Vest est transportée. Que faut-il emporter ?",o:["Le chargeur du dispositif","Rien, le gilet suffit","Le gilet de rechange","Le DSA de la victime"],e:"En cas de transport d’une victime porteuse de la Life Vest, quel que soit le motif, il faut emporter le chargeur.",r:"Chap. 7.2 C.1.3"},
+{t:"circ",q:"ACR consécutif à une hémorragie ou une allergie : qu’est-ce qui améliore le massage ?",o:["Le relevage des membres inférieurs","La position demi-assise","La PLS","Un massage plus lent"],e:"Dans l’ACR consécutif à une hémorragie ou une allergie, le relevage des membres inférieurs améliore le massage cardiaque externe.",r:"Chap. 7.2 C.1.3"},
+{t:"circ",q:"À partir de quel volume un adulte commence-t-il à ressentir les effets d’un saignement ?",o:["Environ 750 ml","Environ 100 ml","Environ 2 litres","Environ 250 ml"],e:"Un adulte ne commence à ressentir les effets d’un saignement qu’à partir d’environ 750 ml de sang.",r:"Chap. 7.3 A"},
+{t:"circ",q:"Quelles sont les caractéristiques d’une hémorragie artérielle ?",o:["Pulsatile, en jets saccadés, de sang rouge vif","En nappe, de sang sombre","Goutte à goutte, de sang noir","Sang mêlé de bulles"],e:"L’hémorragie artérielle est pulsatile au rythme du pouls, rouge vif et souvent très abondante. La veineuse est plus sombre et s’écoule en nappe.",r:"Chap. 7.3 A"},
+{t:"circ",q:"Qu’est-ce qu’un méléna ?",o:["Du sang noir, digéré, d’odeur fétide émis par l’anus","Du sang dans les vomissements","Du sang lors de la toux","Un saignement de nez"],e:"Méléna : sang noir digéré par l’anus. Hématémèse : vomissements. Hémoptysie : toux. Épistaxis : nez. Otorragie : oreilles.",r:"Chap. 7.3 A"},
+{t:"circ",q:"Hémorragie externe sans corps étranger : premier geste après constat ?",o:["Une compression directe","Un garrot d’emblée","Un point de compression","Un pansement simple"],e:"On constate l’hémorragie, on observe la plaie à la recherche d’un corps étranger, puis en son absence on réalise immédiatement une compression directe, et on allonge la victime.",r:"Chap. 7.3 B.2"},
+{t:"circ",q:"Une plaie hémorragique contient un corps étranger. Que faire ?",o:["Ne jamais le retirer ; poser un garrot en amont si le saignement est important","Le retirer puis comprimer","Appuyer directement dessus","Le retirer seulement s’il est petit"],e:"Le corps étranger limite le saignement et son retrait pourrait aggraver la lésion. Si le saignement est important, un garrot est posé en amont.",r:"Chap. 7.3 B.2"},
+{t:"circ",q:"Dans quels cas un point de compression direct est-il justifié ?",o:["Plaie de la carotide, de la fémorale au pli de l’aine ou membre arraché","Toute plaie du bras","Toute plaie de la jambe","Les saignements de nez"],e:"Il se justifie quand compression directe et garrot sont impossibles : carotide au cou, fémorale au pli de l’aine, membre arraché ou sectionné. Il est maintenu jusqu’à l’arrivée d’un médecin.",r:"Chap. 7.3 B.2"},
+{t:"circ",q:"À quelle distance au-dessus de la plaie pose-t-on le garrot ?",o:["5 à 7 cm","1 à 2 cm","15 à 20 cm","À la racine du membre systématiquement"],e:"On limite la longueur de membre garrotté, mais on garde une distance de sécurité de 5 à 7 cm au-dessus de la plaie pour comprimer les vaisseaux sectionnés et rétractés.",r:"FT 10.3"},
+{t:"circ",q:"Douleur typique d’origine coronarienne :",o:["Médio-thoracique, rétro-sternale, constrictive, irradiant parfois dans le bras gauche","Latérale, augmentée par l’inspiration profonde","Déclenchée par la palpation du thorax","Toujours localisée au ventre"],e:"Elle est typiquement médio-thoracique, rétro-sternale, constrictive (cœur serré dans un étau), parfois irradiante au bras gauche, au cou, à la mâchoire, et le plus souvent non modifiée par l’inspiration ou la palpation.",r:"Chap. 7.4 B"},
+{t:"circ",q:"Sapeur-pompier isolé : la compression directe est efficace mais il doit se libérer. Il utilise :",o:["Un tampon relais","Un point de compression","Rien, il ne bouge pas","Un pansement sec simple"],e:"Isolé, il remplace la compression directe par un tampon relais si elle est efficace, ou par un garrot dans le cas contraire.",r:"Chap. 7.3 B.2"},
+
+/* ---------- 8 & 18. Infections et hygiène ---------- */
+{t:"infec",q:"Une projection de sang sur une peau saine est-elle un AEV ?",o:["Non, elle ne présente aucun risque","Oui, toujours","Oui, si le sang est abondant","Oui, si la victime est connue séropositive"],e:"L’AEV est un contact entre un liquide biologique contaminant et le sang d’une personne via une effraction cutanée ou une muqueuse. Sur peau saine, ce n’est pas un AEV.",r:"Chap. 8.2 C"},
+{t:"infec",q:"En cas de piqûre par un objet souillé, combien de temps tremper la plaie dans le Dakin® ?",o:["Au moins 10 minutes","30 secondes","2 minutes","1 heure"],e:"Après lavage à l’eau et au savon puis rinçage, l’antisepsie se fait en trempant la plaie dans le Dakin® à usage unique pendant au moins 10 minutes.",r:"Chap. 8.2 C"},
+{t:"infec",q:"Comment se transmet l’hépatite A ?",o:["Par voie digestive","Par voie sanguine","Par voie sexuelle uniquement","Par piqûre d’insecte"],e:"L’hépatite A se transmet par voie digestive ; les hépatites B et C par voie sanguine ou sexuelle.",r:"Chap. 8.2 B"},
+{t:"infec",q:"Lors du lavage des mains, combien de temps se savonner ?",o:["30 secondes","5 secondes","2 minutes","10 secondes"],e:"On se savonne pendant 30 secondes en insistant sur la pulpe des doigts, les espaces interdigitaux, le pourtour des ongles, le dos des mains et les poignets.",r:"FT 1.1"},
+{t:"infec",q:"Le lavage des mains dispense-t-il du port de gants ?",o:["Non","Oui","Oui, s’il est fait avec une solution hydro-alcoolique","Oui, pour les victimes connues"],e:"L’utilisation de cette méthode de désinfection des mains ne dispense pas du port de gants.",r:"FT 1.1"},
+
+/* ---------- 9. Pathologies diverses ---------- */
+{t:"patho",q:"En dessous de quelle glycémie la victime est-elle en hypoglycémie certaine ?",o:["0,6 g/l (3,3 mmol/l)","1 g/l","0,9 g/l","1,26 g/l"],e:"Une glycémie normale est aux alentours de 0,8 g/l (5 mmol/l). En dessous de 0,6 g/l ou 3,3 mmol/l, l’hypoglycémie est certaine.",r:"Chap. 9.3 A"},
+{t:"patho",q:"Un patient est considéré comme diabétique si sa glycémie à jeun est supérieure à :",o:["1,26 g/l","0,8 g/l","2 g/l","1 g/l"],e:"Le diabète se définit par une glycémie à jeun supérieure à 1,26 g/l.",r:"Chap. 9.3 B"},
+{t:"patho",q:"À quelle condition peut-on resucrer une victime par la bouche ?",o:["Si, et seulement si, elle est capable de déglutir","Toujours","Si elle est inconsciente, en PLS","Si sa glycémie est > 1 g/l"],e:"L’apport de sucre oral se fait si, et seulement si, la victime peut déglutir : boissons sucrées (non light), une dizaine de morceaux de sucre dans l’eau, miel, confiture… puis sucres lents.",r:"Chap. 9.3 C"},
+{t:"patho",q:"Quelle hormone permet le passage et l’utilisation du glucose dans les organes ?",o:["L’insuline","Le glucagon","L’adrénaline","L’histamine"],e:"L’insuline fait entrer le glucose dans les organes ; le glucagon libère le sucre stocké dans le foie ; l’adrénaline est hyperglycémiante.",r:"Chap. 9.3 A"},
+{t:"patho",q:"Pour mesurer la glycémie, comment nettoie-t-on le doigt ?",o:["À l’eau et au savon uniquement","Avec une solution hydro-alcoolique","Avec du Dakin®","On ne le nettoie pas"],e:"Le doigt est nettoyé uniquement à l’eau et au savon : la solution hydro-alcoolique peut fausser la mesure. On évite le pouce, l’index et la pulpe des doigts.",r:"FT 28.1"},
+{t:"patho",q:"Qu’est-ce qui caractérise la crise de spasmophilie ?",o:["Fourmillements symétriques des extrémités, sans jamais de perte de connaissance","Perte de connaissance brutale","Fièvre élevée","Paralysie d’un côté du corps"],e:"Une ventilation trop rapide élimine le CO2 et fait contracter les muscles. Fourmillements, oppression, angoisse, mais jamais de perte de connaissance.",r:"Chap. 9.2"},
+{t:"patho",q:"Mains en « position d’accoucheur » évoquent :",o:["Une crise de tétanie","Un AVC","Une hypoglycémie","Une convulsion"],e:"La crise de tétanie, second stade après la spasmophilie, provoque des contractions avec mains en position d’accoucheur : paumes vers le haut, doigts convergents.",r:"Chap. 9.2"},
+{t:"patho",q:"Quelle proportion de la population est touchée par l’allergie ?",o:["Une personne sur 4","Une personne sur 100","Une personne sur 2","Une personne sur 20"],e:"L’allergie est une pathologie fréquente qui touche une personne sur 4, avec une prédisposition familiale fréquente (terrain atopique).",r:"Chap. 9.4 A"},
+{t:"patho",q:"Quelle molécule contiennent les seringues auto-injectables Anapen® et Anakit® ?",o:["De l’adrénaline","De l’insuline","Du glucagon","De la cétirizine"],e:"Anakit® et Anapen® sont des seringues auto-injectables d’adrénaline. Zyrtec® et Virlix® contiennent de la cétirizine (antihistaminique).",r:"Chap. 9.4 B"},
+{t:"patho",q:"Choc anaphylactique : position de la victime ?",o:["Allongée","Assise","Debout","Demi-assise jambes pliées"],e:"La victime est placée en position adaptée à sa détresse : assise en cas de difficulté respiratoire, allongée en cas de choc anaphylactique.",r:"Chap. 9.4 C"},
+
+/* ---------- 11. Intoxications ---------- */
+{t:"intox",q:"Quelle est l’affinité du CO pour l’hémoglobine par rapport à l’oxygène ?",o:["250 fois plus élevée","2 fois plus élevée","25 fois plus élevée","10 000 fois plus élevée"],e:"Le CO a une affinité 250 fois plus forte que l’O2 pour l’hémoglobine, encore plus pour l’hémoglobine du fœtus.",r:"Chap. 11.6"},
+{t:"intox",q:"Sous oxygène normobare, combien de temps faut-il pour éliminer 50 % du CO ?",o:["1 h 30","20 minutes","4 à 5 heures","24 heures"],e:"Pour éliminer 50 % du CO : 4 à 5 h en air ambiant, 1 h 30 sous O2 et 20 min en milieu hyperbare.",r:"Chap. 11.6 A"},
+{t:"intox",q:"Quel débit d’O2 pour une victime intoxiquée au CO ou aux fumées ?",o:["15 l/min au masque haute concentration, sans diminuer","6 l/min aux lunettes","8 l/min au masque moyenne concentration","Selon la SpO2"],e:"Le débit initial du masque haute concentration est de 15 l/min ; pour le CO, les fumées et les accidents de décompression, il reste à 15 l/min.",r:"FT 20.1"},
+{t:"intox",q:"Une victime dans le coma par CO se réveille dès qu’on l’a extraite. Elle est :",o:["Toujours gravement intoxiquée","Hors de danger","Simple témoin","Laissée sur place"],e:"Une victime dans le coma peut se réveiller dès son extraction de l’atmosphère toxique, mais elle reste gravement intoxiquée.",r:"Chap. 11.6"},
+{t:"intox",q:"Quelle est la densité du monoxyde de carbone ?",o:["0,96, proche de l’air","1,5, plus lourd que l’air","0,3, très léger","2, il stagne au sol"],e:"Le CO est incolore, inodore, insipide, d’une densité proche de l’air (0,96). Il provient de toute combustion incomplète.",r:"Chap. 11.6 A"},
+
+/* ---------- 12. Circonstances ---------- */
+{t:"circo",q:"En dessous de quelle température se situe le seuil de gravité de l’hypothermie ?",o:["32 °C","35 °C","34 °C","30 °C"],e:"L’hypothermie commence sous 35 °C ; le seuil de gravité est sous 32 °C. Vers 28 °C, une FV peut survenir à la moindre mobilisation.",r:"Chap. 12.1"},
+{t:"circo",q:"Classez les pathologies liées à la chaleur du moins grave au plus grave :",o:["Insolation, épuisement hyperthermique, coup de chaleur","Coup de chaleur, insolation, épuisement","Épuisement, coup de chaleur, insolation","Insolation, coup de chaleur, épuisement"],e:"Du moins grave au plus grave : insolation, épuisement hyperthermique, coup de chaleur (pronostic vital engagé sans prise en charge immédiate).",r:"Chap. 12.2 A"},
+{t:"circo",q:"Comment le BSP résume-t-il les effets du courant électrique ?",o:["Les ampères tuent et les volts brûlent","Les volts tuent et les ampères brûlent","Seule la durée compte","Le courant continu est sans danger"],e:"Les conséquences dépendent surtout de l’intensité (ampères) et de la tension (volts) : les ampères tuent et les volts brûlent.",r:"Chap. 12.7 A"},
+{t:"circo",q:"Qu’est-ce que l’électrocution ?",o:["L’état d’une victime en arrêt cardiaque après le passage du courant","Toute lésion due au courant","Une brûlure superficielle","Une tétanisation sans gravité"],e:"L’électrisation regroupe les lésions dues au passage du courant ; l’électrocution désigne une victime en arrêt cardiaque après ce passage.",r:"Chap. 12.7 A"},
+{t:"circo",q:"Comment s’appelle le stade 1 de la noyade ?",o:["L’aquastress","La petite hypoxie","La grande hypoxie","L’anoxie"],e:"Stade 1 : aquastress. La victime a fait le « bouchon », tête alternativement au-dessus et au-dessous de l’eau.",r:"Chap. 12.8 A"},
+{t:"circo",q:"Qu’est-ce que l’hydrocution ?",o:["Une perte de connaissance due au contact de l’eau chez des personnes souffrant d’urticaire au froid ou à l’eau","Une noyade en eau douce","Un accident de décompression","Une hypothermie légère"],e:"L’hydrocution est une perte de connaissance due au contact de l’eau avec la peau chez certains individus souffrant d’urticaire au froid ou à l’eau.",r:"Chap. 12.8 A"},
+{t:"circo",q:"Qu’est-ce que le crush-syndrome ?",o:["La destruction des muscles par compression continue et prolongée de grosses masses musculaires","Une fracture du bassin","Un traumatisme crânien","Une brûlure électrique"],e:"Le syndrome des ensevelis résulte d’une destruction traumatique et ischémique des cellules musculaires par compression prolongée, avec accumulation de produits toxiques.",r:"Chap. 12.5"},
+{t:"circo",q:"Morsure ou piqûre : que retirer avant l’apparition du gonflement ?",o:["Bagues, bracelets ou vêtements serrés","Rien","Le venin par aspiration","Les chaussures uniquement"],e:"La conduite impose d’intervenir en sécurité, de mettre la victime à l’abri et de retirer bagues, bracelets ou vêtements serrés avant le gonflement.",r:"Chap. 12.3 C"},
+
+/* ---------- 13. Plaies et brûlures ---------- */
+{t:"peau",q:"Les brûlures du 1er degré sont-elles comptées dans la surface brûlée chez l’adulte ?",o:["Non, seules les 2e et 3e degrés comptent","Oui, toujours","Oui, si elles dépassent 10 %","Seulement au visage"],e:"Seules les brûlures du 2e et 3e degré sont comptabilisées. Mais un 1er degré étendu chez l’enfant ou le nourrisson impose un avis médical.",r:"Chap. 13.2 B"},
+{t:"peau",q:"Quel signe caractérise la brûlure du 2e degré ?",o:["Des cloques (phlyctènes)","Une peau cartonnée et indolore","Une simple rougeur sèche","Une peau noire carbonisée"],e:"Le 2e degré touche l’épiderme et une partie du derme : douleur intense et phlyctènes, fermées ou rompues.",r:"Chap. 13.2 B.2"},
+{t:"peau",q:"Pourquoi une brûlure du 3e degré est-elle peu douloureuse ?",o:["Les terminaisons nerveuses sont détruites","Elle est superficielle","La victime est en état de choc","Le froid anesthésie la zone"],e:"Toutes les couches de la peau sont touchées, terminaisons nerveuses comprises : peau dure, cartonnée, pâle ou chamois, peu douloureuse voire indolore.",r:"Chap. 13.2 B.2"},
+{t:"peau",q:"Selon la règle des 9 de Wallace, que représente un membre inférieur chez l’adulte ?",o:["18 %","9 %","36 %","27 %"],e:"Membre supérieur 9 %, membre inférieur 18 %, tronc 36 % (18 % par face), tête 9 %, parties génitales 1 %.",r:"Chap. 13.2 B.3"},
+{t:"peau",q:"Quelle surface représente la face palmaire de la main de la victime ?",o:["1 %, quel que soit l’âge","5 %","9 %","0,5 % chez l’adulte et 2 % chez l’enfant"],e:"La paume et les doigts de la victime représentent 1 % de sa surface corporelle, quel que soit l’âge. La règle de Wallace ne s’applique qu’à l’adulte.",r:"Chap. 13.2 B.3"},
+{t:"peau",q:"Chez le nourrisson, combien représente la tête ?",o:["20 % de la surface du corps","9 %","5 %","36 %"],e:"La règle de Wallace ne vaut que pour l’adulte : chez le nourrisson, la tête représente 20 % de la surface corporelle.",r:"Chap. 13.2 B.3"},
+{t:"peau",q:"Brûlure du 2e degré thermique chez l’adulte : à partir de quelle surface est-elle grave ?",o:["Plus de 15 %","Plus de 5 %","Plus de 10 %","Plus de 30 %"],e:"Seuils de gravité : plus de 5 % chez le nourrisson, plus de 10 % chez l’enfant ou l’adulte de plus de 60 ans, plus de 15 % chez l’adulte.",r:"Chap. 13.2 C.3"},
+{t:"peau",q:"Une brûlure du 2e degré est simple si sa surface est inférieure à :",o:["La moitié de la paume de la victime (0,5 %)","Une paume (1 %)","5 %","10 %"],e:"Brûlure simple du 2e degré : moins de 0,5 % (moitié de la face palmaire) et aucune localisation à risque (visage, cou, œil, mains, plis, orifices, voies aériennes).",r:"Chap. 13.2 C.1"},
+{t:"peau",q:"Combien de temps refroidir une brûlure simple ?",o:["Sans limite de durée, tant que la victime le souhaite","Exactement 5 minutes","Jamais","1 heure obligatoirement"],e:"Une brûlure simple se refroidit sans limite de durée, tant que la victime le souhaite (effet antidouleur), par compresse hydrogel ou ruissellement d’eau sans pression.",r:"Chap. 13.2 E.1"},
+{t:"peau",q:"Brûlure grave étendue (adulte > 15 %) : faut-il la refroidir ?",o:["Non, on ne refroidit pas","Oui, abondamment","Oui, pendant 20 minutes","Oui, avec de la glace"],e:"On ne refroidit pas les brûlures dépassant 5 % chez le nourrisson, 10 % chez l’enfant, 15 % chez l’adulte. On couvre dans une couverture propre, idéalement stérile.",r:"Chap. 13.2 E.3"},
+{t:"peau",q:"Que faire des phlyctènes ?",o:["Ne jamais les percer","Les percer avec une aiguille stérile","Les vider puis désinfecter","Les découper"],e:"Quelle que soit la gravité de la brûlure, la conduite est de ne pas percer les phlyctènes.",r:"Chap. 13.2 E"},
+{t:"peau",q:"Comment laver une plaie simple ?",o:["Du centre vers la périphérie, sans jamais revenir en arrière","De la périphérie vers le centre","Par frottements circulaires","Avec une solution hydro-alcoolique"],e:"On lave au sérum physiologique (ou eau et savon) par arrosage ou compresses imbibées, du centre vers la périphérie, sans revenir en arrière.",r:"Chap. 13.1 E.1"},
+
+/* ---------- 14. Maternité ---------- */
+{t:"mater",q:"Combien de naissances ont lieu en pré-hospitalier par an à la BSPP ?",o:["250 à 300","25 à 30","2 500 à 3 000","4 500"],e:"La BSPP assure environ 4 500 interventions par an pour parturiente, et 250 à 300 naissances ont lieu en pré-hospitalier.",r:"Chap. 14.1"},
+{t:"mater",q:"Pourquoi allonger systématiquement la mère sur le côté ?",o:["Sur le dos, le fœtus peut comprimer la veine cave inférieure et faire chuter la pression artérielle","Pour faciliter l’expulsion","Pour son confort uniquement","Pour éviter les vomissements"],e:"Sur le dos, le fœtus comprime la veine cave inférieure : le retour veineux diminue, avec risque de chute de pression chez la mère et donc chez le fœtus.",r:"Chap. 14.3 A.3"},
+{t:"mater",q:"Les sapeurs-pompiers peuvent-ils réaliser un examen gynécologique ?",o:["Non, aucun examen gynécologique","Oui, pour évaluer la dilatation","Oui, si le médecin le demande par téléphone","Oui, en cas d’urgence"],e:"Aucun examen gynécologique ne doit être effectué par les sapeurs-pompiers.",r:"Chap. 14.3 A.2"},
+{t:"mater",q:"Rupture de la poche des eaux sans contraction : dans quel délai doit avoir lieu l’accouchement ?",o:["Dans les 24 heures","Dans l’heure","Dans la semaine","Aucun délai"],e:"La rupture peut survenir sans contraction ; la mère doit alors être hospitalisée et accoucher dans les 24 heures.",r:"Chap. 14.3 A.1"},
+{t:"mater",q:"Quand clampe-t-on le cordon ombilical ?",o:["Environ à 1 minute de vie, jamais moins sauf détresse","Immédiatement à la sortie","Après l’expulsion du placenta","Après 10 minutes"],e:"Le clampage se fait à 1 minute de vie minimum, sauf détresse du nouveau-né. Il doit impérativement être fait avant l’expulsion du placenta.",r:"Chap. 14.4"},
+{t:"mater",q:"Comment introduit-on le nouveau-né dans le sac en polyéthylène ?",o:["Par les pieds","Par la tête","Couché sur le ventre","On ne l’y met pas"],e:"Le nouveau-né est introduit obligatoirement par les pieds pour éviter un contact du sac avec son visage. Le sac lutte contre l’hypothermie.",r:"Chap. 14.4 A.2"},
+{t:"mater",q:"Sur quoi évalue-t-on le nouveau-né à la naissance ?",o:["Respiration, cri et tonus","La coloration de la peau","La glycémie","La température rectale"],e:"Respiration, cri et tonus sont les signes de bonne adaptation. La coloration n’est pas évaluée : le nouveau-né est cyanosé à la naissance, avec une SpO2 souvent proche de 70 %.",r:"Chap. 20.2 A"},
+{t:"mater",q:"Que contient le cordon ombilical ?",o:["Deux artères et une veine","Une artère et deux veines","Une artère et une veine","Deux artères et deux veines"],e:"Le cordon présente deux artères et une veine. Il est clampé à 10-15 cm de la paroi abdominale.",r:"Chap. 20.2 A"},
+{t:"mater",q:"Combien de sapeurs-pompiers faut-il pour réanimer un nouveau-né ?",o:["3","1","2","5"],e:"Les premiers gestes, simultanés, imposent obligatoirement 3 sapeurs-pompiers : le chef d’agrès gère la respiration, les équipiers sèchent et stimulent.",r:"Chap. 14.4 B.2"},
+{t:"mater",q:"Après la naissance, où pose-t-on le nouveau-né ?",o:["Sur le ventre de sa mère, peau contre peau, sans le surélever","Dans les bras d’un équipier","Sur le brancard","Au-dessus de la mère pour faciliter le drainage"],e:"Le nouveau-né est posé sur le ventre de sa mère, peau à peau, tête dégagée, sans le surélever pour éviter un reflux de sang tant que le cordon n’est pas clampé.",r:"Chap. 14.4 A.2"},
+
+/* ---------- 15-17. Trauma, routier, relevage ---------- */
+{t:"trauma",q:"Airbag passager non déclenché : quelle distance de sécurité respecter ?",o:["90 cm","30 cm","60 cm","1,5 m"],e:"Distances : 60 cm pour l’airbag conducteur, 30 cm pour l’airbag rideau, 90 cm pour l’airbag passager.",r:"Chap. 16.2 A.2"},
+{t:"trauma",q:"Airbag conducteur non déclenché : quelle distance de sécurité ?",o:["60 cm","30 cm","90 cm","20 cm"],e:"La distance de sécurité est de 60 cm pour l’airbag conducteur.",r:"Chap. 16.2 A.2"},
+{t:"trauma",q:"Comment aborder une victime dans un véhicule accidenté ?",o:["De préférence de face, pour éviter toute rotation de la tête","Par l’arrière","Par le côté opposé à la victime","Par le toit"],e:"On approche la victime de préférence de face afin d’éviter toute rotation de la tête, puis bilan primaire et maintien de la tête depuis l’extérieur.",r:"Chap. 16.3 C"},
+{t:"trauma",q:"Lors d’un relevage, où se place le chef ?",o:["En principe à la tête, pour surveiller le visage de la victime et les équipiers","Aux pieds","Au milieu","À l’écart"],e:"Le chef désigne la méthode et se place en principe à la tête : il doit surveiller le visage de la victime et la position des sapeurs-pompiers.",r:"Chap. 17.1 A"},
+{t:"trauma",q:"Quel est le rôle principal de la PLS ?",o:["Garder les voies aériennes libres en empêchant la chute de la langue","Immobiliser le rachis","Améliorer la circulation","Réchauffer la victime"],e:"La PLS empêche la chute de la langue en arrière et laisse les liquides s’écouler hors de la bouche.",r:"FT 17.1"},
+{t:"trauma",q:"Lésion du rachis : pourquoi est-elle grave ?",o:["Elle peut atteindre la moelle épinière","Elle saigne toujours beaucoup","Elle provoque toujours un arrêt cardiaque","Elle est toujours visible"],e:"La gravité tient au risque d’atteinte de la moelle épinière. La lésion n’est souvent que soupçonnée, seule la radiologie l’identifie.",r:"Chap. 15.4 A"},
+
+/* ---------- 19. Nombreuses victimes ---------- */
+{t:"novi",q:"Comment les premiers intervenants catégorisent-ils les victimes ?",o:["Décédés, urgences absolues (UA), urgences relatives (UR)","EU, U1, U2, U3","Rouge, orange, vert","Graves et légers"],e:"Les premiers intervenants trient en DCD, UA (pronostic vital engagé) et UR. Le médecin affine ensuite les UA en extrêmes urgences (EU) et U1.",r:"Chap. 19.1 D"},
+{t:"novi",q:"Une victime a été UA puis UR en cours d’intervention. Quelle catégorie retenir ?",o:["La plus grave : UA","La dernière : UR","Aucune","On recommence le tri"],e:"C’est la catégorisation la plus grave en cours d’intervention qui est retenue pour chaque victime.",r:"Chap. 19.1"},
+{t:"novi",q:"Quelle est l’action prioritaire du premier intervenant en situation à nombreuses victimes ?",o:["Évaluer la situation","Commencer une RCP","Évacuer les blessés légers","Rédiger les fiches bilans"],e:"Évaluer est prioritaire pour avoir une vision d’ensemble, estimer les risques, le nombre de victimes et les renforts, avant d’informer puis d’agir.",r:"Chap. 19.1 C"},
+
+/* ---------- 20. Pédiatrie ---------- */
+{t:"pedia",q:"Un nourrisson de 5 mois né à 7 mois de grossesse a les compétences d’un nourrisson de :",o:["3 mois","5 mois","7 mois","1 mois"],e:"On corrige l’âge légal en enlevant les mois de prématurité : 5 mois moins 2 mois = 3 mois.",r:"Chap. 20.3 A"},
+{t:"pedia",q:"Quels sont le poids et la taille moyens du nouveau-né normal ?",o:["3 à 3,5 kg pour environ 50 cm","2 kg pour 40 cm","4,5 kg pour 60 cm","1,5 kg pour 35 cm"],e:"À la naissance, le nouveau-né normal fait en moyenne 3 à 3,5 kg pour environ 50 cm.",r:"Chap. 20.2 A"},
+{t:"pedia",q:"En pédiatrie, quelle certitude rappelle le BSP ?",o:["Il faut croire les parents","Il faut se méfier des parents","L’enfant est un adulte en modèle réduit","Les pleurs ne sont jamais inquiétants"],e:"Il faut croire les parents : ils sont les mieux placés pour repérer une anomalie. L’enfant n’est pas un adulte en modèle réduit, c’est un adulte en devenir.",r:"Chap. 20.1"},
+{t:"pedia",q:"Jusqu’à quel âge tout signe chez le nourrisson impose généralement un transport en pédiatrie ?",o:["3 mois","1 mois","1 an","6 mois"],e:"Toute apparition de signes chez le nouveau-né et le nourrisson jusqu’à 3 mois impose généralement le transport vers un service pédiatrique.",r:"Chap. 20.1"},
+{t:"pedia",q:"Vers quel âge la maturation du système respiratoire se rapproche-t-elle de celle de l’adulte ?",o:["8 ans","2 ans","12 ans","16 ans"],e:"La maturation du système respiratoire ne se rapproche de celle de l’adulte que vers 8 ans. Le cerveau du nouveau-né n’a atteint que 25 % de son développement.",r:"Chap. 20.1"},
+{t:"pedia",q:"Chez le petit enfant qui parle, que vaut V3 au Glasgow pédiatrique ?",o:["Sons","Mots","Cris, gémissements","Parle comme d’habitude"],e:"V5 parle comme d’habitude, V4 mots, V3 sons, V2 cris et gémissements, V1 rien.",r:"Chap. 20.3 B.3"},
+
+/* ---------- Fiches techniques / O2 ---------- */
+{t:"gestes",q:"Quelle est la fraction inspirée en O2 (FiO2) dans l’air ambiant ?",o:["21 %","16 %","50 %","100 %"],e:"Dans l’air ambiant, la FiO2 est de 21 % ; avec de l’O2 pur, elle est proche de 100 %.",r:"FT 20.1"},
+{t:"gestes",q:"Quel est le débit initial du masque à haute concentration ?",o:["15 l/min","6 l/min","2 l/min","9 l/min"],e:"Débit initial 15 l/min. Une fois l’objectif atteint, il peut être réduit progressivement jusqu’à 8 l/min minimum, sauf CO, fumées et décompression où il reste à 15.",r:"FT 20.1"},
+{t:"gestes",q:"Quel débit minimum pour le masque à moyenne concentration ?",o:["6 l/min","8 l/min","2 l/min","15 l/min"],e:"Le masque moyenne concentration démarre à 15 l/min puis peut descendre jusqu’à 6 l/min minimum si l’amélioration persiste.",r:"FT 20.1"},
+{t:"gestes",q:"Quelle SpO2 cible chez un insuffisant respiratoire chronique (IRC) ?",o:["89 à 94 %","95 à 100 %","80 à 85 %","100 % obligatoirement"],e:"La cible est 95-100 % pour la plupart des victimes, et 89-94 % pour les IRC.",r:"FT 20.1"},
+{t:"gestes",q:"Donne-t-on de l’O2 systématiquement en cas de douleur thoracique ?",o:["Non, pas de façon systématique","Oui, toujours à 15 l/min","Oui, aux lunettes à 2 l/min","Oui, si la victime a plus de 60 ans"],e:"L’O2 est un médicament qui peut être nocif en excès. Il n’y a pas d’administration systématique pour les douleurs thoraciques et les AVC.",r:"FT 20.1"},
+{t:"gestes",q:"IRC sans détresse, sans O2 à domicile, avec gêne respiratoire : quel dispositif ?",o:["Lunettes à oxygène à 2 l/min","Masque haute concentration à 15 l/min","Insufflateur manuel","Aucun"],e:"Selon le protocole, l’IRC sans détresse vitale qui n’a pas de lunettes reçoit des lunettes à 2 l/min, augmentées progressivement si nécessaire.",r:"FT 20.1"},
+{t:"gestes",q:"L’inhalation d’O2 est possible si la fréquence respiratoire est :",o:["Supérieure à 6 par minute","Supérieure à 12 par minute","Inférieure à 6 par minute","Quelle qu’elle soit"],e:"L’inhalation concerne une victime qui respire suffisamment, avec une fréquence supérieure à 6 mouvements par minute. En dessous, on ventile.",r:"FT 20.1"},
+{t:"gestes",q:"Peut-on retirer l’O2 administré par inhalation de sa propre initiative ?",o:["Non, pas avant l’accord de la coordination médicale","Oui, dès que la SpO2 atteint 95 %","Oui, à l’arrivée dans le VSAV","Oui, si la victime le demande"],e:"L’O2 administré par inhalation ne doit pas être retiré avant accord de la coordination médicale.",r:"FT 20.1"},
+{t:"gestes",q:"Sur quel bras ne faut-il pas mesurer la SpO2 ?",o:["Celui qui porte le brassard de pression artérielle","Le bras dominant","Le bras gauche","Le bras droit"],e:"La SpO2 ne se mesure pas sur un bras portant le brassard de pression artérielle ni sur des doigts ou ongles traumatisés.",r:"FT 26.1"},
+{t:"gestes",q:"Où se place le DAE par rapport à la victime ?",o:["Près de la tête, pour que le sapeur-pompier qui insuffle entende les messages","Aux pieds","Dans le VSAV","Peu importe"],e:"Le DAE est placé près de la tête pour que le sapeur-pompier réalisant les insufflations entende les messages vocaux.",r:"FT 23.1"},
+{t:"gestes",q:"Chez l’adulte, où placer le talon de la main pour les compressions thoraciques ?",o:["Sur la moitié inférieure du sternum, sans appuyer sur l’appendice xiphoïde","Sur l’appendice xiphoïde","Sous le sein gauche","Au milieu de l’abdomen"],e:"Chez l’adulte, le talon d’une main se place sur la moitié inférieure du sternum, sur la ligne médiane, sans appuyer sur l’appendice xiphoïde.",r:"FT 22.1"},
+{t:"gestes",q:"Chez le nourrisson en équipe, avec quoi réalise-t-on les compressions ?",o:["La pulpe des deux pouces","Le talon d’une main","Les deux mains","Le poing"],e:"En équipe, on place la pulpe des deux pouces sur le sternum, un doigt au-dessus de l’appendice xiphoïde. Seul, on utilise la pulpe de 2 doigts.",r:"FT 22.1"}
+];
+
+/* ============ État ============ */
+const CLE = "ssuap-qcm-bsp2002-v1";
+let memoire = {stats:{}, meilleur:0, parties:0, son:true};
+try { const s = localStorage.getItem(CLE); if (s) memoire = Object.assign(memoire, JSON.parse(s)); } catch(e) {}
+function sauver(){ try { localStorage.setItem(CLE, JSON.stringify(memoire)); } catch(e) {} }
+
+Q.forEach((x,i)=>x.id=i);
+let mode = "entrainement", nbChoisi = 20;
+let themesActifs = new Set(Object.keys(THEMES));
+let partie = null;
+
+const $ = s => document.querySelector(s);
+const melange = a => { const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];} return b; };
+
+/* ============ ECG ============ */
+function construireTrace(plat){
+  let d="M0 40", x=0;
+  while(x<1600){
+    if(plat){ d+=` L${x+100} 40`; x+=100; continue; }
+    d+=` L${x+60} 40 L${x+70} 34 L${x+80} 40 L${x+92} 40 L${x+98} 48 L${x+106} 6 L${x+114} 60 L${x+120} 40 L${x+140} 40 L${x+158} 30 L${x+176} 40 L${x+200} 40`;
+    x+=200;
+  }
+  $("#tracePath").setAttribute("d", d);
+}
+construireTrace(false);
+function pouls(ok){
+  const ecg=$("#ecg"), m=$("#moniteur");
+  if(ok){ ecg.classList.remove("plat"); construireTrace(false); m.classList.remove("beat"); void m.offsetWidth; m.classList.add("beat"); }
+  else { ecg.classList.add("plat"); construireTrace(true); setTimeout(()=>{ecg.classList.remove("plat");construireTrace(false);},1100); }
+}
+
+/* ============ Son (doux) ============ */
+let actx=null;
+function bip(ok){
+  if(!memoire.son) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain();
+    o.type="sine"; o.frequency.value = ok?880:180;
+    g.gain.setValueAtTime(0.0001,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.06,actx.currentTime+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001,actx.currentTime+(ok?0.18:0.45));
+    o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime+(ok?0.2:0.5));
+    if(ok){ const o2=actx.createOscillator(),g2=actx.createGain(); o2.frequency.value=1175; g2.gain.setValueAtTime(0.0001,actx.currentTime+0.12); g2.gain.exponentialRampToValueAtTime(0.05,actx.currentTime+0.14); g2.gain.exponentialRampToValueAtTime(0.0001,actx.currentTime+0.32); o2.connect(g2).connect(actx.destination); o2.start(actx.currentTime+0.12); o2.stop(actx.currentTime+0.34); }
+  }catch(e){}
+}
+function majSon(){ $("#btnSon").textContent = memoire.son ? "🔈" : "🔇"; }
+$("#btnSon").onclick=()=>{ memoire.son=!memoire.son; sauver(); majSon(); };
+majSon();
+
+/* ============ Accueil ============ */
+function maitriseTheme(t){
+  const ids=Q.filter(q=>q.t===t).map(q=>q.id);
+  const ok=ids.filter(id=>(memoire.stats[id]||{}).ok>0 && ((memoire.stats[id]||{}).der===1)).length;
+  return ids.length? ok/ids.length : 0;
+}
+function dessinerThemes(){
+  const box=$("#themes"); box.innerHTML="";
+  const tous=document.createElement("button");
+  tous.className="chip"; tous.setAttribute("aria-pressed", themesActifs.size===Object.keys(THEMES).length);
+  tous.innerHTML="✨ Tout le BSP";
+  tous.onclick=()=>{ themesActifs = themesActifs.size===Object.keys(THEMES).length ? new Set() : new Set(Object.keys(THEMES)); dessinerThemes(); };
+  box.appendChild(tous);
+  for(const [k,v] of Object.entries(THEMES)){
+    const n=Q.filter(q=>q.t===k).length;
+    const b=document.createElement("button");
+    b.className="chip"; b.setAttribute("aria-pressed", themesActifs.has(k));
+    const m=Math.round(maitriseTheme(k)*100);
+    b.innerHTML=`${v.ico} ${v.nom} <span class="n">${n}</span><span class="maitrise" title="Maîtrise ${m} %"><i style="width:${m}%"></i></span>`;
+    b.onclick=()=>{ themesActifs.has(k)?themesActifs.delete(k):themesActifs.add(k); dessinerThemes(); };
+    box.appendChild(b);
+  }
+  $("#btnGo").disabled = themesActifs.size===0;
+}
+function dessinerStats(){
+  const vus=Object.keys(memoire.stats).length;
+  const maitrises=Object.values(memoire.stats).filter(s=>s.der===1).length;
+  const faibles=Object.entries(memoire.stats).filter(([id,s])=>s.der===0).length;
+  $("#stats").innerHTML = `<span>Questions vues : <b>${vus} / ${Q.length}</b></span><span>Maîtrisées : <b>${maitrises}</b></span><span>Meilleure série : <b>${memoire.meilleur} 🔥</b></span>${vus?'<button class="lien" id="btnReset">Remettre à zéro</button>':''}`;
+  $("#btnFaibles").classList.toggle("hidden", faibles===0);
+  $("#btnFaibles").textContent = `Réviser mes points faibles (${faibles})`;
+  const r=$("#btnReset"); if(r) r.onclick=()=>{ if(confirm("Effacer toute ta progression ?")){ memoire.stats={}; memoire.meilleur=0; sauver(); dessinerThemes(); dessinerStats(); } };
+}
+document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{
+  mode=b.dataset.mode;
+  document.querySelectorAll(".mode").forEach(x=>x.setAttribute("aria-pressed", x===b));
+});
+document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{
+  nbChoisi=+b.dataset.n;
+  document.querySelectorAll("[data-n]").forEach(x=>x.setAttribute("aria-pressed", x===b));
+});
+$("#btnGo").onclick=()=>{
+  let pool=melange(Q.filter(q=>themesActifs.has(q.t)));
+  if(mode!=="survie" && nbChoisi>0) pool=pool.slice(0,nbChoisi);
+  demarrer(pool);
+};
+$("#btnFaibles").onclick=()=>{
+  const ids=Object.entries(memoire.stats).filter(([id,s])=>s.der===0).map(([id])=>+id);
+  demarrer(melange(Q.filter(q=>ids.includes(q.id))));
+};
+$("#btnQuitter").onclick=()=>{ if(confirm("Quitter l’intervention en cours ?")) accueil(); };
+
+function afficher(id){
+  ["#ecranAccueil","#ecranQuiz","#ecranFin"].forEach(s=>$(s).classList.toggle("hidden", s!==id));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function accueil(){ clearInterval(partie&&partie.timer); partie=null; majConstantes(0,0,null); dessinerThemes(); dessinerStats(); afficher("#ecranAccueil"); }
+
+/* ============ Partie ============ */
+function majConstantes(score,serie,vies){
+  $("#cScore").textContent=score; $("#cSerie").textContent=serie;
+  if(vies===null){ $("#cVies").textContent="–"; $("#cViesLbl").textContent="vies"; }
+  else if(mode==="survie"){ $("#cVies").textContent="❤".repeat(vies)||"0"; $("#cViesLbl").textContent="vies"; }
+  else { $("#cVies").textContent=vies; $("#cViesLbl").textContent="bonnes"; }
+}
+function demarrer(pool){
+  partie={pool, i:0, score:0, serie:0, serieMax:0, bonnes:0, vies:3, rep:[], timer:null, repondu:false};
+  majConstantes(0,0, mode==="survie"?3:0);
+  afficher("#ecranQuiz");
+  poserQuestion();
+}
+function poserQuestion(){
+  const p=partie, q=p.pool[p.i];
+  p.repondu=false;
+  const total = mode==="survie" ? "∞" : p.pool.length;
+  $("#progTxt").textContent = `${p.i+1} / ${total}`;
+  $("#progBar").style.width = mode==="survie" ? Math.min(100,(p.i/Math.max(1,p.pool.length))*100)+"%" : (p.i/p.pool.length*100)+"%";
+  const choix = melange(q.o.map((txt,k)=>({txt, bonne:k===0})));
+  p.choix=choix;
+  const th=THEMES[q.t];
+  $("#fenetre").outerHTML = `<article class="fenetre" id="fenetre">
+    <div class="tete"><span class="th">${th.ico} ${th.nom}</span><span class="num">Q${p.i+1}</span></div>
+    ${mode==="chrono"?'<div class="chrono"><i id="chronoBar"></i></div>':''}
+    <div class="corps">
+      <p class="question">${q.q}</p>
+      <div class="reponses">${choix.map((c,k)=>`<button class="rep" data-k="${k}"><span class="lettre">${"ABCD"[k]}</span>${c.txt}</button>`).join("")}</div>
+      <div id="zoneExplic"></div>
+    </div></article>`;
+  document.querySelectorAll(".rep").forEach(b=>b.onclick=()=>repondre(+b.dataset.k));
+  if(mode==="chrono") lancerChrono();
+}
+function lancerChrono(){
+  const duree=25000, debut=performance.now(), bar=$("#chronoBar");
+  clearInterval(partie.timer);
+  partie.timer=setInterval(()=>{
+    const r=1-(performance.now()-debut)/duree;
+    if(bar){ bar.style.width=Math.max(0,r*100)+"%"; bar.style.background = r<.3 ? "#FF4D67" : "var(--jaune)"; }
+    if(r<=0){ clearInterval(partie.timer); repondre(-1); }
+  },100);
+}
+function repondre(k){
+  const p=partie; if(!p||p.repondu) return;
+  p.repondu=true; clearInterval(p.timer);
+  const q=p.pool[p.i];
+  const ok = k>=0 && p.choix[k].bonne;
+  document.querySelectorAll(".rep").forEach((b,j)=>{
+    b.disabled=true;
+    if(p.choix[j].bonne) b.classList.add("bonne");
+    else if(j===k) b.classList.add("fausse");
+    else b.classList.add("eteinte");
+  });
+  const s = memoire.stats[q.id] || {ok:0,ko:0,der:0};
+  if(ok){ s.ok++; s.der=1; p.bonnes++; p.serie++; p.serieMax=Math.max(p.serieMax,p.serie); p.score += 10 + Math.min(p.serie-1,10)*2; }
+  else { s.ko++; s.der=0; p.serie=0; if(mode==="survie") p.vies--; }
+  memoire.stats[q.id]=s;
+  if(p.serieMax>memoire.meilleur) memoire.meilleur=p.serieMax;
+  sauver();
+  p.rep.push({q, ok, choisi: k>=0?p.choix[k].txt:"Temps écoulé"});
+  majConstantes(p.score,p.serie, mode==="survie"?p.vies:p.bonnes);
+  pouls(ok); bip(ok);
+  if(ok && p.serie>0 && p.serie%5===0) confettis();
+  if(navigator.vibrate && !ok) try{navigator.vibrate(120);}catch(e){}
+
+  const bravo=["Pouls retrouvé !","Bilan parfait !","Chef d’agrès en puissance !","Impeccable, comme la tenue F1 !","Ça, c’est du BSP pur jus !","Le médecin coordinateur valide !"];
+  const oups=["Flatline… on reprend !","Pas de panique, on recommence le bilan.","Raté, mais tu ne le rateras plus.","Petit no flow, on relance !"];
+  const titre = ok ? bravo[Math.floor(Math.random()*bravo.length)] : (k<0?"Temps écoulé !":oups[Math.floor(Math.random()*oups.length)]);
+  const dernier = mode==="survie" ? (p.vies<=0 || p.i>=p.pool.length-1) : p.i>=p.pool.length-1;
+  $("#zoneExplic").innerHTML = `<div class="explic ${ok?'':'ko'}">
+      <h4>${ok?'✅':'❌'} ${titre}</h4>
+      ${ok?'':`<p><b>Bonne réponse :</b> ${q.o[0]}</p>`}
+      <p>${q.e}</p>
+      <p class="ref">📖 BSP 200.2 – ${q.r}</p>
+    </div>
+    <div class="suite"><button class="btn jaune" id="btnSuite">${dernier?'Voir mon bilan':'Question suivante'}</button></div>`;
+  $("#btnSuite").onclick=suivant;
+  $("#btnSuite").focus({preventScroll:true});
+  $("#zoneExplic").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function suivant(){
+  const p=partie;
+  if(mode==="survie" && p.vies<=0) return fin();
+  p.i++;
+  if(p.i>=p.pool.length) return fin();
+  poserQuestion();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function confettis(){
+  const em=["🔥","🚒","❤️","⭐","🩺"];
+  for(let i=0;i<16;i++){
+    const s=document.createElement("span"); s.className="confetti";
+    s.textContent=em[i%em.length];
+    s.style.left=(window.innerWidth/2)+"px"; s.style.top=(window.innerHeight/3)+"px";
+    s.style.setProperty("--dx",(Math.random()*500-250)+"px");
+    s.style.setProperty("--dy",(Math.random()*400-120)+"px");
+    s.style.setProperty("--rot",(Math.random()*540-270)+"deg");
+    document.body.appendChild(s); setTimeout(()=>s.remove(),1100);
+  }
+}
+
+/* ============ Fin ============ */
+function fin(){
+  const p=partie; clearInterval(p.timer);
+  memoire.parties++; sauver();
+  const n=p.rep.length, pct = n? Math.round(p.bonnes/n*100) : 0;
+  let badge, verdict, sous;
+  if(mode==="survie"){ badge="❤️"; verdict=`${p.bonnes} bonne${p.bonnes>1?'s':''} réponse${p.bonnes>1?'s':''} avant l’arrêt`; sous=p.bonnes>=30?"Endurance de marathonien du VSAV.":p.bonnes>=15?"Belle garde, tu tiens la distance.":"On se remet en tenue et on y retourne."; }
+  else if(pct>=90){ badge="🏆"; verdict="Prêt pour le départ réflexe !"; sous="Le BSP 200.2 n’a plus de secret pour toi."; }
+  else if(pct>=70){ badge="🚒"; verdict="Solide, chef !"; sous="Encore quelques réglages et c’est parfait."; }
+  else if(pct>=50){ badge="🩺"; verdict="Ça tient la route."; sous="Repasse tes erreurs ci-dessous, ça va rentrer."; }
+  else { badge="💪"; verdict="Bilan à compléter."; sous="Pas grave : chaque erreur corrigée est une vie sauvée plus tard."; }
+
+  const parTh={};
+  p.rep.forEach(r=>{ const t=r.q.t; parTh[t]=parTh[t]||{ok:0,n:0}; parTh[t].n++; if(r.ok) parTh[t].ok++; });
+  const lignes=Object.entries(parTh).sort((a,b)=>a[1].ok/a[1].n-b[1].ok/b[1].n).map(([t,v])=>{
+    const r=Math.round(v.ok/v.n*100);
+    return `<div class="ligne-th"><span>${THEMES[t].ico} ${THEMES[t].nom}</span><span class="jauge"><i style="width:${r}%;background:${r>=70?'var(--vert)':r>=50?'var(--jaune)':'var(--rouge)'}"></i></span><b>${v.ok}/${v.n}</b></div>`;
+  }).join("");
+  const erreurs=p.rep.filter(r=>!r.ok);
+
+  $("#ecranFin").innerHTML = `
+    <article class="fenetre">
+      <div class="tete"><span class="th">📋 Fiche bilan de ta garde</span><span class="num">${mode==="chrono"?"Départ réflexe":mode==="survie"?"3 vies":"Entraînement"}</span></div>
+      <div class="resultat">
+        <div class="badge">${badge}</div>
+        <div class="grosnote">${mode==="survie"?p.bonnes:pct+" %"}</div>
+        <p class="verdict">${verdict}</p>
+        <p class="sous">${sous}</p>
+        <p class="sous" style="margin-top:8px">${p.score} points – meilleure série ${p.serieMax} 🔥</p>
+        <div class="bilan-th">${lignes}</div>
+        <div class="depart" style="justify-content:center">
+          ${erreurs.length?'<button class="btn" id="btnRejouerErr">Rejouer mes erreurs ('+erreurs.length+')</button>':''}
+          <button class="btn sec" id="btnRejouer">Nouvelle partie</button>
+          <button class="btn jaune" id="btnAccueil">Accueil</button>
+        </div>
+      </div>
+    </article>
+    ${erreurs.length?`<h2>À revoir</h2><div class="erreurs">${erreurs.map(r=>`
+      <div class="err">
+        <p class="q">${THEMES[r.q.t].ico} ${r.q.q}</p>
+        <p>Ta réponse : ${r.choisi}</p>
+        <p class="ok">✔ ${r.q.o[0]}</p>
+        <p>${r.q.e}</p>
+        <p class="ref" style="font-size:14px;color:var(--texte-doux)">📖 BSP 200.2 – ${r.q.r}</p>
+      </div>`).join("")}</div>`:''}`;
+  afficher("#ecranFin");
+  if(pct>=90 && mode!=="survie") confettis();
+  const re=$("#btnRejouerErr"); if(re) re.onclick=()=>demarrer(melange(erreurs.map(r=>r.q)));
+  $("#btnRejouer").onclick=()=>$("#btnGo").onclick();
+  $("#btnAccueil").onclick=accueil;
+}
+
+/* ============ Clavier ============ */
+document.addEventListener("keydown",e=>{
+  if($("#ecranQuiz").classList.contains("hidden")||!partie) return;
+  if(!partie.repondu && ["1","2","3","4"].includes(e.key)){ const k=+e.key-1; if(partie.choix[k]) repondre(k); }
+  else if(partie.repondu && e.key==="Enter" && e.target.tagName!=="BUTTON"){ e.preventDefault(); suivant(); }
+});
+
+accueil();
+</script>
+</body>
+</html>
