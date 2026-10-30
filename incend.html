@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pression ! Révision Incendie – BSP 200.10 à 200.20</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --braise:#E8590C; --braise-fonce:#B8430A; --flamme:#FFB703;
+  --suie:#1B1F2A; --suie-2:#2A3142;
+  --vert:#13A06A; --vert-clair:#DAF4E7; --rouge:#D62839; --rouge-clair:#FCE2E4;
+  --fond:#F6F2EE; --surface:#FFFFFF; --texte:#1B1F2A; --texte-doux:#555D70;
+  --ligne:#E6DED6; --ombre:0 10px 30px rgba(27,31,42,.14);
+  --display:"Big Shoulders Display","Arial Narrow",Arial,sans-serif;
+  --corps:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --fond:#13161E; --surface:#1F2431; --texte:#F1EEEA; --texte-doux:#B3B9C8;
+    --ligne:#343B4D; --vert-clair:#103827; --rouge-clair:#45161C;
+    --ombre:0 10px 30px rgba(0,0,0,.5); color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{margin:0;min-height:100%}
+body{background:var(--fond);color:var(--texte);font-family:var(--corps);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--flamme);outline-offset:3px;border-radius:12px}
+.wrap{max-width:880px;margin:0 auto;padding:18px 16px 60px}
+.hidden{display:none!important}
+
+/* ---------- Tableau de bord ARI (élément signature) ---------- */
+.tableau{background:var(--suie);color:#fff;border-radius:24px;padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;box-shadow:var(--ombre);position:relative;overflow:hidden}
+.titre{font-family:var(--display);font-weight:900;font-size:clamp(42px,9vw,72px);line-height:.88;margin:0;letter-spacing:.5px;text-transform:none}
+.titre small{display:block;font-size:.34em;font-weight:700;color:var(--flamme);margin-top:8px;letter-spacing:.6px}
+.compteurs{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.cpt{background:var(--suie-2);border-radius:14px;padding:7px 12px;min-width:86px}
+.cpt b{display:block;font-family:var(--display);font-size:30px;line-height:1;font-weight:900}
+.cpt span{font-size:13px;color:#C7CCD8}
+.cpt.o b{color:var(--flamme)}.cpt.v b{color:#5EE6A8}
+.mano{width:170px;height:170px;position:relative}
+.mano svg{width:100%;height:100%;display:block}
+.mano .val{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-family:var(--display);font-weight:900;font-size:30px;line-height:1}
+.mano .lbl{position:absolute;left:0;right:0;bottom:6px;text-align:center;font-size:12px;color:#C7CCD8}
+#aiguille{transform-origin:100px 100px;transition:transform .7s cubic-bezier(.3,1.6,.5,1)}
+.tableau.alerte{animation:clignote .5s 3}
+@keyframes clignote{50%{background:#5A1219}}
+.son{position:absolute;top:12px;right:14px;background:var(--suie-2);border:0;border-radius:12px;padding:6px 10px;color:#fff;font-size:18px;z-index:2}
+
+/* ---------- Accueil ---------- */
+.intro{margin:22px 4px 8px;font-size:18px;color:var(--texte-doux);max-width:64ch}
+h2{font-family:var(--display);font-weight:900;font-size:32px;margin:28px 4px 12px;line-height:1}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.mode{background:var(--surface);border:0;border-radius:20px;padding:16px 16px 18px;text-align:left;box-shadow:var(--ombre);transition:transform .15s ease}
+.mode:hover{transform:translateY(-3px)}
+.mode .ico{font-size:38px;line-height:1}
+.mode h3{font-family:var(--display);font-size:28px;margin:8px 0 2px;font-weight:900}
+.mode p{margin:0;color:var(--texte-doux);font-size:15px}
+.mode[aria-pressed="true"]{background:var(--braise);color:#fff}
+.mode[aria-pressed="true"] p{color:#FFE7D9}
+.themes,.nombre{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:0;border-radius:999px;padding:9px 14px;background:var(--surface);box-shadow:0 2px 8px rgba(27,31,42,.10);font-size:15px;display:flex;align-items:center;gap:8px;transition:transform .12s ease}
+.chip:active{transform:scale(.96)}
+.chip[aria-pressed="true"]{background:var(--suie);color:#fff}
+.chip .n{font-size:12px;opacity:.75}
+.chip .maitrise{width:34px;height:6px;border-radius:9px;background:var(--ligne);overflow:hidden;display:inline-block}
+.chip .maitrise i{display:block;height:100%;background:var(--vert)}
+.depart{margin-top:26px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{border:0;border-radius:16px;padding:15px 24px;font-weight:700;font-size:18px;background:var(--braise);color:#fff;box-shadow:0 6px 0 var(--braise-fonce);transition:transform .1s ease,box-shadow .1s ease}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--braise-fonce)}
+.btn.sec{background:var(--suie);box-shadow:0 6px 0 #07090D}
+.btn.sec:active{box-shadow:0 2px 0 #07090D}
+.btn.jaune{background:var(--flamme);color:var(--suie);box-shadow:0 6px 0 #C48A00}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.stats{display:flex;gap:14px;flex-wrap:wrap;margin-top:18px;color:var(--texte-doux);font-size:15px}
+.stats b{color:var(--texte)}
+.lien{background:none;border:0;color:var(--texte-doux);text-decoration:underline;padding:4px;font-size:14px}
+
+/* ---------- Quiz ---------- */
+.barre{display:flex;align-items:center;gap:10px;margin:14px 2px 12px}
+.prog{flex:1;height:12px;background:var(--ligne);border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--flamme),var(--braise));border-radius:99px;transition:width .35s ease}
+.pastille{background:var(--surface);border-radius:999px;padding:6px 12px;font-weight:700;font-size:15px;box-shadow:0 2px 8px rgba(27,31,42,.1);white-space:nowrap}
+.quitter{background:none;border:0;font-size:22px;padding:4px 8px;color:var(--texte-doux)}
+.fenetre{background:var(--surface);border-radius:24px;box-shadow:var(--ombre);overflow:hidden;animation:entre .32s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes entre{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.fenetre .tete{background:var(--suie);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.fenetre .tete .th{font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:.3px}
+.fenetre .tete .num{color:var(--flamme);font-family:var(--display);font-size:22px;font-weight:900;white-space:nowrap}
+.chrono{height:6px;background:var(--suie-2)}
+.chrono i{display:block;height:100%;background:var(--flamme);width:100%}
+.corps{padding:20px 18px 18px}
+.bsp{display:inline-block;font-size:13px;font-weight:700;color:var(--braise);margin-bottom:6px}
+.question{font-size:clamp(19px,4.4vw,23px);font-weight:700;line-height:1.35;margin:0 0 18px;max-width:60ch}
+.reponses{display:grid;gap:10px}
+.rep{border:0;text-align:left;background:var(--fond);border-radius:16px;padding:14px 14px 14px 60px;position:relative;font-size:17px;line-height:1.4;min-height:56px;transition:transform .12s ease,background .2s ease}
+.rep:hover:not(:disabled){transform:translateX(4px)}
+.rep .lettre{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:12px;background:var(--suie);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:21px}
+.rep:disabled{cursor:default}
+.rep.bonne{background:var(--vert-clair)}
+.rep.bonne .lettre{background:var(--vert)}
+.rep.fausse{background:var(--rouge-clair);animation:secoue .4s}
+.rep.fausse .lettre{background:var(--rouge)}
+.rep.eteinte{opacity:.5}
+@keyframes secoue{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.explic{margin-top:16px;border-radius:18px;padding:16px 16px 14px;background:var(--vert-clair);animation:entre .3s ease}
+.explic.ko{background:var(--rouge-clair)}
+.explic h4{margin:0 0 6px;font-family:var(--display);font-size:26px;font-weight:900;line-height:1.05}
+.explic p{margin:0 0 8px}
+.ref{font-size:14px;color:var(--texte-doux)}
+.suite{display:flex;justify-content:flex-end;margin-top:14px}
+.raccourcis{font-size:13px;color:var(--texte-doux);margin-top:10px;text-align:center}
+.etincelle{position:fixed;pointer-events:none;font-size:24px;z-index:50;animation:vole 1s ease-out forwards}
+@keyframes vole{to{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}
+
+/* ---------- Fin ---------- */
+.resultat{text-align:center;padding:26px 18px}
+.grosnote{font-family:var(--display);font-weight:900;font-size:clamp(76px,18vw,128px);line-height:.85;color:var(--braise)}
+.verdict{font-size:20px;font-weight:700;margin:12px 0 4px}
+.sous{color:var(--texte-doux);margin:0}
+.bilan-th{display:grid;gap:8px;margin-top:18px;text-align:left}
+.ligne-th{display:grid;grid-template-columns:1fr 110px 52px;gap:10px;align-items:center;font-size:15px}
+.jauge{height:10px;background:var(--ligne);border-radius:99px;overflow:hidden}
+.jauge i{display:block;height:100%;border-radius:99px}
+.erreurs{display:grid;gap:12px;margin-top:10px}
+.err{background:var(--surface);border-radius:18px;padding:14px 16px;box-shadow:var(--ombre)}
+.err .q{font-weight:700;margin:0 0 6px}
+.err .ok{color:var(--vert);font-weight:700}
+.err p{margin:4px 0}
+.badge{display:inline-block;font-size:46px;animation:rebond 1s ease infinite alternate}
+@keyframes rebond{to{transform:translateY(-8px) rotate(-6deg)}}
+@media (max-width:560px){
+  .tableau{grid-template-columns:1fr}
+  .mano{width:150px;height:150px;justify-self:center;order:-1}
+  .ligne-th{grid-template-columns:1fr 70px 44px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="tableau" id="tableau">
+    <button class="son" id="btnSon" aria-label="Activer ou couper le son" title="Son">🔈</button>
+    <div>
+      <h1 class="titre">Pression !<small>Révision incendie BSPP – BSP 200.10 à 200.20</small></h1>
+      <div class="compteurs" aria-live="polite">
+        <div class="cpt o"><b id="cScore">0</b><span>points</span></div>
+        <div class="cpt"><b id="cSerie">0</b><span>série 🔥</span></div>
+        <div class="cpt v"><b id="cBonnes">0</b><span>bonnes</span></div>
+      </div>
+    </div>
+    <div class="mano" aria-label="Manomètre ARI">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <circle cx="100" cy="100" r="92" fill="#2A3142"/>
+        <path d="M 30.7 140 A 80 80 0 0 1 40.5 46.5" fill="none" stroke="#D62839" stroke-width="14" stroke-linecap="round"/>
+        <path d="M 40.5 46.5 A 80 80 0 0 1 100 20" fill="none" stroke="#FFB703" stroke-width="14"/>
+        <path d="M 100 20 A 80 80 0 0 1 169.3 140" fill="none" stroke="#13A06A" stroke-width="14" stroke-linecap="round"/>
+        <g id="aiguille"><polygon points="96,100 104,100 100,30" fill="#FFFFFF"/></g>
+        <circle cx="100" cy="100" r="11" fill="#E8590C"/>
+      </svg>
+      <div class="val" id="cBar">300</div>
+      <div class="lbl">bars</div>
+    </div>
+  </header>
+
+  <main id="ecranAccueil">
+    <p class="intro">Questions et explications tirées uniquement des BSP 200.10, 200.11, 200.12, 200.13, 200.15, 200.16-17, 200.18, 200.19 et 200.20. Ton ARI démarre à 300 bars : une bonne réponse regonfle, une erreur te coûte de l’air.</p>
+
+    <h2>Ton mode de jeu</h2>
+    <div class="modes" role="group" aria-label="Mode de jeu">
+      <button class="mode" data-mode="entrainement" aria-pressed="true">
+        <div class="ico">🚒</div><h3>Entraînement</h3>
+        <p>À ton rythme, explication après chaque réponse.</p>
+      </button>
+      <button class="mode" data-mode="chrono" aria-pressed="false">
+        <div class="ico">⏱️</div><h3>Départ réflexe</h3>
+        <p>25 secondes par question, comme un départ en trombe.</p>
+      </button>
+      <button class="mode" data-mode="survie" aria-pressed="false">
+        <div class="ico">🧯</div><h3>Reco d’attaque</h3>
+        <p>Chaque erreur coûte 70 bars. À 90 bars, c’est le repli.</p>
+      </button>
+    </div>
+
+    <h2>Les BSP à réviser</h2>
+    <div class="themes" id="themes" role="group" aria-label="Chapitres"></div>
+
+    <h2>Nombre de questions</h2>
+    <div class="nombre" role="group" aria-label="Nombre de questions">
+      <button class="chip" data-n="10" aria-pressed="false">10</button>
+      <button class="chip" data-n="20" aria-pressed="true">20</button>
+      <button class="chip" data-n="40" aria-pressed="false">40</button>
+      <button class="chip" data-n="0" aria-pressed="false">Toutes</button>
+    </div>
+
+    <div class="depart">
+      <button class="btn" id="btnGo">Engager le binôme</button>
+      <button class="btn sec hidden" id="btnFaibles">Réviser mes points faibles</button>
+    </div>
+    <div class="stats" id="stats"></div>
+  </main>
+
+  <section id="ecranQuiz" class="hidden" aria-live="polite">
+    <div class="barre">
+      <button class="quitter" id="btnQuitter" aria-label="Retour à l’accueil" title="Retour à l’accueil">✕</button>
+      <div class="prog" aria-hidden="true"><i id="progBar"></i></div>
+      <span class="pastille" id="progTxt">1 / 20</span>
+    </div>
+    <article class="fenetre" id="fenetre"></article>
+    <p class="raccourcis">Clavier : touches 1 à 4 pour répondre, Entrée pour continuer</p>
+  </section>
+
+  <section id="ecranFin" class="hidden"></section>
+</div>
+
+<script>
+const THEMES = {
+  dn:   {nom:"Départ normal et engagement", ico:"🚒", bsp:"BSP 200.10"},
+  man:  {nom:"Manœuvres individuelles", ico:"🔧", bsp:"BSP 200.10"},
+  reco: {nom:"Reconnaissances", ico:"🔦", bsp:"BSP 200.11"},
+  sauv: {nom:"Sauvetages et mises en sécurité", ico:"🪢", bsp:"BSP 200.12"},
+  etab: {nom:"Établissements", ico:"🧯", bsp:"BSP 200.13"},
+  att:  {nom:"Attaque", ico:"💦", bsp:"BSP 200.15"},
+  deb:  {nom:"Protection, déblai, surveillance", ico:"🪓", bsp:"BSP 200.16 & 200.17"},
+  feu:  {nom:"Feux et phénomènes thermiques", ico:"🔥", bsp:"BSP 200.18"},
+  mat:  {nom:"Matériels", ico:"🎒", bsp:"BSP 200.19"},
+  nrbc: {nom:"EPI et matériels NRBC", ico:"☢️", bsp:"BSP 200.20"}
+};
+
+const Q = [
+/* ================= BSP 200.10 – Départ normal ================= */
+{t:"dn",q:"De quoi est constitué un départ normal (DN) ?",o:["2 engins-pompe et 1 moyen élévateur aérien","1 engin-pompe et 1 MEA","3 engins-pompe","2 engins-pompe, 1 MEA et 1 VSAV"],e:"Le DN, commandé par le chef de garde, comprend 2 engins-pompe et 1 MEA (avec ventilation opérationnelle).",r:"Partie 1 §1"},
+{t:"dn",q:"Pour quel sinistre type le départ normal est-il gabarisé ?",o:["Un feu d’appartement de 70 m² en étage, accessible aux MEA et restant dans son volume","Un feu de pavillon de 150 m²","Un feu de cave de 30 m²","Un feu d’entrepôt de 500 m²"],e:"Le DN est dimensionné pour un feu d’appartement de 70 m² situé en étage, accessible aux moyens élévateurs aériens et qui reste dans son volume.",r:"Partie 1 §1"},
+{t:"dn",q:"Quel est l’échelonnement d’engagement du DN quand la situation le permet ?",o:["1er engin-pompe, échelle, 2e engin-pompe","Échelle, 1er engin-pompe, 2e engin-pompe","1er et 2e engins-pompe, puis échelle","2e engin-pompe, 1er engin-pompe, échelle"],e:"Le DN s’engage dans l’ordre : 1er engin-pompe, puis l’échelle, puis le 2e engin-pompe.",r:"Partie 2 §3"},
+{t:"dn",q:"Pourquoi le 1er engin-pompe doit-il dépasser largement l’entrée de l’immeuble ?",o:["Pour laisser la façade aux MEA, faciliter ses moyens et se protéger du rayonnement","Pour se rapprocher du point d’eau suivant","Pour bloquer la circulation","Pour que le chef de garde se gare devant"],e:"Dépasser l’adresse facilite la mise en œuvre des moyens, permet l’engagement des MEA en façade, met à l’abri du rayonnement ou d’une explosion et permet à l’équipage de se préparer à couvert.",r:"Partie 2 §3.1"},
+{t:"dn",q:"Sur quel hydrant le 1er engin-pompe s’alimente-t-il ?",o:["Systématiquement sur l’hydrant le plus proche","Sur l’hydrant le plus approprié à la manœuvre","Sur le poteau le plus puissant du secteur","Uniquement sur sa citerne"],e:"Le 1er EP s’alimente systématiquement sur l’hydrant le plus proche. Le 2e EP, lui, s’alimente sur l’hydrant le plus approprié à la manœuvre.",r:"Partie 2 §3.1 et 3.5"},
+{t:"dn",q:"LA ou LDT mise en œuvre avant que la pompe ne soit alimentée : combien d’impulsions au maximum ?",o:["10 impulsions avant rupture d’attaque","5 impulsions","20 impulsions","Aucune limite"],e:"Exceptionnellement, le chef d’agrès peut autoriser la LDT ou la LA avant l’alimentation de la pompe ; le porte-lance dispose alors d’un maximum de 10 impulsions.",r:"Partie 2 §3.1"},
+{t:"dn",q:"Combien de litres sont nécessaires pour alimenter l’établissement de la ligne d’attaque ?",o:["300 litres","100 litres","1 000 litres","50 litres"],e:"Le BSP précise que 300 litres sont nécessaires pour alimenter l’établissement de la ligne d’attaque.",r:"Partie 2 §3.1"},
+{t:"dn",q:"Combien de lignes d’attaque le chef de garde autorise-t-il sur la pompe du 1er engin ?",o:["Une seule","Deux","Trois","Autant que la pompe le permet"],e:"Pour éviter une rupture d’attaque en cas de défaillance de la pompe du 1er engin, le chef de garde interdit le raccordement de plus d’une LA sur cette pompe.",r:"Partie 2 §3.6"},
+{t:"dn",q:"Combien d’engins-pompe engagés sur feu doivent obligatoirement être alimentés ?",o:["Les 3 premiers","Le premier seulement","Les 2 premiers","Tous, sans exception"],e:"Dans tous les cas, les 3 premiers engins-pompe engagés sur feu doivent obligatoirement être alimentés.",r:"Partie 2 §3.7"},
+{t:"dn",q:"Que représente le « tour du feu » effectué par le chef de garde ?",o:["La visualisation des 6 faces extérieures du volume sinistré et des accès","Un tour du pâté de maisons en VLR","Le contrôle des hydrants","Le contrôle croisé des EPI"],e:"Le tour du feu, c’est la visualisation des 6 faces extérieures du volume sinistré et des cheminements permettant d’y accéder, éventuellement à l’aide de la caméra thermique.",r:"Partie 2 §3.6"},
+{t:"dn",q:"Que doit faire le chef d’agrès du MEA avant d’aborder une victime pour un sauvetage ?",o:["Se munir du harnais du LSPCC","Retirer son ARI","Demander l’accord du chef de garde","Déployer le matelas de sauvetage"],e:"Dès lors qu’il doit s’engager pour un sauvetage, le chef d’agrès du MEA se munit du harnais du LSPCC avant d’aborder la victime.",r:"Partie 2 §3.4"},
+{t:"dn",q:"Le MEA arrive en 1er sans sauvetage à réaliser et doit couper une propagation en façade. Où se situe le point d’attaque ?",o:["Toujours sur la voie publique","Dans la cage d’escalier","Au palier du niveau sinistré","Dans la nacelle uniquement"],e:"Dans ce cas exceptionnel, le chef d’agrès peut établir les premières lances, mais le point d’attaque doit toujours se situer sur la voie publique.",r:"Partie 2 §3.3"},
+{t:"dn",q:"Quel est l’équipage du camion d’accompagnement (CA) ?",o:["2 hommes","4 hommes","6 hommes","1 conducteur seul"],e:"L’équipage du CA est de 2 hommes. Il emporte notamment une lance canon eau/mousse et 2 x 1 600 m de tuyaux de 110 mm.",r:"Partie 1 §3"},
+{t:"dn",q:"Quelle phrase résume le point de situation du 1er chef d’agrès au chef de garde ?",o:["« Il s’agit de… j’ai fait… je n’ai pas fait… »","« J’ai vu, j’ai fait, je redoute, je propose »","« Feu éteint, rien à signaler »","« Je vois, je fais, je rends compte »"],e:"Pour faciliter l’engagement du chef de garde, le 1er chef d’agrès fait un point de situation : « il s’agit de… j’ai fait… je n’ai pas fait… ».",r:"Partie 2 §3.2"},
+{t:"dn",q:"Quand l’ARI est-il endossé systématiquement dans l’engin ?",o:["Pour tout départ feu, court-circuit, explosion, fuite de gaz ou sur ordre","Uniquement pour les feux de cave","Uniquement sur ordre du chef de garde","Seulement une fois arrivé sur les lieux"],e:"L’ARI est endossé systématiquement dans l’engin pour tout départ pour feu, court-circuit, explosion, fuite de gaz ou sur ordre du chef d’agrès.",r:"Partie 3 Titre 1 §8"},
+{t:"dn",q:"Quand a lieu la vérification du matériel ?",o:["Chaque matin à la prise de garde, à chaque changement de piquet et après une intervention importante","Une fois par semaine","Uniquement après une intervention","Une fois par mois"],e:"La vérification se fait chaque matin à la prise de garde, à chaque changement de piquet d’incendie (ARI, APRF) et après réarmement ou retour d’intervention importante.",r:"Partie 2 §2"},
+{t:"dn",q:"Quel est le plus petit élément engagé au cours d’un incendie dans le cadre de la MGO ?",o:["L’équipe (un chef et un servant)","Le sapeur-pompier isolé","L’agrès","Le groupe"],e:"Composée d’un chef et d’un servant, l’équipe est le plus petit élément engagé. Elle prévoit toujours un itinéraire de repli.",r:"Partie 2 §4.1"},
+
+/* ================= BSP 200.10 – Manœuvres individuelles ================= */
+{t:"man",q:"À quelle fréquence est faite la reconnaissance opérationnelle des bouches et poteaux d’incendie publics ?",o:["Une fois par semestre","Une fois par an","Une fois par trimestre","Une fois par mois"],e:"Les BI et PI publics sont reconnus une fois par semestre. Les PEI privés, une fois par an, avec l’autorisation du propriétaire.",r:"Titre 1 §2.1"},
+{t:"man",q:"Une bouche d’incendie signalée par potelets : quelle est la distance maximale entre les 2 potelets ?",o:["2 m","5 m","1 m","10 m"],e:"Les 2 potelets rouges sont distants de 2 m maximum, pour une hauteur de 50 à 120 cm.",r:"Titre 1 §2.6"},
+{t:"man",q:"Combien de niveaux de barrage du gaz existe-t-il sur les robinets de branchement ?",o:["4","2","3","5"],e:"4 niveaux : ❶ organe de coupure générale, ❷ robinet pied de colonne montante, ❸ robinet de branchement particulier, ❹ robinet de compteur.",r:"Titre 1 §3"},
+{t:"man",q:"Comment se ferme généralement un barrage de gaz ?",o:["Par un 1/4 de tour dans le sens des aiguilles d’une montre","Par un tour complet vers la gauche","En tirant le goujon","Par 3 tours dans le sens inverse"],e:"La fermeture s’effectue généralement par 1/4 de tour dans le sens des aiguilles d’une montre, sans forcer et sans jamais revenir en arrière.",r:"Titre 1 §3"},
+{t:"man",q:"Après fermeture d’un barrage sous trottoir, qu’inscrit-on à la craie ?",o:["« GAZ BARRÉ »","« ROBINET FERMÉ »","« VU »","« DANGER GAZ »"],e:"On inscrit « GAZ BARRÉ » à la craie après un barrage sous trottoir. Une étiquette « ROBINET FERMÉ » est apposée après la manœuvre d’un barrage.",r:"Titre 1 §3"},
+{t:"man",q:"Un branchement porte une plaque rectangulaire « RÉSEAU ». Que faire ?",o:["Ne pas le manœuvrer : il est interdit aux sapeurs-pompiers","Le fermer en priorité","Le fermer à la clé universelle","Le signaler à la craie puis le fermer"],e:"Les branchements identifiés par une plaque « RÉSEAU » ne sont pas manœuvrables par les sapeurs-pompiers.",r:"Titre 1 §3"},
+{t:"man",q:"En cas de doute sur la position d’un barrage, quel critère compte ?",o:["La position du goujon, perpendiculaire à l’axe de la conduite","La couleur du robinet","La flèche peinte au sol","Le bruit du gaz"],e:"Le seul critère en cas de doute est la position du goujon (carré de manœuvre), perpendiculaire à l’axe supposé de la conduite. Si le goujon n’est pas manœuvrable, on privilégie le barrage amont.",r:"Titre 1 §3"},
+{t:"man",q:"Après la manœuvre d’un coffret de coupure rapide (CCR), qui peut rétablir le courant ?",o:["Uniquement les agents d’EDF","Le chef d’agrès","Le chef de garde","Le gardien de l’immeuble"],e:"Aucune manœuvre de rétablissement de courant n’est autorisée aux sapeurs-pompiers. Le bloc de coupure est remis à l’agent d’EDF dès son arrivée.",r:"Titre 1 §4"},
+{t:"man",q:"Entre quelles années les CCR ont-ils été installés, et combien environ ?",o:["Entre 1998 et 2004, environ 500","Entre 1980 et 1990, environ 5 000","Depuis 2010, environ 200","Entre 2004 et 2014, environ 1 000"],e:"EDF a installé environ 500 CCR entre 1998 et 2004. Ils ne sont plus installés depuis, EDF ne pouvant plus garantir la mise hors tension par cette seule manœuvre.",r:"Titre 1 §4"},
+{t:"man",q:"Pose d’un court-circuiteur dans le métro : quelle partie pose-t-on en premier ?",o:["La partie inférieure sur le rail de roulement (« négatif »)","La partie supérieure sur le rail conducteur (« positif »)","Les deux en même temps","Le câble sur la barre de guidage"],e:"On pose d’abord la partie inférieure sur le rail de roulement (négatif), puis on plaque la partie supérieure sur le rail conducteur (positif), tête tournée à l’opposé.",r:"Titre 1 §5"},
+{t:"man",q:"Où ne faut-il jamais poser un court-circuiteur ?",o:["Sur les barres de guidage côté quai et les coupons de protection","Sur le rail de roulement","À plus de 10 m de la station","Sur une voie métro fer"],e:"Interdit sur les coupons de protection des sectionnements (flèches noires et jaunes), sur les barres de guidage côté quai et sur les pans inclinés aux extrémités des rails.",r:"Titre 1 §5"},
+{t:"man",q:"À quoi sert le « Goldorak » de la RATP ?",o:["À détecter l’absence de tension sur le rail de traction","À court-circuiter le rail","À couper le courant de la station","À éclairer le tunnel"],e:"Utilisé uniquement par la RATP, ce n’est pas un court-circuiteur mais un détecteur d’absence de tension (diodes rouges si tension).",r:"Titre 1 §5"},
+{t:"man",q:"Quelle est la pression de la LDT 35 dans le tableau des établissements ?",o:["6 bars","3 bars","10 bars","15 bars"],e:"La LDT 35 fonctionne à 6 bars pour un débit de 250 à 500 l/min.",r:"Titre 1 §6"},
+{t:"man",q:"À partir de quel diamètre les tuyaux doivent-ils être vidés avant d’être roulés ?",o:["70 mm","45 mm","35 mm","110 mm"],e:"À partir de 70 mm de diamètre, les tuyaux doivent être vidés avant d’être roulés.",r:"Titre 1 §6.9"},
+{t:"man",q:"Par où commence l’enroulement d’un tuyau en simple ?",o:["Par la partie située au point le plus élevé de la rue","Par le demi-raccord muni de la courroie","Par le milieu du tuyau","Par le point le plus bas"],e:"On commence par le côté du demi-raccord non muni de la courroie, et par la partie la plus élevée de la rue pour faciliter l’écoulement de l’eau.",r:"Titre 1 §6.5"},
+{t:"man",q:"Pourquoi manœuvrer doucement les robinets des lances et divisions ?",o:["Pour éviter les coups de bélier","Pour économiser l’eau","Pour ne pas abîmer les joints","Pour garder la pression à 6 bars"],e:"Manœuvrer doucement les robinets des lances, divisions et retenues évite les coups de bélier.",r:"Titre 1 §6.11"},
+{t:"man",q:"Combien de personnes une échelle à crochets peut-elle supporter en position verticale ?",o:["Un seul homme","Deux hommes","Trois hommes","Un homme et une victime"],e:"Entièrement métalliques, sans résistance horizontale, les échelles à crochets ne supportent qu’un homme en position verticale. Leur emploi est en principe réservé aux sauvetages.",r:"Titre 2 §2.2"},
+{t:"man",q:"Jusqu’à quels étages l’échelle à coulisses 3 plans permet-elle d’accéder ?",o:["Les 3e et 4e étages","Les 1er et 2e étages","Jusqu’au 8e étage","Uniquement le rez-de-chaussée"],e:"Les échelles à coulisses petit et grand modèles servent aux 1er et 2e étages ; la 3 plans aux 3e et 4e étages, avec 2 arcs-boutants.",r:"Titre 2 §2.3 et 2.4"},
+{t:"man",q:"Comment pose-t-on une échelle à crochets à terre ?",o:["Crochets tournés vers le sol","Crochets vers le haut","Sur la tranche","Contre un mur"],e:"Afin d’éviter les accidents, les crochets doivent être tournés vers le sol lorsque l’échelle est posée à terre.",r:"Titre 2 §2.6"},
+{t:"man",q:"Lors de la montée à l’échelle à crochets, que crie le servant quand le chef peut engager un pied ?",o:["« ÉCHELON ! »","« MONTEZ ! »","« STOP ! »","« ATTENTION ! »"],e:"Le servant crie « MONTEZ ! » pour lancer l’ascension, puis « ÉCHELON ! » lorsque le chef peut engager un pied sur l’échelon.",r:"Titre 2 §2.6"},
+
+/* ================= BSP 200.11 – Reconnaissances ================= */
+{t:"reco",q:"Combien de types de reconnaissances existe-t-il ?",o:["3 : d’attaque, périphérique et à vue","2 : d’attaque et périphérique","4","1 seule, adaptée à chaque cas"],e:"Reconnaissance d’attaque (RA), reconnaissance périphérique (RP) et reconnaissance à vue (RV).",r:"Partie 1"},
+{t:"reco",q:"Que signifie « binôme porteur de l’ARI » ?",o:["Le binôme ne coiffe pas le masque","Le binôme a le masque coiffé","L’ARI est dans l’engin","La bouteille est fermée"],e:"Sous ARI : masque coiffé. Porteur de l’ARI : masque non coiffé.",r:"Partie 1 §4"},
+{t:"reco",q:"Qu’est-ce qu’un ARI en « position d’attente » ?",o:["SAD encliquetée, masque non coiffé, bouteille ouverte","Masque coiffé, bouteille fermée","ARI posé au sol","Bouteille ouverte, SAD retirée"],e:"Après contrôle croisé des EPI, l’ARI du binôme de sécurité est en attente : SAD encliquetée, masque non coiffé, bouteille ouverte.",r:"Partie 1 §4.3"},
+{t:"reco",q:"Durée maximale d’engagement en reconnaissance d’attaque (initial + ultérieur) ?",o:["25 minutes","30 minutes","15 minutes","40 minutes"],e:"La RA est limitée à 25 minutes au total. Au-delà de 25 min d’absence, le binôme de sécurité est engagé à sa recherche.",r:"Partie 2 §2.1"},
+{t:"reco",q:"Durée maximale d’engagement en reconnaissance périphérique ?",o:["30 minutes","25 minutes","45 minutes","Pas de limite"],e:"La RP est limitée à 30 minutes maximum, engagement initial et ultérieur compris.",r:"Partie 2 §3.1"},
+{t:"reco",q:"La reconnaissance à vue est-elle limitée dans le temps ?",o:["Non","Oui, à 25 minutes","Oui, à 30 minutes","Oui, à 10 minutes"],e:"La RV n’est pas limitée dans le temps, mais le binôme doit être inscrit sur un TGR et ne jamais se séparer.",r:"Partie 2 §4.1"},
+{t:"reco",q:"En dessous de quelle pression aucun engagement initial n’est autorisé ?",o:["280 bars","300 bars","200 bars","250 bars"],e:"Aucun engagement initial si l’ARI est sous 280 bars ; aucun réengagement ultérieur sous 200 bars.",r:"Partie 2 §2.1"},
+{t:"reco",q:"À quelle pression le binôme se replie-t-il immédiatement ?",o:["90 bars","55 bars","120 bars","200 bars"],e:"Le binôme se replie dès que le manomètre de l’un des 2 affiche 90 bars. Le sifflet d’alerte à 55 bars signale la fin proche de l’autonomie.",r:"Partie 2 §2.3"},
+{t:"reco",q:"Quel débit doit avoir le moyen hydraulique au point d’accès d’une RA ?",o:["500 l/min","250 l/min","1 000 l/min","150 l/min"],e:"Avant de partir en RA, on établit un moyen hydraulique délivrant 500 l/min au point d’accès.",r:"Partie 2 §2.2"},
+{t:"reco",q:"Dans quel sens doivent toujours s’effectuer les reconnaissances sous ARI ?",o:["Dans le sens du tirage, sauf sauvetage","À contre-tirage","Du haut vers le bas","Peu importe"],e:"Les reconnaissances sous ARI se font toujours dans le sens du tirage, hormis le cas express d’un sauvetage.",r:"Partie 2 §1"},
+{t:"reco",q:"Qu’est-ce qui seul justifie l’engagement d’emblée d’un binôme avant binôme de sécurité, TGR et moyen hydraulique ?",o:["La notion de victime ou de sauvetage à réaliser","Un ordre du chef de garde","Un feu de faible ampleur","L’absence de fumée"],e:"Seule la notion de victime ou de sauvetage justifie cet engagement immédiat, qui induit une prise de risque et ne doit pas durer.",r:"Partie 2 §1 et 2.1"},
+{t:"reco",q:"Quels locaux un binôme doit-il visiter en priorité ?",o:["Les voisins au même niveau, ceux de N+1, puis le dernier étage","Le rez-de-chaussée d’abord","Uniquement l’appartement sinistré","Les caves"],e:"Il visite en priorité les appartements voisins au même niveau, les locaux à N+1, le dernier étage, puis redescend étage par étage. Les locaux exposés aux fumées passent en premier.",r:"Partie 2 §1"},
+{t:"reco",q:"Quel chemin de repli le COS doit-il disposer ?",o:["Une échelle à main ou un MEA par niveau, un BEA pour 2 niveaux","Un seul MEA pour tout l’immeuble","Uniquement l’escalier","Une corde par niveau"],e:"Le COS dispose d’un chemin de repli par niveau : une échelle à main ou un MEA par niveau, un BEA pour 2 niveaux.",r:"Partie 2 §1"},
+{t:"reco",q:"Comment se compose le signal d’alerte de repli ?",o:["« Alerte Repli » x3 sur les canaux tactiques, puis tous les moyens sonores pendant 1 min","Un coup de sirène du 1er engin","Un message unique au chef de garde","Le déclenchement des ICS de tous les binômes"],e:"Sur ordre du COS : ❶ message « Alerte Repli » trois fois sur les canaux tactiques, ❷ corne de brume, porte-voix… pendant 1 min jusqu’au retour de tous les binômes.",r:"Partie 1 §5"},
+{t:"reco",q:"En reconnaissance d’attaque, qui progresse en tête ?",o:["Le chef, suivi du servant qui déroule la ligne guide","Le servant","Le binôme de sécurité","Le chef d’agrès"],e:"Le chef progresse en tête ; le servant suit et déroule la ligne guide ; le binôme reste solidaire par la liaison personnelle.",r:"Partie 2 §2.3"},
+{t:"reco",q:"Quels sont les 4 temps du compte rendu type « Reconnaissance » ?",o:["J’ai vu, j’ai fait, je redoute, je propose","Je vois, je fais, je rends compte, je repars","Analyse, action, alerte, attaque","Il s’agit de, j’ai fait, je n’ai pas fait, je demande"],e:"J’ai vu (analyse), j’ai fait (action), je redoute (estimation), je propose (anticipation).",r:"Partie 2 §2.5"},
+{t:"reco",q:"Après un passage en zone de remise en condition, combien de fois peut-on encore être engagé sous ARI ?",o:["Une seconde et dernière fois","Autant que nécessaire","Jamais","Deux fois encore"],e:"Après la zone de remise en condition, un sapeur-pompier ne peut être engagé qu’une seconde et dernière fois en reconnaissance sous ARI.",r:"Partie 2 §2.6"},
+{t:"reco",q:"Quelle inscription signale un appartement reconnu où 2 personnes sont confinées ?",o:["« VU » + fonction + engin d’appartenance + « 2 CONF »","« VU 2 »","« 2 VICTIMES »","« CONF » seulement"],e:"On inscrit « VU », la fonction, l’engin d’appartenance et « X CONF ». Aucune inscription si la reconnaissance est impossible ou incomplète.",r:"Partie 2 §3.5"},
+{t:"reco",q:"Quel est le grade minimum du responsable d’un point d’accès avec TGR ?",o:["CCH titulaire CT1SP","Sapeur 1re classe","Sergent-chef","Officier"],e:"Chaque point d’accès est contrôlé par un responsable muni d’un TGR, CCH titulaire CT1SP à minima.",r:"Partie 2 §3.1"},
+{t:"reco",q:"En reconnaissance à vue, le chef est-il amarré à son servant ?",o:["Non, mais le binôme ne doit jamais se séparer","Oui, toujours","Oui, par la ligne guide","Seulement de nuit"],e:"En RV, le chef n’est pas amarré à son servant, mais le binôme ne se sépare jamais.",r:"Partie 2 §4.1"},
+{t:"reco",q:"Qu’est-ce que la ligne de vie ?",o:["La ligne guide plus la liaison personnelle","La corde du LSPCC","Le tuyau de la lance","La liaison radio"],e:"Composée de la ligne guide et de la liaison personnelle, elle garde le binôme indissociable, l’oriente et maintient un lien avec l’extérieur.",r:"Partie 1 §5"},
+
+/* ================= BSP 200.12 – Sauvetages ================= */
+{t:"sauv",q:"Quelle est la définition du sauvetage ?",o:["Soustraire d’un péril immédiat une personne vouée sans aide à une mort certaine","Extraire en l’accompagnant une personne menacée","Faire sortir préventivement des personnes d’un périmètre","Maintenir des personnes à l’abri dans leurs locaux"],e:"Le sauvetage soustrait d’un péril immédiat une personne qui, sans aide extérieure, serait vouée à une mort certaine.",r:"Partie 1 §1"},
+{t:"sauv",q:"Comment appelle-t-on l’action d’extraire, en l’accompagnant, une personne menacée qui ne peut s’en soustraire seule ?",o:["Une mise en sécurité","Un sauvetage","Une évacuation","Un confinement"],e:"La mise en sécurité extrait en l’accompagnant une personne menacée par un danger auquel elle ne peut se soustraire d’elle-même.",r:"Partie 1 §2"},
+{t:"sauv",q:"Ordonner à des personnes de rester calfeutrées dans leurs locaux s’appelle :",o:["Le confinement","L’évacuation","La mise en sécurité","La reconnaissance"],e:"Le confinement maintient les personnes à l’abri d’un danger ambiant en se calfeutrant à l’intérieur de leurs locaux.",r:"Partie 1 §4"},
+{t:"sauv",q:"Par où le sauvetage s’effectue-t-il de préférence au cours d’un incendie ?",o:["Par les communications existantes","Par l’extérieur au MEA","Par le matelas de sauvetage","Par l’échelle à crochets"],e:"Les communications existantes sont les voies les plus rapides, commodes et sûres. Si elles sont impraticables, on passe par l’extérieur.",r:"Partie 2 §2"},
+{t:"sauv",q:"Une personne évacuée peut-elle être laissée seule ?",o:["Jamais","Oui, une fois hors du périmètre","Oui, si elle est valide","Oui, sur ordre du COS"],e:"En tout état de cause, la personne déplacée ne doit jamais être laissée seule.",r:"Partie 2 §3"},
+{t:"sauv",q:"Quelle hauteur de chute maximale pour le matelas de sauvetage ?",o:["15 m (4 à 5 étages)","8 m","25 m","30 m"],e:"Le matelas s’utilise pour une seule personne à la fois et une chute de 15 m maximum, soit 4 à 5 étages.",r:"Partie 3 §1.3"},
+{t:"sauv",q:"Quel est le temps de gonflage du matelas de sauvetage ?",o:["40 secondes","10 secondes","2 minutes","5 minutes"],e:"Le temps de gonflage est de 40 secondes après ouverture de la bouteille.",r:"Partie 3 §1.3"},
+{t:"sauv",q:"Quand utilise-t-on le matelas de sauvetage ?",o:["Quand aucun moyen par les communications existantes ou par l’extérieur n’est utilisable","En premier recours","Pour les personnes invalides","Pour plusieurs personnes à la fois"],e:"C’est le dernier recours : une personne valide en péril direct se réceptionne sur le tapis quand aucun autre moyen n’est utilisable.",r:"Partie 3 §1.3"},
+{t:"sauv",q:"Sauveteur isolé : quelle technique privilégier pour une personne invalide ?",o:["Le dégagement d’urgence","Le « porter pompier »","Le matelas de sauvetage","Le harnais LSPCC seul"],e:"Si le sauveteur est isolé, il privilégie le « dégagement d’urgence » plutôt que le porter pompier.",r:"Partie 3 §1.2"},
+{t:"sauv",q:"Combien de sauveteurs pour le 1er sauvetage par l’extérieur au LSPCC ?",o:["3 : un chef d’agrès et une équipe","2","4","6"],e:"Ce sauvetage nécessite trois sauveteurs : un chef d’agrès et une équipe (chef d’équipe + servant).",r:"Partie 3 §2.3.1"},
+{t:"sauv",q:"Dans quelle position la victime est-elle engagée pour la descente au LSPCC ?",o:["Face à la façade, les pieds en premier","Dos à la façade, tête en premier","Assise sur l’appui de fenêtre","Allongée sur une planche"],e:"Le chef d’agrès et le chef d’équipe placent la victime face à la façade, les pieds en premier.",r:"Partie 3 §2.3.1"},
+{t:"sauv",q:"Que crie le servant au sol pour recevoir la commande lancée ?",o:["« ENVOYEZ ! »","« HISSEZ ! »","« DESCENDEZ ! »","« HALTE ! »"],e:"Le chef d’équipe crie « ATTENTION ! », le servant répond « ENVOYEZ ! », puis la commande est lancée.",r:"Partie 3 §2.3.1"},
+{t:"sauv",q:"Quel nœud évite que la corde ne sorte du descendeur type 8 ?",o:["Un nœud de huit simple à l’extrémité du garant","Un nœud de chaise","Un nœud plat","Un demi-cabestan"],e:"Il convient de réaliser un nœud de huit simple à l’extrémité du garant.",r:"Partie 3 §2.3.1"},
+{t:"sauv",q:"Que dispose-t-on sur la victime pour éviter qu’elle ne sorte du harnais ?",o:["Un anneau de sangle rouge en « harnais torse » de réchappe","Une deuxième corde","Un collier cervical","Une sangle bleue aux chevilles"],e:"Un anneau de sangle ROUGE complémentaire est disposé en « harnais torse » de réchappe.",r:"Partie 3 §2.3.1"},
+{t:"sauv",q:"Sauvetage en excavation : quelles sont les 2 équipes ?",o:["Groupe d’exploration (GE) et groupe de remontée (GR)","Équipe d’attaque et de sécurité","Groupe de descente et de surface","Binôme de tête et binôme de queue"],e:"Deux équipes, GE et GR, chacune dirigée par un sous-officier.",r:"Partie 3 §3.4.1"},
+{t:"sauv",q:"Avant un sauvetage en excavation, avec quoi effectue-t-on le contrôle préalable ?",o:["Le détecteur multigaz","La caméra thermique","Le détecteur de CO","Le MCB2"],e:"Le contrôle préalable est effectué au moyen du détecteur multigaz. L’ARI est obligatoire si l’on redoute une atmosphère viciée.",r:"Partie 3 §3.4.1"},
+{t:"sauv",q:"Quel commandement rythme la remontée par le GR ?",o:["« À BRAS… FERME ! »","« HISSEZ ! HISSEZ ! »","« UN, DEUX, TROIS ! »","« TIREZ ! »"],e:"Au commandement « À BRAS ! » on engage le dispositif de préhension au plus bas, à « FERME ! » on tire.",r:"Partie 3 §3.4.3"},
+{t:"sauv",q:"Pourquoi utiliser la « technique du harnais » pour extraire un sapeur-pompier ?",o:["Avec la sangle d’extraction, le dossard de l’ARI tend à heurter la tête de la victime","Pour aller plus vite","Pour économiser l’air","Parce que la poignée casse souvent"],e:"Lors de la traction par la poignée d’extraction, le dossard heurte la tête du SP victime : la technique du harnais évite cet inconvénient.",r:"Partie 3 §2.4.2"},
+{t:"sauv",q:"Quel moyen permet de rassurer et calmer à distance des personnes paniquées ?",o:["Le porte-voix","La corne de brume","La radio","Le gyrophare"],e:"Le porte-voix rassure et calme les personnes en danger qui pourraient menacer de se jeter par les fenêtres.",r:"Partie 2 §2"},
+
+/* ================= BSP 200.13 – Établissements ================= */
+{t:"etab",q:"Dans quel ordre trouve-t-on les établissements du point d’eau vers le point d’attaque ?",o:["Alimentation, manœuvre, attaque","Attaque, manœuvre, alimentation","Manœuvre, alimentation, attaque","Alimentation, attaque, manœuvre"],e:"Du point d’eau vers le point d’attaque : alimentation, manœuvre, attaque.",r:"Partie 1"},
+{t:"etab",q:"De quoi est composée la ligne d’attaque (LA) ?",o:["3 tuyaux de 70 x 20 m et 2 tuyaux de 45 x 20 m, soit 100 m","5 tuyaux de 45 x 20 m","2 tuyaux de 70 et 3 de 45","4 tuyaux de 70 x 20 m"],e:"3 tuyaux de 70 x 20 m (60 m, dont un avec division) et 2 tuyaux de 45 x 20 m (40 m, dont un avec lance).",r:"Partie 1 §1.3 et 6.3"},
+{t:"etab",q:"Quelle pression en sortie de pompe pour une seule lance sur la LA de plain-pied ?",o:["10 bars (9,75 bars)","6 bars","15 bars","11 bars"],e:"6 bars à la lance + 0,45 bar (70 mm) + 2,3 bars (45 mm) + 1 bar (division) = 9,75, soit 10 bars.",r:"Partie 1 §1.3.1"},
+{t:"etab",q:"Une 2de lance de 500 l/min est établie sur la division. Pression en sortie de pompe ?",o:["11 bars","10 bars","12 bars","15 bars"],e:"Avec 1 000 l/min dans les 70 mm, la perte de charge passe à 1,8 bar : la pression en sortie de pompe est de 11 bars.",r:"Partie 1 §1.3.2"},
+{t:"etab",q:"Combien ajouter à la pression en sortie de pompe pour un dénivelé positif ?",o:["1 bar par 10 m","1 bar par étage","2 bars par 10 m","0,5 bar par 10 m"],e:"Il faut rajouter 1 bar de pression pour 10 m de dénivelé positif.",r:"Partie 1 §1.3"},
+{t:"etab",q:"Quelle condition avant d’autoriser une 2de lance sur la LA ?",o:["La pompe doit absolument être alimentée","Le chef de garde doit être présent","La citerne doit être vide","La LDT doit être établie"],e:"Le conducteur peut d’abord envoyer l’eau de la citerne, mais la pompe doit absolument être alimentée avant une 2de lance sur la LA.",r:"Partie 1 §1.3"},
+{t:"etab",q:"Quel potentiel hydraulique le conducteur doit-il pouvoir assurer par lance ?",o:["500 l/min","250 l/min","1 000 l/min","300 l/min"],e:"Le conducteur assure 500 l/min par lance. En phase d’extinction, le débit est adapté.",r:"Partie 1 §3.1"},
+{t:"etab",q:"Par quel mot se termine le commandement d’exécution ?",o:["« ÉTABLISSEZ ! »","« EN RECONNAISSANCE ! »","« ALLEZ ! »","« EXÉCUTION ! »"],e:"Le commandement d’exécution précise lance, point d’attaque, division et point d’eau, et se termine par « ÉTABLISSEZ ! ». Il est répété par l’exécutant.",r:"Partie 1 §3.3"},
+{t:"etab",q:"Quelle équipe est chargée des 3e et 4e lances ?",o:["La 2e équipe","La 1re équipe","Le conducteur","Le chef d’agrès"],e:"La 1re équipe fait les premiers établissements (1re, 2e lance, LDT). La 2e équipe fait les 3e et 4e lances.",r:"Partie 1 §3.4"},
+{t:"etab",q:"Quel est le débit de référence de la LDT 35 ?",o:["250 l/min, avec 500 l/min possible immédiatement","500 l/min","1 000 l/min","150 l/min"],e:"La LDT 35 a un débit de référence de 250 l/min mais peut fournir immédiatement 500 l/min.",r:"Partie 2 §2"},
+{t:"etab",q:"Quelle est la longueur totale de la LDT 35 ?",o:["80 m","100 m","60 m","40 m"],e:"SRV 35 x 20 m + 45 x 40 m + 45 x 20 m : 80 m roulés sur le tambour. Le chef d’agrès choisit 20, 60 ou 80 m.",r:"Partie 2 §2"},
+{t:"etab",q:"Quelle proportion des feux la LDT 35 permet-elle d’attaquer rapidement ?",o:["90 %","50 %","70 %","99 %"],e:"Elle est pertinente pour 90 % des feux de contenants et contenus en infrastructure, voie publique, RDC et 1er étage.",r:"Partie 2 §2"},
+{t:"etab",q:"La LDT 35 en étage élevé avec besoin de 500 l/min est-elle recommandée ?",o:["Non, au-delà du 1er étage elle n’est pas recommandée","Oui, toujours","Oui, jusqu’au 5e étage","Oui, avec la division"],e:"En raison des contraintes sur le matériel, la LDT 35 au-delà du 1er étage n’est pas recommandée si elle nécessite 500 l/min.",r:"Partie 2 §2"},
+{t:"etab",q:"Quelle est la couleur du manchon des tuyaux de 70 mm de la LA ?",o:["Bleu","Rouge","Jaune","Vert"],e:"Manchon bleu pour les 70 mm, rouge pour les 45 mm avec lance.",r:"Partie 1 §6.2"},
+{t:"etab",q:"Comment la division est-elle montée sur la ligne d’attaque ?",o:["À l’envers, pour être à l’endroit une fois posée au sol","À l’endroit","Démontée, dans la poche","Sur le tuyau de 45"],e:"La division est montée à l’envers sur la LA afin qu’une fois posée au sol elle soit à l’endroit.",r:"Partie 1 §7.1"},
+{t:"etab",q:"Le pliage en « écheveaux concentriques » s’applique à quels tuyaux ?",o:["Uniquement aux 45 x 20 m","Aux 70 x 20 m","Aux 110 mm","À tous"],e:"Il crée un effet ressort sous pression et encombre moins les escaliers de service, mais ne s’applique qu’aux 45 x 20 m.",r:"Partie 1 §7.3"},
+{t:"etab",q:"Quel débit maximum permet une colonne sèche de 65 mm ?",o:["1 000 l/min","500 l/min","2 000 l/min","1 500 l/min"],e:"CS 65 mm : 1 000 l/min max. CS 100 mm (2 lignes de 70) : 2 000 l/min max.",r:"Partie 2 §5"},
+{t:"etab",q:"Lance sur colonne sèche : où le 1er servant dépose-t-il le tuyau de raccordement ?",o:["Au pied de la prise d’incendie à N-1","Au niveau sinistré","Au rez-de-chaussée","À N+1"],e:"Le 1er servant dépose son 70 x 20 m et le tuyau de raccordement au pied de la prise d’incendie à N-1.",r:"Partie 2 §5"},
+{t:"etab",q:"Quand la pompe ne doit-elle pas nécessairement être alimentée dès l’établissement d’une lance ?",o:["Pour les lances sur colonne humide","Pour la LDT","Pour la ligne d’attaque","Jamais"],e:"L’alimentation de la pompe est réalisée dès qu’une lance est établie, à l’exception des lances sur colonne humide.",r:"Partie 1 §1"},
+{t:"etab",q:"Que fait le porteur ARI de sa clé avec plaque patronymique avant l’engagement ?",o:["Il la remet au responsable du TGR","Il la laisse dans l’engin","Il la remet au conducteur","Il la garde dans sa poche"],e:"Clé retirée dès la descente de l’engin, gardée sur soi, puis remise au responsable du TGR avant tout engagement.",r:"Partie 1 §5"},
+{t:"etab",q:"Au cours de l’attaque, le port complet des EPI est :",o:["Obligatoire, son non-respect engage la responsabilité de l’intéressé et/ou de son chef","Conseillé","Laissé à l’appréciation du binôme","Obligatoire uniquement en infrastructure"],e:"Le port complet des EPI est obligatoire ; son non-respect entraîne automatiquement la responsabilité de l’intéressé et/ou de son chef.",r:"Partie 1 §3.2"},
+
+/* ================= BSP 200.15 – Attaque ================= */
+{t:"att",q:"Que signifie CEFF dans la lecture du feu ?",o:["Chaleur, Environnement, Fumées, Flammes","Combustible, Énergie, Fumées, Feu","Couleur, Épaisseur, Fluides, Fenêtres","Chaleur, Explosion, Flash, Fumées"],e:"La lecture du feu s’effectue par l’appréciation de la Chaleur, de l’Environnement, des Fumées et des Flammes.",r:"Partie 1"},
+{t:"att",q:"Taux de concentration d’émulseur pour les feux d’hydrocarbures ?",o:["3 %","6 %","1 %","10 %"],e:"3 % pour les hydrocarbures ; 6 % pour les solvants, alcools et produits polaires.",r:"Partie 1"},
+{t:"att",q:"Taux de foisonnement d’une mousse moyen foisonnement ?",o:["De 20 à 200","Inférieur à 20","Supérieur à 200","De 200 à 1 000"],e:"Bas : moins de 20 ; moyen : 20 à 200 ; haut : plus de 200.",r:"Partie 1"},
+{t:"att",q:"Qu’est-ce que le taux de foisonnement ?",o:["Le rapport du volume de mousse sur le volume de solution moussante","Le pourcentage d’émulseur dans la solution","Le débit de mousse par m²","La durée de vie de la mousse"],e:"Le taux de foisonnement est le rapport volume de mousse / volume de solution moussante.",r:"Partie 1"},
+{t:"att",q:"Qu’est-ce que l’attaque d’emblée ?",o:["Une attaque immédiate sur un foyer visible, sans reconnaissance d’attaque","Une attaque par l’extérieur","Une attaque après ventilation","La première impulsion de TPF"],e:"Elle permet d’attaquer directement un foyer visible à l’œil nu ou à la caméra thermique ; la reconnaissance d’attaque n’est alors pas réalisée.",r:"Partie 1"},
+{t:"att",q:"Comment agit principalement l’eau ?",o:["Par refroidissement","Par inhibition","Par soufflage","Par dilution"],e:"L’eau agit principalement par refroidissement, mais aussi par inertage et étouffement.",r:"Partie 2 §1"},
+{t:"att",q:"Combien de fois l’eau dopée est-elle plus efficace que l’eau seule ?",o:["2 à 3 fois","5 fois","10 fois","1,5 fois"],e:"L’eau dopée agit par refroidissement et étouffement, 2 à 3 fois plus efficacement que l’eau seule.",r:"Partie 2 §2.1"},
+{t:"att",q:"Concentration d’eau dopée pour un feu de véhicule, sièges ou plastiques ?",o:["0,5 %","0,2 %","0,3 %","0,4 %"],e:"0,2 % bois/végétation/papier, 0,3 % caoutchouc/pneus, 0,4 % textiles/habitation, 0,5 % véhicules/sièges/plastiques.",r:"Partie 2 §2.2"},
+{t:"att",q:"Concentration d’eau dopée pour un feu d’habitation ?",o:["0,4 %","0,2 %","0,5 %","3 %"],e:"0,4 % pour les textiles ou l’habitation.",r:"Partie 2 §2.2"},
+{t:"att",q:"Pourquoi ne pas diriger le jet de mousse directement sur le foyer ?",o:["Pour ne pas rompre l’homogénéité du tapis de mousse","Pour économiser l’émulseur","Pour éviter le recul","Parce que la mousse est toxique"],e:"Le point d’impact ne doit pas être dirigé sur le foyer afin de garder un tapis de mousse homogène.",r:"Partie 2 §3.1"},
+{t:"att",q:"Comment agit la poudre ?",o:["Par étouffement et inhibition","Par refroidissement","Par soufflage","Par dilution"],e:"Les poudres, choisies selon la classe du feu, agissent par étouffement et inhibition.",r:"Partie 2 §4"},
+{t:"att",q:"Quel agent est le plus recommandé sur les installations électriques ?",o:["Le CO2","L’eau dopée","La mousse","Le sable"],e:"Le CO2 agit par étouffement, soufflage et refroidissement : moyen le plus recommandé sur les installations électriques.",r:"Partie 2 §5"},
+{t:"att",q:"Quelle est la règle des 4 D du porte-lance ?",o:["Diffusion, Direction, Durée, Débit","Danger, Distance, Direction, Débit","Diffusion, Distance, Durée, Danger","Débit, Direction, Dénivelé, Durée"],e:"Diffusion (petites ou grosses gouttes), Direction (fumées, roll over, foyer), Durée, Débit. Si l’effet n’est pas atteint, le porte-lance se repose les questions.",r:"Partie 3 §2"},
+{t:"att",q:"Que fait le porte-lance s’il constate une baisse anormale de pression ?",o:["Il se replie et rend compte","Il ouvre la lance au maximum","Il continue en jet droit","Il passe en jet brisé"],e:"Le porte-lance doit se replier et rendre compte dès qu’il constate une baisse anormale de pression à la lance.",r:"Partie 3 §2"},
+{t:"att",q:"Quel jet permet d’absorber un maximum de chaleur sur une grande surface d’échange ?",o:["Le jet diffusé d’attaque","Le jet droit","Le jet brisé","Le jet bâton"],e:"Composé de gouttelettes, le jet diffusé d’attaque absorbe un maximum de chaleur et lutte contre les phénomènes thermiques.",r:"Partie 3 §3.1"},
+{t:"att",q:"Qu’est-ce que le jet brisé ?",o:["Jet droit avec lance partiellement ouverte, grosses gouttes, utilisé en phase d’extinction","Jet diffusé à débit minimal","Le jet le plus ouvert à débit maximal","Un jet par impulsions"],e:"Le jet brisé, en position jet droit lance partiellement ouverte, produit de grosses gouttes qui pénètrent la matière.",r:"Partie 3 §3.3"},
+{t:"att",q:"Fuite de gaz enflammée avec fort rayonnement : quel jet protège le binôme ?",o:["Le jet diffusé de protection","Le jet droit","Le jet brisé","Le TPF"],e:"Plus grande ouverture du jet à débit maximum, il protège le binôme lors d’un fort rayonnement.",r:"Partie 3 §3.4"},
+{t:"att",q:"Lequel est un inconvénient du jet droit ?",o:["Effet de recul et conduction de l’électricité","Faible portée","Absorbe trop de chaleur","Impossible en extérieur"],e:"Le jet droit absorbe moins de chaleur, peut dégrader et propager, provoque un recul et est conducteur de l’électricité.",r:"Partie 3 §3.2"},
+{t:"att",q:"Que fait le binôme avant tout engagement dans un local ?",o:["Plaquette sur le TGR, contrôle croisé des EPI hors cône d’expansion, moyen hydraulique en eau, lance réglée et testée","Ventilation du local","Ouverture de toutes les fenêtres","Appel du chef de garde"],e:"Ce sont les 4 actions préalables ; le réglage et le test de la lance reviennent au chef d’équipe.",r:"Partie 4 §2"},
+{t:"att",q:"Je vois de la fumée mais aucune flamme visible. Je fais :",o:["Une phase de progression","Une phase d’attaque","Une phase d’extinction","Un sauvetage"],e:"Fumée sans flamme : progression. Flammes dans les fumées : attaque. Foyer : attaque et/ou extinction. Victime : sauvetage.",r:"Partie 4 §2"},
+{t:"att",q:"Fumée anormale sortant en surpression par les interstices, feu qui « respire » : que faire ?",o:["Ne pas ouvrir la porte et rendre compte","Ouvrir prudemment","Forcer la porte","Ventiler par la porte"],e:"NE PAS OUVRIR LA PORTE ! Rendre compte, s’écarter des ouvrants et du cône d’expansion, interdire toute ouverture sans ordre.",r:"Partie 4 §2"},
+{t:"att",q:"À quelle fréquence le binôme répète-t-il le traitement préventif des fumées (TPF) ?",o:["Tous les 1 à 2 mètres","Tous les 5 mètres","Toutes les 30 secondes","À chaque porte"],e:"Projections d’eau brèves, débit minimum, cran tactile, répétées régulièrement tous les 1 à 2 mètres.",r:"Partie 4 §3.1"},
+{t:"att",q:"Quelle affirmation est vraie sur les gouttes ?",o:["Plus les gouttes sont fines, plus elles absorbent d’énergie calorifique","Les grosses gouttes absorbent le plus","La taille ne compte pas","Les fines gouttes éteignent mieux le foyer"],e:"Plus les gouttes sont fines, plus elles absorbent d’énergie : c’est l’intérêt du nuage de gouttelettes du TPF.",r:"Partie 4 §3.1"},
+{t:"att",q:"Foyer visible : comment le chef d’équipe conduit-il l’attaque ?",o:["Jet diffusé d’attaque débit maximum, de la partie haute vers la base des flammes","Jet droit sur la base des flammes","Jet brisé du bas vers le haut","TPF uniquement"],e:"Action lente et progressive : eau dans tout le volume en commençant par la partie haute, pour finir à la base des flammes.",r:"Partie 4 §3.2"},
+{t:"att",q:"Foyer non visible et flammes dans les fumées : où diriger le jet ?",o:["Au plus haut et au plus loin, jusqu’à disparition des flammes","Au sol","Vers la porte d’entrée","Vers soi pour se protéger"],e:"Lance complètement ouverte, jet diffusé d’attaque, dirigé au plus haut et au plus loin, puis on poursuit la progression.",r:"Partie 4 §3.2"},
+{t:"att",q:"Parmi progression, attaque et extinction, laquelle est obligatoire ?",o:["L’extinction","La progression","L’attaque","Les trois"],e:"Ces trois phases sont indépendantes ; seule la phase d’extinction est obligatoire.",r:"Partie 4 §3.3"},
+{t:"att",q:"Feu de PSC : le binôme doit-il traiter les fumées ?",o:["Non, il progresse debout pour agir le plus vite possible sur le foyer","Oui, tous les mètres","Oui, au jet droit","Il attend la ventilation"],e:"En feu de PSC, il n’est pas nécessaire de traiter les fumées ; le binôme se baisse seulement si la chaleur l’impose.",r:"Partie 4 §3.4"},
+{t:"att",q:"En protection de façade, pourquoi ne pas diriger le jet dans les locaux sinistrés ?",o:["Risque d’inverser le tirage et de brûler le binôme intérieur","Pour économiser l’eau","Pour protéger les vitres","Pour ne pas mouiller les biens"],e:"Le risque est d’inverser le tirage, ce qui peut causer de graves brûlures au binôme qui attaque par les communications existantes.",r:"Partie 4 §3.4"},
+{t:"att",q:"Durée de l’attaque d’atténuation ?",o:["Jet droit poursuivi 10 secondes après la disparition des flammes","1 minute","Jusqu’à extinction complète","5 secondes"],e:"Le porte-lance poursuit 10 s après la disparition des flammes ; renouvelable ; arrêt obligatoire avant l’extinction par l’intérieur.",r:"Partie 4 §3.4"},
+{t:"att",q:"Quel jet impose l’attaque d’atténuation ?",o:["Un jet droit (jet bâton) à travers l’ouvrant vers le plafond","Un jet diffusé d’attaque","Un jet diffusé de protection","Un jet brisé"],e:"Jet droit exclusif, dirigé vers le plafond pour se diffuser sur le foyer. Un jet diffusé inverse le tirage et propage l’incendie.",r:"Partie 4 §3.4"},
+{t:"att",q:"Feu au 5e étage, porte-lance au RDC : à quelle distance de la façade se placer ?",o:["11 m","10 m","6 m","15 m"],e:"Règle : (étages x 2) + 1. N = 5 donc D = 11 m (1 m = 1 pas).",r:"Partie 4 §3.4"},
+{t:"att",q:"Feu au 7e, nacelle au niveau du 5e : quelle distance D ?",o:["5 m","15 m","7 m","3 m"],e:"N = 2 étages à atteindre, donc D = (2 x 2) + 1 = 5 m.",r:"Partie 4 §3.4"},
+{t:"att",q:"Débit minimum d’une lance DN 33/35 en attaque d’atténuation ?",o:["400 l/min (500 l/min en DN 45)","250 l/min","1 000 l/min","150 l/min"],e:"400 l/min minimum en DN 33/35 ou 500 l/min en DN 45. La portée utile du jet bâton est de 5 étages.",r:"Partie 4 §3.4"},
+{t:"att",q:"Première étape de l’arbre décisionnel ?",o:["Le contrôle croisé des EPI","Ouvrir la porte","Le TPF","L’appel au chef de garde"],e:"L’arbre débute par le contrôle croisé des EPI, puis : porte ouverte ? signes à la porte ? foyer visible ?",r:"Partie 5"},
+{t:"att",q:"Une fois le binôme engagé, que fait le CA ?",o:["Il referme la porte si nécessaire ou fait mettre le rideau stoppeur fumée","Il ouvre les fenêtres","Il rejoint le binôme","Il coupe l’eau"],e:"Le CA referme la porte si nécessaire ou fait mettre en place le rideau stoppeur fumée.",r:"Partie 4 §2"},
+
+/* ================= BSP 200.16 & 200.17 ================= */
+{t:"deb",q:"Qu’est-ce que le dégarnissage ?",o:["Gratter murs, poutres et planchers pour retirer les résidus de combustion","Déplacer les décombres","Évacuer l’eau","Soutenir un bâtiment par des étais"],e:"Il retire la couche de résidus de combustion pour s’assurer de l’extinction au cœur du matériau et prévenir une reprise.",r:"Partie 1"},
+{t:"deb",q:"Quand débute la surveillance ?",o:["Une fois le message « feu éteint » transmis","Dès l’arrivée du DN","Après le départ du COS","Avant le déblai"],e:"La surveillance empêche toute reprise de feu par un détachement mis en place une fois le message « feu éteint » transmis.",r:"Partie 1"},
+{t:"deb",q:"Qu’est-ce qu’une ronde ?",o:["La poursuite par intermittence du service de surveillance","Le tour du feu du chef de garde","Une reconnaissance à vue","Un contrôle d’hydrants"],e:"Opération programmée qui poursuit la surveillance par intermittence quand le COS le juge nécessaire.",r:"Partie 1"},
+{t:"deb",q:"Épuisement ou assèchement : comment s’appelle l’évacuation mécanique d’une quantité importante de liquide ?",o:["L’épuisement","L’assèchement","La trouée","Le bâchage"],e:"Épuisement : évacuation mécanique d’une grande quantité de liquide. Assèchement : rendre un sol à son état initial.",r:"Partie 1"},
+{t:"deb",q:"Quand la protection doit-elle être mise en œuvre ?",o:["Le plus tôt possible, elle est indissociable de l’attaque","Après le déblai","Une fois le feu éteint","Uniquement sur demande du sinistré"],e:"Pour être efficace, la protection est mise en œuvre le plus tôt possible ; elle est indissociable de l’attaque.",r:"Partie 2"},
+{t:"deb",q:"Laquelle est une opération de protection faite seulement dans des cas exceptionnels ?",o:["Déménager le mobilier exposé","Bâcher les objets","Évacuer l’eau des planchers","Aérer les locaux"],e:"Déménager le mobilier et étayer sommairement ne se font que dans des cas exceptionnels.",r:"Partie 2"},
+{t:"deb",q:"Quels moyens spéciaux le COS peut-il demander pour la protection ?",o:["PEV, BPE, BAP voire CESD","VSAV et AR","EPA et BEA","GRIMP et RSMU"],e:"Pour anticiper la protection, le COS peut demander un PEV, BPE, BAP voire un CESD.",r:"Partie 2"},
+{t:"deb",q:"Le déblai peut-il être mené pendant l’attaque ?",o:["Oui, pour faciliter l’extinction","Non, jamais","Seulement de nuit","Seulement après les rondes"],e:"Le déblai peut être mené conjointement à l’attaque pour faciliter l’extinction.",r:"Partie 3 §1.1"},
+{t:"deb",q:"Distance minimale du déblai déposé par rapport à une façade ?",o:["2 mètres","5 mètres","50 cm","10 mètres"],e:"Le déblai est positionné à 2 m minimum d’une façade, jamais sur un barrage gaz ou électrique, une amenée d’air ou une bouche de ventilation de métro.",r:"Partie 3 §1.3"},
+{t:"deb",q:"Avant de transporter le déblai dans la cage d’escalier, il doit être :",o:["Suffisamment froid et/ou humide (règle absolue)","Mis en sac","Photographié","Trié par le sinistré"],e:"Cette règle absolue évite une reprise de feu dans la cage d’escalier ou l’ascenseur qui mettrait en danger les intervenants.",r:"Partie 3 §1.3"},
+{t:"deb",q:"Éjecter le déblai par une fenêtre sans moyen d’évacuation :",o:["Est déconseillé, en dernier ressort et validé par le COS","Est la méthode de référence","Est interdit en toutes circonstances","Est laissé au choix du chef d’équipe"],e:"Action exceptionnelle, en dernier ressort, toujours soumise à la validation du COS.",r:"Partie 3 §1.3"},
+{t:"deb",q:"Où privilégier la zone de dépose du déblai ?",o:["Sur la voie publique plutôt qu’en courette intérieure","En courette intérieure","Dans le hall","Sur le toit"],e:"La voie publique limite la pollution aux particules, facilite l’intervention des services publics et limite le risque de reprise.",r:"Partie 3 §1.3"},
+{t:"deb",q:"Que fait-on du déblai sur la voie publique ?",o:["On l’étale et on le refroidit à la lance","On l’empile en un seul tas","On le bâche","On le laisse sans surveillance"],e:"Il est refroidi à la lance (avec mouillant si nécessaire) et étalé, contrôlé à vue ou à la caméra thermique.",r:"Partie 3 §1.3"},
+{t:"deb",q:"Quel déblai réaliser en attendant le LCPP et/ou le RCCI ?",o:["Un déblai « adapté » ou « temporisé »","Un déblai complet immédiat","Aucun déblai ni surveillance","Un déblai par l’extérieur uniquement"],e:"Déblai et dégarnissage a minima, pour préserver les indices nécessaires à la détermination de l’origine de l’incendie.",r:"Partie 3 §1.3"},
+{t:"deb",q:"Que faire des objets à forte valeur affective ?",o:["Les disposer dans une pièce non touchée par le sinistre","Les évacuer sur la voie publique","Les jeter avec le déblai","Les confier au chef de garde"],e:"Photos, documents, jouets… sont placés dans une pièce saine, jamais à la vue des passants.",r:"Partie 3 §1.4"},
+{t:"deb",q:"Comment se déroule l’enlèvement des bijoux et objets de valeur ?",o:["Si possible en présence de la police","Par le chef d’équipe seul","Par le sinistré seul","Par le LCPP"],e:"Le COS veille à ce que leur enlèvement se fasse, dans la mesure du possible, en présence de la police.",r:"Partie 3 §1.6"},
+{t:"deb",q:"Où se fait l’apprentissage du déblai et du dégarnissage ?",o:["Uniquement sur intervention","En centre de formation dédié","Sur simulateur","Au GFIS"],e:"Il n’existe pas de site d’entraînement : les plus expérimentés transmettent leurs savoirs sur opération.",r:"Partie 3 §1.5"},
+{t:"deb",q:"Pourquoi les sens (toucher, ouïe, vue) restent-ils indispensables ?",o:["La caméra thermique seule ne suffit pas à conclure à l’absence de point chaud","Les caméras sont souvent en panne","Le règlement interdit la caméra","Pour économiser les batteries"],e:"L’usage seul du matériel, comme la caméra thermique, n’est pas suffisant pour conclure à l’absence de point chaud.",r:"Partie 3 §1.5"},
+{t:"deb",q:"Peut-on s’engager seul pendant le déblai ou le dégarnissage ?",o:["Non, c’est interdit","Oui, en zone saine","Oui, de jour","Oui, avec une radio"],e:"Du fait des risques accrus, il est interdit de s’engager seul dans ces missions.",r:"Partie 3 §1.8"},
+{t:"deb",q:"Quand le COS peut-il autoriser le passage de l’ARI au masque FFP2 ?",o:["Feu éteint, en l’absence de CO et de matières en suspension","Dès le message « feu éteint »","Après 1 heure de déblai","Jamais"],e:"En présence de fumées ou poussières, l’ARI est exigé en zone d’exclusion. Sans CO ni particules, le COS peut autoriser le FFP2.",r:"Partie 3 §1.8"},
+{t:"deb",q:"Pourquoi se méfier des panneaux photovoltaïques ?",o:["Même endommagés, ils produisent de l’électricité en permanence","Ils sont radioactifs","Ils explosent à l’eau","Ils dégagent du CO"],e:"Les panneaux, même endommagés ou partiellement brûlés, peuvent produire de l’électricité en permanence.",r:"Partie 3 §1.8"},
+{t:"deb",q:"Quel phénomène peut survenir plusieurs heures après l’extinction, pendant le déblai ?",o:["Le smoke explosion","Le flash over","Le backdraft","Le roll-over"],e:"Le smoke explosion (famille des FGI) peut survenir longtemps après l’extinction, notamment pendant le déblai.",r:"Partie 3 §1.8"},
+{t:"deb",q:"Dans quel sens réaliser le dégarnissage ?",o:["De la partie saine vers la partie sinistrée","De la partie sinistrée vers la partie saine","Du bas vers le haut","Au hasard"],e:"Point fondamental : de la partie saine vers la partie sinistrée, pour ne pas courir après le feu.",r:"Partie 3 §1.10"},
+{t:"deb",q:"Feu de façade : comment dégarnir les parties touchées ?",o:["Très largement, du haut vers le bas et de la partie saine vers la partie touchée","Du bas vers le haut","Uniquement la zone brûlée","Uniquement au jet droit"],e:"On dégarnit très largement du haut vers le bas et de la partie saine vers la partie touchée, en favorisant le mouillant.",r:"Partie 3 §1.9"},
+{t:"deb",q:"De nuit, pourquoi éteindre tout éclairage ?",o:["Pour repérer les braises résiduelles","Pour économiser les batteries","Pour ne pas gêner les voisins","Pour mieux voir la fumée"],e:"L’extinction de tout éclairage révèle les braises ; un projecteur seul révèle fumerolles et voiles de fumée.",r:"Partie 3 §1.10"},
+{t:"deb",q:"Comment repérer une poutre vermoulue ?",o:["En tapant le bois, il sonne creux s’il est atteint","À la caméra thermique uniquement","À l’odeur","En la mouillant"],e:"Les parties vermoulues sonnent creux. Le bois est dégarni en mettant « à blanc » les parties touchées sans fragiliser la structure.",r:"Partie 3 §1.11"},
+{t:"deb",q:"L’emploi de la caméra thermique pour le contrôle des points chauds est :",o:["Systématique lors du dégarnissage, de la surveillance et des rondes","Facultatif","Réservé au chef de garde","Interdit pendant les rondes"],e:"Elle est systématique, mais ne se substitue pas à l’analyse du chef : elle vient confirmer ses observations.",r:"Partie 3 §3"},
+{t:"deb",q:"ERP : un détecteur ionique de fumée endommagé par la chaleur doit être :",o:["Récupéré après levée de doute au MCB2 ou par le GIR","Jeté avec le déblai","Laissé en place","Arrosé abondamment"],e:"Ces détecteurs contiennent des sources radioactives : levée de doute au MCB2 ou par un GIR, puis récupération.",r:"Partie 3 §1.9"},
+{t:"deb",q:"Feu de toiture : où éviter de stocker le déblai ?",o:["Au dernier niveau du bâtiment","Sur la voie publique","Dans une benne","En courette"],e:"Le stockage au dernier niveau est à éviter : surcharge d’un plancher déjà fragilisé par l’eau d’extinction.",r:"Partie 3 §1.9"},
+{t:"deb",q:"L’ARI est obligatoire tant que…",o:["Le contrôle de la teneur en CO n’a pas été effectué par le COS","Le feu n’est pas éteint","Le chef de garde est présent","La nuit n’est pas tombée"],e:"Le port de l’ARI est obligatoire tant que le contrôle de la teneur en monoxyde de carbone n’a pas été effectué par le COS.",r:"Partie 4"},
+{t:"deb",q:"Exemple de réarticulation des secteurs pour le déblai d’un feu au R+7 :",o:["Un secteur regroupant le niveau sinistré, N+1 et N-1","Un secteur par appartement","Un seul secteur pour tout l’immeuble","Uniquement le niveau sinistré"],e:"Le secteur R+7 englobe le niveau sinistré, N+1 et N-1 pour mieux comprendre les imbrications entre niveaux.",r:"Partie 3 §1.7"},
+
+/* ================= BSP 200.18 – Feux et incendies ================= */
+{t:"feu",q:"En quelle phase s’effectue uniquement la combustion ?",o:["En phase gazeuse","En phase solide","En phase liquide","En toutes phases"],e:"La combustion s’effectue uniquement en phase gazeuse : ce sont les vapeurs émises qui brûlent.",r:"Partie 1 et 2"},
+{t:"feu",q:"Au-delà de quelle température aucune matière organique ne résiste ?",o:["500 °C","200 °C","1 000 °C","1 500 °C"],e:"Aucune matière organique ne résiste à une température supérieure à 500 °C.",r:"Partie 2 §1"},
+{t:"feu",q:"Les feux de classe B sont des :",o:["Feux gras (liquides ou solides liquéfiables)","Feux secs","Feux de gaz","Feux de métaux"],e:"A : feux secs ; B : feux gras ; C : feux de gaz ; D : feux de métaux ; F : auxiliaires de cuisson.",r:"Partie 2 §2"},
+{t:"feu",q:"Que caractérise la classe F ?",o:["Les feux d’huiles végétales et animales sur appareils de cuisson","Les feux de forêt","Les feux de fluides","Les feux de façade"],e:"Ce sont les feux liés aux auxiliaires de cuisson.",r:"Partie 2 §2.5"},
+{t:"feu",q:"Quelle classe de feu présente 2 modes de combustion, vive et lente ?",o:["Classe A","Classe B","Classe C","Classe D"],e:"Les feux secs peuvent brûler avec flammes ou lentement avec braises : on dit que le feu « couve ».",r:"Partie 2 §2.1"},
+{t:"feu",q:"Les feux de classe B couvent-ils ?",o:["Non, ils flambent ou s’éteignent","Oui, toujours","Uniquement les solvants","Oui, sous la mousse"],e:"Pas de combustion lente : l’abattage des flammes provoque l’extinction, mais un rallumage brutal est possible à l’auto-inflammation.",r:"Partie 2 §2.2"},
+{t:"feu",q:"Grande nappe de liquide inflammable non miscible à l’eau : quel agent ?",o:["La mousse","L’eau en jet droit","Le sable","Le CO2"],e:"Poudre pour les feux de faible importance, mousse pour les nappes de grande superficie.",r:"Partie 2 §2.2.1"},
+{t:"feu",q:"Fuite de gaz enflammée : faut-il l’éteindre ?",o:["Non, sauf urgence : on barre la conduite et on surveille la flamme","Oui, immédiatement à l’eau","Oui, à la poudre","Oui, en soufflant la flamme"],e:"L’accumulation du gaz qui s’échappe peut provoquer une explosion. L’effort porte sur le barrage de la conduite.",r:"Partie 2 §2.3"},
+{t:"feu",q:"Pourquoi ne jamais éteindre un feu de métaux à l’eau ou à la mousse ?",o:["Réaction violente avec dégagement d’hydrogène et risque d’explosion","L’eau s’évapore trop vite","La mousse est inefficace","Pour éviter la pollution"],e:"La plupart des métaux réagissent violemment à l’eau en dégageant de l’hydrogène. On utilise sable sec ou ciment.",r:"Partie 2 §2.4"},
+{t:"feu",q:"Au-dessus de quelle température ambiante les combustibles de classe C sont-ils gazeux ?",o:["15 °C","0 °C","37 °C","100 °C"],e:"Les feux de classe C concernent les combustibles en phase gazeuse au-dessus de 15 °C.",r:"Partie 2 §2.3"},
+{t:"feu",q:"Qu’est-ce que le point éclair ?",o:["Température minimale où les vapeurs s’enflamment au contact d’une énergie et s’éteignent à son retrait","Température où les gaz brûlent seuls sans flamme","Température maximale avant explosion","Température d’ébullition"],e:"Au point éclair la flamme s’éteint au retrait de l’énergie ; au point feu elle se maintient ; à l’auto-inflammation, pas besoin de flamme.",r:"Partie 1 §19-21"},
+{t:"feu",q:"Une explosion qui crée une onde de choc est dite :",o:["Détonante","Déflagrante","Diffusante","Stœchiométrique"],e:"Combustion très rapide avec onde de surpression : déflagrante. Combustion instantanée avec onde de choc : détonante.",r:"Partie 2 §4"},
+{t:"feu",q:"Quel est l’exemple type d’une flamme de pré-mélange ?",o:["Le chalumeau","La bougie","Le feu de bois","L’allumette"],e:"Pré-mélange (chalumeau, combustion complète, partie bleue vers 1 500 °C). Diffusion (bougie, flamme jaune, incomplète).",r:"Partie 2 §5"},
+{t:"feu",q:"Répartition de la chaleur d’une flamme sans plafond de fumées ?",o:["Convection 60 %, rayonnement 30 %, conduction 10 %","Rayonnement 60 %, convection 30 %, conduction 10 %","Conduction 60 %, convection 30 %, rayonnement 10 %","Un tiers chacun"],e:"Avec un plafond de fumées, la tendance s’inverse : rayonnement 60 %, convection 30 %.",r:"Partie 2 §9.2"},
+{t:"feu",q:"Si la température est multipliée par 2, le rayonnement est multiplié par :",o:["16","2","4","8"],e:"Lorsque la température est multipliée par 2, le rayonnement est multiplié par 16.",r:"Partie 2 §9.1.3"},
+{t:"feu",q:"Quel est le pouvoir calorifique approximatif du bois ?",o:["19 MJ/kg","40 MJ/kg","4 MJ/kg","100 MJ/kg"],e:"Bois : environ 19 MJ/kg. Polystyrène : 40 MJ/kg. PVC : 4 à 30 MJ/kg (16 en moyenne).",r:"Partie 2 §7"},
+{t:"feu",q:"Quelle différence entre escarbilles et brandons ?",o:["Les escarbilles portent à quelques mètres, les brandons à de grandes distances selon le vent","Les escarbilles sont liquides","Les brandons sont gazeux","Aucune"],e:"Escarbilles : petites particules incandescentes, quelques mètres. Brandons : fragments en ignition pouvant franchir d’importantes distances.",r:"Partie 2 §9.3.3"},
+{t:"feu",q:"Quelles sont les 4 étapes du développement d’un feu ?",o:["Naissance, croissance, plein développement, décroissance","Allumage, propagation, flash over, extinction","Naissance, flash over, backdraft, extinction","Pyrolyse, combustion, explosion, braises"],e:"Le développement d’un feu suit toujours ces 4 étapes. La croissance est le moment le plus instable.",r:"Partie 2 §11"},
+{t:"feu",q:"Que se passe-t-il pour la vitesse des réactions à chaque +10 °C ?",o:["Elle double approximativement","Elle triple","Elle augmente de 10 %","Elle reste stable"],e:"On estime que la vitesse des réactions de combustion double à chaque fois que la température augmente de 10 °C.",r:"Partie 2 §11.2.3"},
+{t:"feu",q:"Température d’un feu de contenant au bout de 5 minutes ?",o:["600 °C (jusqu’à 1 200 °C en cage d’escalier)","300 °C","1 000 °C","150 °C"],e:"Feu de contenant : 600 °C en 5 min. Dans une cage d’escalier : jusqu’à 1 200 °C dans le même temps.",r:"Partie 2 §11.2.4"},
+{t:"feu",q:"À quelle température se produit en moyenne le flash over ?",o:["600 °C","300 °C","1 000 °C","1 200 °C"],e:"Vers 600 °C, passage brutal d’un feu localisé à un feu généralisé ; l’ambiance atteint environ 1 000 °C.",r:"Partie 3 §1.2.4"},
+{t:"feu",q:"Dans quel ordre apparaissent les signes avant un flash over ?",o:["Stratification, anges danseurs, roll-over, amplification du rayonnement, pyrolyse en partie basse","Roll-over puis anges danseurs","Fumées noires puis vitres qui vibrent","Pyrolyse puis anges danseurs"],e:"❶ stratification ❷ anges danseurs ❸ roll-over ❹ amplification du rayonnement ❺ pyrolyse en partie basse ❻ flash over.",r:"Partie 3 §1.2"},
+{t:"feu",q:"Puissance moyenne développée par un embrasement généralisé ?",o:["Environ 7 MW (3 MW minimum)","0,5 MW","20 MW","1 MW"],e:"Un EG développe environ 7 MW ; sa puissance minimale est estimée à 3 MW.",r:"Partie 3 §1.2.5"},
+{t:"feu",q:"Quelle puissance absorbe une lance de 500 l/min ?",o:["6 MW","2 MW","0,5 MW","10 MW"],e:"40 l/min : 0,5 MW ; 150 l/min : 2 MW ; 500 l/min : 6 MW.",r:"Partie 3 §1.2.5"},
+{t:"feu",q:"Quel élément manque au triangle du feu avant un backdraft ?",o:["Le comburant","L’énergie d’activation","Le combustible","La chaleur"],e:"Backdraft : volume fermé, triangle incomplet, il manque le comburant. Une rupture du confinement suffit à l’explosion.",r:"Partie 3 §2 et §4"},
+{t:"feu",q:"Quel signe annonce un backdraft ?",o:["Fumées grasses sortant par bouffées, le feu « respire »","Flammes vives visibles aux fenêtres","Crépitements forts","Fumées blanches légères"],e:"Aucune flamme nette, vitres noires qui vibrent, fumées par bouffées, sons amortis, poignées très chaudes.",r:"Partie 3 §2.3"},
+{t:"feu",q:"Risque de backdraft : que dit le BSP sur la ventilation opérationnelle ?",o:["Interdire toute utilisation de la VO","La mettre en route immédiatement","Ventiler en surpression","Ventiler seulement par la porte"],e:"Face au risque de backdraft, toute utilisation de la VO est interdite.",r:"Partie 3 §2.4"},
+{t:"feu",q:"Backdraft : si aucun sortant ne peut être créé, comment inerter les fumées ?",o:["Depuis l’extérieur, jet diffusé d’attaque en continu par entrebâillement ou trouée haute","En ouvrant grand la porte","Par la ventilation","Au jet droit vers le sol"],e:"On inerte depuis l’extérieur en continu, jusqu’à disparition des signes de l’EF.",r:"Partie 3 §2.4.2"},
+{t:"feu",q:"Quel élément manque au triangle du feu dans un fire gas ignition (FGI) ?",o:["L’énergie d’activation","Le comburant","Le combustible","Rien, il est complet"],e:"Dans le FGI, combustible et comburant sont réunis : il ne manque que l’énergie d’activation.",r:"Partie 3 §3 et §4"},
+{t:"feu",q:"Mélange gazeux proche du point de stœchiométrie + énergie d’activation donne :",o:["Un smoke explosion","Un flash fire","Un flash over","Un roll-over"],e:"Proche de la LII ou LSI : flash fire (effets thermiques). Proche de la stœchiométrie : smoke explosion (thermiques + mécaniques).",r:"Partie 3 §3.2"},
+{t:"feu",q:"Le smoke explosion correspond-il à l’« explosion de fumées » française ?",o:["Non, l’explosion de fumées (EF) désigne le backdraft","Oui, c’est la traduction exacte","Oui, c’est un flash over","Non, c’est un roll-over"],e:"Attention à ne pas confondre : en français, « explosion de fumées » = backdraft.",r:"Partie 3 §3"},
+{t:"feu",q:"Face aux risques de FGI, qu’est-ce qui prime ?",o:["L’attaque prime sur la ventilation","La ventilation prime sur l’attaque","Le déblai prime","L’évacuation prime"],e:"L’attaque prime sur la ventilation pour refroidir les fumées. Ensuite on les inerte, puis on les ventile si possible.",r:"Partie 3 §3.2.2"},
+{t:"feu",q:"Qu’est-ce qu’un roll-over ?",o:["Une langue de feu dans le plafond de fumées, en lien direct avec le foyer","Un embrasement généralisé","Une explosion de fumées","Une flamme bleue au sol"],e:"Langue de feu ou rouleau de flammes en partie haute d’un feu de contenant, en lien direct avec le foyer.",r:"Partie 1 §25"},
+{t:"feu",q:"Pourquoi surveiller longtemps un point chaud même loin du foyer ?",o:["La conduction est inéluctable : la chaleur se diffuse dans tout le matériau","À cause du rayonnement solaire","Parce que la convection descend","Pour la caméra thermique"],e:"La mauvaise conductibilité n’est pas une garantie : l’égalisation des températures n’est qu’une question de temps.",r:"Partie 2 §9.1.1"},
+
+/* ================= BSP 200.19 – Matériels ================= */
+{t:"mat",q:"Volume et pression de service de la bouteille d’ARI MSA AirGo ?",o:["6,8 l à 300 bars, autonomie supérieure à 40 min","9 l à 200 bars","6 l à 350 bars","4 l à 300 bars"],e:"La bouteille de 6,8 l à 300 bars offre une autonomie supérieure à 40 minutes.",r:"Titre 1 §2.3"},
+{t:"mat",q:"Quelle surpression la SAD maintient-elle dans le masque ?",o:["Environ 2,9 mbar","29 bars","0,5 bar","10 mbar"],e:"Une surpression est assurée en permanence dans le masque par la SAD, environ 2,9 mbar.",r:"Titre 1 §2.4"},
+{t:"mat",q:"Débit d’air fourni par la cagoule d’évacuation ?",o:["50 l/min","100 l/min","25 l/min","200 l/min"],e:"Raccordée à la seconde connexion d’un ARI AirGo, elle fournit 50 l/min par un flexible de 1,5 m. Elle sert uniquement au sauvetage.",r:"Titre 1 §2.6"},
+{t:"mat",q:"Pourquoi desserrer légèrement les bretelles après avoir bouclé la ceinture ventrale ?",o:["Pour créer une couche d’air contre la brûlure thermique","Pour respirer plus facilement","Pour pouvoir retirer l’ARI vite","Pour régler le masque"],e:"Le léger desserrage crée une couche d’air protectrice contre les brûlures thermiques.",r:"Titre 1 §4"},
+{t:"mat",q:"Au bout de combien de temps d’immobilité l’ICS émet-il ses pré-alarmes ?",o:["Environ 40 secondes","10 secondes","2 minutes","5 secondes"],e:"Après 40 s d’immobilité, 3 pré-alarmes de 5 s chacune, acquittables par un simple mouvement.",r:"Titre 2 §3.1"},
+{t:"mat",q:"Comment acquitter l’alarme principale d’immobilité (95 dB) ?",o:["Par 2 pressions successives sur le bouton jaune","Par un mouvement","Par le bouton rouge","En remettant la clé"],e:"L’alarme principale de 95 dB s’acquitte par 2 pressions successives sur le bouton jaune.",r:"Titre 2 §3.1"},
+{t:"mat",q:"À quelle pression est réglé le « signal de retrait » de l’ICS ?",o:["90 bars","55 bars","200 bars","120 bars"],e:"Signal de retrait à 90 bars (se désengager) ; alarme de retour en zone saine à 55 bars.",r:"Titre 2 §3"},
+{t:"mat",q:"À quelle température interne l’ICS arrive-t-il au bout de ses capacités ?",o:["80 °C","50 °C","120 °C","200 °C"],e:"L’alarme de température se déclenche quand la température interne du boîtier atteint 80 °C.",r:"Titre 2 §3"},
+{t:"mat",q:"Comment arme-t-on l’ICS ?",o:["En retirant la clé d’activation","En appuyant sur le bouton vert","En ouvrant la bouteille","En coiffant le masque"],e:"Il doit être armé avant tout engagement, ARI coiffé ou non, en retirant la clé.",r:"Titre 2 §3"},
+{t:"mat",q:"Quel est le débit du ventilateur thermique TEMPEST ?",o:["43 000 m³/h","10 000 m³/h","100 000 m³/h","4 300 m³/h"],e:"Débit : 43 000 m³/h ; réservoir de 6 l soit 1 h 30 d’autonomie. Il n’est pas antidéflagrant et se met en œuvre sur ordre du chef de garde.",r:"Titre 4 §2"},
+{t:"mat",q:"Sur une caméra thermique ARGUS IV, que signifie la couleur rouge ?",o:["Ce qu’il y a de plus chaud dans le champ de vision","Une victime","Le plus froid","Un danger électrique"],e:"En rouge : le plus chaud du champ de vision ; en noir : le plus froid.",r:"Titre 7 §2.2"},
+{t:"mat",q:"Plage du mode « Feu » de la caméra FLIR K45 ?",o:["0 à 650 °C","- 20 à 150 °C","0 à 1 200 °C","100 à 300 °C"],e:"Mode « Recherche » : -20 à 150 °C (points chauds, personnes). Mode « Feu » : 0 à 650 °C.",r:"Titre 7 §4"},
+{t:"mat",q:"Quelle caméra thermique peut être utilisée en atmosphère explosive ?",o:["La DRAGER UCF 9000","La FLIR K45","L’ARGUS IV","La DRAGER UCF 1600"],e:"Les 3 autres modèles ne sont pas antidéflagrants ; l’UCF 9000 peut être utilisée en atmosphère explosive.",r:"Titre 7 §5"},
+{t:"mat",q:"Seuils d’alarme du détecteur portatif de CO ?",o:["50 ppm (basse) et 100 ppm (haute)","10 et 50 ppm","100 et 500 ppm","5 et 10 ppm"],e:"Alarme basse à 50 ppm, alarme haute à 100 ppm. Dès le déclenchement : rendre compte et se protéger.",r:"Titre 8 §2"},
+{t:"mat",q:"Le détecteur portatif de CO est-il porté sur les feux ?",o:["Non, il est porté à chaque intervention sauf les feux","Oui, toujours","Uniquement sur les feux","Uniquement en cave"],e:"Étalonné sur des seuils bas, il peut sonner sur incendie. Il est porté à chaque intervention à l’exception des feux, mais utile en rondes et surveillance.",r:"Titre 8 §3"},
+{t:"mat",q:"Quels gaz détecte l’ALTAIR 4X ?",o:["Méthane, CO, oxygène et H2S","CO, CO2, chlore, ammoniac","Méthane, propane, butane, CO","Oxygène, azote, CO2, H2S"],e:"Détection simultanée de 4 gaz : CH4, CO, O2 et H2S.",r:"Titre 9 §1"},
+{t:"mat",q:"Seuils d’alarme de l’ALTAIR 4X pour l’oxygène ?",o:["19 % (basse) et 23 % (haute)","15 % et 21 %","10 % et 30 %","21 % et 25 %"],e:"O2 : 19 % / 23 %. Explosimétrie : 20 % / 40 % LIE. CO : 50 / 100 ppm. H2S : 5 / 10 ppm.",r:"Titre 9 §3"},
+{t:"mat",q:"Avec la poire de prélèvement de l’ALTAIR 4X, combien de pompages pour une mesure fiable ?",o:["Au moins 8","Au moins 4","2","20"],e:"Au moins 4 pompages pour déclencher l’alarme, au moins 8 pour lire une mesure fiable.",r:"Titre 9 §3.1"},
+{t:"mat",q:"Longueur de corde du LSPCC des engins-pompe et des MEA ?",o:["30 m pour les EP, 60 m pour les MEA","60 m pour les EP, 30 m pour les MEA","40 m pour tous","20 m et 40 m"],e:"Les LSPCC équipent les EP (30 m) et les MEA (60 m). Corde de 12,5 mm, rupture 3 000 kg.",r:"Titre 10 §1"},
+{t:"mat",q:"Lors de la constitution d’un dispositif LSPCC, quelle est la limite de rupture ?",o:["Celle de l’élément le moins résistant","3 000 kg","Celle de la corde","La somme des éléments"],e:"Les éléments résistent environ à 2 000 kg (corde 3 000 kg), mais la limite est celle de l’élément le moins résistant.",r:"Titre 10 §2"},
+{t:"mat",q:"Peut-on placer le descendeur type « 8 » sur le harnais ?",o:["En aucun cas","Oui, au point ventral","Oui, au point dorsal","Oui, pour un sauveteur seul"],e:"En aucun cas le descendeur type 8 ne doit être placé sur le harnais. La petite boucle se place côté point fixe.",r:"Titre 10 §2.2"},
+{t:"mat",q:"Comment se termine toujours une des extrémités de la corde du LSPCC ?",o:["Par un nœud de double huit","Par un mousqueton","Par une boucle cousue","Par un nœud plat"],e:"Une des extrémités est toujours terminée par un nœud de double huit. L’allongement normal de la corde peut aller jusqu’à 4 %.",r:"Titre 10 §2.3"},
+{t:"mat",q:"Quelle lance équipe obligatoirement et en permanence la ligne d’attaque ?",o:["La LDMR 500 Brigamatic","La G-Force Multiforce","La LDMR 1000","La lance 50/25"],e:"La LDMR 500 Brigamatic, « lance à pression régulée », équipe obligatoirement la LA. Elle comporte une grille contre les corps étrangers.",r:"Titre 12 §2.3"},
+{t:"mat",q:"Dans quelle position sont rangées les lances à débit réglable ?",o:["Systématiquement en position de débit maximal","Au débit minimal","Fermées en jet droit","Au cran TPF"],e:"Les lances à débit réglable sont positionnées systématiquement en position de débit maximal.",r:"Titre 12 §3"},
+{t:"mat",q:"À quelle pression les tuyaux sont-ils essayés chaque année ?",o:["12 bars","6 bars","20 bars","15 bars"],e:"Une fois par an, essai en eau en montant progressivement jusqu’à 12 bars. Une mise en œuvre sur feu suivie d’une vérification compte comme essai.",r:"Titre 13 §4"},
+{t:"mat",q:"Dans quel délai les tuyaux sont-ils nettoyés après mise en œuvre ?",o:["Dans les 24 heures","Dans la semaine","Immédiatement sur place","Une fois par mois"],e:"Après chaque mise en œuvre, les tuyaux sont nettoyés à la lance dans les 24 heures par leur compagnie.",r:"Titre 13 §5"},
+
+/* ================= BSP 200.20 – NRBC ================= */
+{t:"nrbc",q:"Dans quel milieu l’APRF assure-t-il la protection ?",o:["En milieu non confiné, à l’air libre","En espace confiné","Sur un feu","Dans les égouts"],e:"L’APRF associé à une cartouche protège voies respiratoires, peau du visage et yeux à l’air libre. En espace confiné, on porte l’ARI.",r:"Partie 1 §2"},
+{t:"nrbc",q:"Dans quel cas la cartouche filtrante est-elle interdite ?",o:["En présence de CO ou CO2 (donc sur feu), de produit inconnu ou de mélange","À l’air libre","En présence d’hydrocarbures","Pour les agents biologiques"],e:"Interdite aussi en présence d’iode, si elle est détériorée, et si l’oxygène est inférieur à 19 %. Dans ces cas, porter l’ARI.",r:"Partie 1 §3.2"},
+{t:"nrbc",q:"Concentration d’oxygène minimale pour utiliser la cartouche filtrante ?",o:["19 %","21 %","15 %","17 %"],e:"Il est interdit d’utiliser la cartouche si l’oxygène dans l’air est inférieur à 19 %.",r:"Partie 1 §3.2"},
+{t:"nrbc",q:"Lequel justifie la sortie immédiate de la zone d’exclusion sous APRF ?",o:["La perception d’une odeur","Une légère fatigue","La fin du carnet PDF1","Un appel radio"],e:"Odeur, difficultés à respirer, symptômes ou sudation importante par la cartouche : on sort immédiatement.",r:"Partie 1 §3.3"},
+{t:"nrbc",q:"Durée de vie des gants butyle ?",o:["15 ans","5 ans","10 ans","2 ans"],e:"Les gants butyle ont une durée de vie de 15 ans ; ils résistent mieux aux liquides corrosifs que les gants d’attaque.",r:"Partie 1 §4"},
+{t:"nrbc",q:"Comment se ferme la tenue COMAT ?",o:["Par une glissière horizontale dans le dos","Par une glissière verticale devant","Par velcro sur le côté","Par boutons pressions"],e:"La glissière horizontale dans le dos impose un habillage obligatoirement en binôme.",r:"Partie 1 §8.1"},
+{t:"nrbc",q:"Durée de vie de la tenue COMAT ?",o:["10 ans","15 ans","5 ans","20 ans"],e:"Conditionnée sous vide partiel, la COMAT a une durée de vie de 10 ans. Elle existe en 4 tailles.",r:"Partie 1 §8.2"},
+{t:"nrbc",q:"Avec quoi la COMAT est-elle portée en zone de danger ?",o:["Exclusivement avec l’APRF ou l’ARI","Avec un masque FFP2","Sans protection respiratoire","Avec la cagoule d’évacuation"],e:"En zone de danger, la COMAT est portée exclusivement avec l’APRF ou l’ARI.",r:"Partie 1 §8.3"},
+{t:"nrbc",q:"Quelle taille de TYCHEM C choisir ?",o:["La taille immédiatement supérieure à sa taille habituelle","Sa taille exacte","Toujours XXL","Une taille en dessous"],e:"La taille supérieure apporte de l’aisance et renforce l’étanchéité entre combinaison et masque.",r:"Partie 1 §9.3"},
+{t:"nrbc",q:"Quand revêt-on la tenue de protection risque biologique exceptionnel ?",o:["Pour tout agent biologique sous forme de poudre","Pour toute victime fiévreuse","Pour la gale","Pour les feux"],e:"Elle est revêtue systématiquement pour des agents biologiques en poudre. En présence de liquide, COMAT + APRF.",r:"Partie 1 §7.1"},
+{t:"nrbc",q:"Que contient le gant de décontamination sèche ?",o:["De la terre de foulon absorbant 90 % des corps gras","Du charbon actif","Du bicarbonate","De l’alcool"],e:"Efficace contre les contaminations chimiques liquides, il ne peut pas extraire un toxique déjà pénétré dans la peau.",r:"Partie 2 §3"},
+{t:"nrbc",q:"Combien de personnes un gant de décontamination permet-il de traiter ?",o:["Une seule","Deux","Cinq","Autant que nécessaire"],e:"Un gant de décontamination doit être utilisé pour une seule personne.",r:"Partie 2 §3.1"},
+{t:"nrbc",q:"Le papier PDF1 détecte les toxiques de guerre sous quelle forme ?",o:["Liquide uniquement","Vapeur","Aérosol","Toutes formes"],e:"Il vire au contact des toxiques liquides (ypérite, G, VX), ne réagit ni aux vapeurs ni aux aérosols, ni à l’eau ou l’essence, mais se tâche au gazole.",r:"Partie 2 §4"},
+{t:"nrbc",q:"Quelle valeur normale de bruit de fond affiche le MCB2 ?",o:["Entre 0,5 et 1 c/s environ","Entre 10 et 20 c/s","0 c/s","9 999 c/s"],e:"Au-delà de 3 fois le bruit de fond du lieu, le niveau de radioactivité est considéré comme anormal.",r:"Partie 2 §5.3"},
+{t:"nrbc",q:"Que signifie « 9999 » clignotant sur le MCB2 ?",o:["L’appareil sature : s’éloigner de la source","Les piles sont faibles","Défaut du capteur","Aucune radioactivité"],e:"Face à une source de trop forte énergie, l’appareil sature. « DEF CAPT » signale un défaut du détecteur.",r:"Partie 2 §5.3"},
+{t:"nrbc",q:"Quel rayonnement le MCB2 ne détecte-t-il pas ?",o:["Les rayonnements neutroniques","Les rayonnements bêta","La contamination surfacique","La radioactivité ambiante"],e:"L’appareil ne détecte pas les neutrons et peut manquer des traces de faible énergie ; le GIR complète les investigations.",r:"Partie 2 §5.2"},
+{t:"nrbc",q:"Pour l’AP4C, quand le seuil « DANGER » est-il atteint pour l’homme sans protection ?",o:["Dès l’allumage du 1er voyant rouge","Au 5e voyant","Quand tout clignote","À la diode PRÊT"],e:"Le seuil DANGER est atteint dès le 1er voyant rouge ; le clignotement des 5 voyants indique une concentration au-delà du 5e niveau.",r:"Partie 2 §6.7"},
+{t:"nrbc",q:"Délai de réponse maximal de l’AP4C pour de très faibles concentrations ?",o:["Environ 16 secondes","1 seconde","1 minute","5 minutes"],e:"Jusqu’à 16 s pour de très faibles concentrations, environ 2 s pour de fortes.",r:"Partie 2 §6.7"},
+{t:"nrbc",q:"En mode liquide avec le S4PE, quelle surface prélever si rien n’est visible ?",o:["100 cm² (10 bandes de 10 cm)","1 m²","10 cm²","50 cm²"],e:"On prélève 100 cm², puis on chauffe 10 à 15 s maximum dans la pipe de l’AP4C.",r:"Partie 2 §6.8"},
+{t:"nrbc",q:"Peut-on éteindre l’AP4C si des diodes sont encore allumées ?",o:["Non, il faut le laisser se purger","Oui, immédiatement","Oui, en retirant la pile","Oui, après 5 secondes"],e:"L’AP4C ne doit pas être arrêté si des diodes sont encore allumées : il faut le laisser se purger.",r:"Partie 2 §6.4"},
+{t:"nrbc",q:"Que signifie le principe « mains propres / mains sales » ?",o:["L’un ne touche que l’intérieur non souillé des EPI, l’autre que l’extérieur souillé","Se laver les mains avant et après","Porter deux paires de gants","Désinfecter les gants à l’alcool"],e:"Principe essentiel au déshabillage pour éviter les transferts de contamination. On passe de « mains sales » à « mains propres » en changeant de gants.",r:"Partie 3"},
+{t:"nrbc",q:"Que fait-on des équipements réutilisables (ARI, détecteurs) en fin d’intervention NRBC ?",o:["On les laisse sur place en zone identifiée en attente de décision du COS","On les rapporte au centre","On les lave sur place","On les jette"],e:"Ils restent sur place, en attente de la décision du COS sur avis de l’officier NRBC Brigade.",r:"Partie 1 §8.5"}
+];
+
+
+/* ============ État ============ */
+const CLE = "incendie-qcm-bsp200-v1";
+let memoire = {stats:{}, meilleur:0, parties:0, son:true};
+try { const s = localStorage.getItem(CLE); if (s) memoire = Object.assign(memoire, JSON.parse(s)); } catch(e) {}
+function sauver(){ try { localStorage.setItem(CLE, JSON.stringify(memoire)); } catch(e) {} }
+
+Q.forEach((x,i)=>x.id=i);
+let mode="entrainement", nbChoisi=20, themesActifs=new Set(Object.keys(THEMES)), partie=null;
+const $=s=>document.querySelector(s);
+const melange=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;};
+
+/* ============ Manomètre ============ */
+function majMano(bars){
+  bars=Math.max(0,Math.min(300,bars));
+  const angle=-120+(bars/300)*240;
+  $("#aiguille").style.transform=`rotate(${angle}deg)`;
+  $("#cBar").textContent=Math.round(bars);
+}
+function alerte(){ const t=$("#tableau"); t.classList.remove("alerte"); void t.offsetWidth; t.classList.add("alerte"); }
+
+/* ============ Son ============ */
+let actx=null;
+function bip(ok,sifflet){
+  if(!memoire.son) return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(),g=actx.createGain(),t=actx.currentTime;
+    o.type=ok?"triangle":"sawtooth"; o.frequency.value=sifflet?1400:(ok?660:150);
+    if(ok) o.frequency.exponentialRampToValueAtTime(990,t+0.15);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(sifflet?0.04:0.05,t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+(sifflet?0.6:(ok?0.22:0.4)));
+    o.connect(g).connect(actx.destination); o.start(); o.stop(t+0.65);
+  }catch(e){}
+}
+function majSon(){ $("#btnSon").textContent=memoire.son?"🔈":"🔇"; }
+$("#btnSon").onclick=()=>{memoire.son=!memoire.son;sauver();majSon();};
+majSon();
+
+/* ============ Accueil ============ */
+function maitriseTheme(t){
+  const ids=Q.filter(q=>q.t===t).map(q=>q.id);
+  const ok=ids.filter(id=>(memoire.stats[id]||{}).der===1).length;
+  return ids.length?ok/ids.length:0;
+}
+function dessinerThemes(){
+  const box=$("#themes"); box.innerHTML="";
+  const tous=document.createElement("button");
+  tous.className="chip"; tous.setAttribute("aria-pressed",themesActifs.size===Object.keys(THEMES).length);
+  tous.textContent="✨ Tous les BSP";
+  tous.onclick=()=>{themesActifs=themesActifs.size===Object.keys(THEMES).length?new Set():new Set(Object.keys(THEMES));dessinerThemes();};
+  box.appendChild(tous);
+  for(const [k,v] of Object.entries(THEMES)){
+    const n=Q.filter(q=>q.t===k).length, m=Math.round(maitriseTheme(k)*100);
+    const b=document.createElement("button");
+    b.className="chip"; b.setAttribute("aria-pressed",themesActifs.has(k));
+    b.innerHTML=`${v.ico} ${v.nom} <span class="n">${v.bsp.replace("BSP ","")} · ${n}</span><span class="maitrise" title="Maîtrise ${m} %"><i style="width:${m}%"></i></span>`;
+    b.onclick=()=>{themesActifs.has(k)?themesActifs.delete(k):themesActifs.add(k);dessinerThemes();};
+    box.appendChild(b);
+  }
+  $("#btnGo").disabled=themesActifs.size===0;
+}
+function dessinerStats(){
+  const vus=Object.keys(memoire.stats).length;
+  const maitrises=Object.values(memoire.stats).filter(s=>s.der===1).length;
+  const faibles=Object.values(memoire.stats).filter(s=>s.der===0).length;
+  $("#stats").innerHTML=`<span>Questions vues : <b>${vus} / ${Q.length}</b></span><span>Maîtrisées : <b>${maitrises}</b></span><span>Meilleure série : <b>${memoire.meilleur} 🔥</b></span>${vus?'<button class="lien" id="btnReset">Remettre à zéro</button>':''}`;
+  $("#btnFaibles").classList.toggle("hidden",faibles===0);
+  $("#btnFaibles").textContent=`Réviser mes points faibles (${faibles})`;
+  const r=$("#btnReset"); if(r) r.onclick=()=>{ if(confirm("Effacer toute ta progression ?")){memoire.stats={};memoire.meilleur=0;sauver();dessinerThemes();dessinerStats();} };
+}
+document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll(".mode").forEach(x=>x.setAttribute("aria-pressed",x===b));});
+document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{nbChoisi=+b.dataset.n;document.querySelectorAll("[data-n]").forEach(x=>x.setAttribute("aria-pressed",x===b));});
+$("#btnGo").onclick=()=>{
+  let pool=melange(Q.filter(q=>themesActifs.has(q.t)));
+  if(mode!=="survie"&&nbChoisi>0) pool=pool.slice(0,nbChoisi);
+  demarrer(pool);
+};
+$("#btnFaibles").onclick=()=>{
+  const ids=Object.entries(memoire.stats).filter(([id,s])=>s.der===0).map(([id])=>+id);
+  demarrer(melange(Q.filter(q=>ids.includes(q.id))));
+};
+$("#btnQuitter").onclick=()=>{ if(confirm("Quitter l’intervention en cours ?")) accueil(); };
+function afficher(id){ ["#ecranAccueil","#ecranQuiz","#ecranFin"].forEach(s=>$(s).classList.toggle("hidden",s!==id)); window.scrollTo({top:0,behavior:"smooth"}); }
+function accueil(){ if(partie) clearInterval(partie.timer); partie=null; majCompteurs(0,0,0); majMano(300); dessinerThemes(); dessinerStats(); afficher("#ecranAccueil"); }
+
+/* ============ Partie ============ */
+function majCompteurs(score,serie,bonnes){ $("#cScore").textContent=score; $("#cSerie").textContent=serie; $("#cBonnes").textContent=bonnes; }
+function demarrer(pool){
+  partie={pool,i:0,score:0,serie:0,serieMax:0,bonnes:0,bars:300,rep:[],timer:null,repondu:false,siffle:false};
+  majCompteurs(0,0,0); majMano(300); afficher("#ecranQuiz"); poserQuestion();
+}
+function poserQuestion(){
+  const p=partie,q=p.pool[p.i]; p.repondu=false;
+  $("#progTxt").textContent=`${p.i+1} / ${mode==="survie"?"∞":p.pool.length}`;
+  $("#progBar").style.width=(p.i/p.pool.length*100)+"%";
+  p.choix=melange(q.o.map((txt,k)=>({txt,bonne:k===0})));
+  const th=THEMES[q.t];
+  $("#fenetre").outerHTML=`<article class="fenetre" id="fenetre">
+    <div class="tete"><span class="th">${th.ico} ${th.nom}</span><span class="num">Q${p.i+1}</span></div>
+    ${mode==="chrono"?'<div class="chrono"><i id="chronoBar"></i></div>':''}
+    <div class="corps">
+      <span class="bsp">${th.bsp}</span>
+      <p class="question">${q.q}</p>
+      <div class="reponses">${p.choix.map((c,k)=>`<button class="rep" data-k="${k}"><span class="lettre">${"ABCD"[k]}</span>${c.txt}</button>`).join("")}</div>
+      <div id="zoneExplic"></div>
+    </div></article>`;
+  document.querySelectorAll(".rep").forEach(b=>b.onclick=()=>repondre(+b.dataset.k));
+  if(mode==="chrono") lancerChrono();
+}
+function lancerChrono(){
+  const duree=25000,debut=performance.now(),bar=$("#chronoBar");
+  clearInterval(partie.timer);
+  partie.timer=setInterval(()=>{
+    const r=1-(performance.now()-debut)/duree;
+    if(bar){bar.style.width=Math.max(0,r*100)+"%";bar.style.background=r<.3?"#D62839":"var(--flamme)";}
+    if(r<=0){clearInterval(partie.timer);repondre(-1);}
+  },100);
+}
+function repondre(k){
+  const p=partie; if(!p||p.repondu) return;
+  p.repondu=true; clearInterval(p.timer);
+  const q=p.pool[p.i], ok=k>=0&&p.choix[k].bonne;
+  document.querySelectorAll(".rep").forEach((b,j)=>{
+    b.disabled=true;
+    if(p.choix[j].bonne) b.classList.add("bonne");
+    else if(j===k) b.classList.add("fausse");
+    else b.classList.add("eteinte");
+  });
+  const s=memoire.stats[q.id]||{ok:0,ko:0,der:0};
+  if(ok){ s.ok++; s.der=1; p.bonnes++; p.serie++; p.serieMax=Math.max(p.serieMax,p.serie); p.score+=10+Math.min(p.serie-1,10)*2; p.bars=Math.min(300,p.bars+(mode==="survie"?10:15)); }
+  else { s.ko++; s.der=0; p.serie=0; p.bars=Math.max(0,p.bars-(mode==="survie"?70:30)); }
+  memoire.stats[q.id]=s; if(p.serieMax>memoire.meilleur) memoire.meilleur=p.serieMax; sauver();
+  p.rep.push({q,ok,choisi:k>=0?p.choix[k].txt:"Temps écoulé"});
+  majCompteurs(p.score,p.serie,p.bonnes); majMano(p.bars);
+  const repli = mode==="survie" && p.bars<=90;
+  if(!ok) alerte();
+  bip(ok,false);
+  if(!ok && p.bars<=55 && mode!=="survie" && !p.siffle){ p.siffle=true; setTimeout(()=>bip(false,true),350); }
+  if(ok&&p.serie>0&&p.serie%5===0) etincelles();
+  if(!ok&&navigator.vibrate) try{navigator.vibrate(120);}catch(e){}
+
+  const bravo=["Lance ouverte, cible atteinte !","Chef d’équipe validé !","Lecture du feu parfaite !","Ça, c’est du BSP pur jus !","Le COS est fier de toi !","Jet diffusé, réponse précise !"];
+  const oups=["Retour de flamme…","Baisse de pression à la lance !","Pas de panique, on relit le BSP.","Fumée épaisse, on recommence !"];
+  const titre= repli ? "90 bars : repli immédiat !" : ok ? bravo[Math.floor(Math.random()*bravo.length)] : (k<0?"Temps écoulé !":oups[Math.floor(Math.random()*oups.length)]);
+  const dernier= repli || p.i>=p.pool.length-1;
+  $("#zoneExplic").innerHTML=`<div class="explic ${ok?'':'ko'}">
+      <h4>${ok?'✅':'❌'} ${titre}</h4>
+      ${ok?'':`<p><b>Bonne réponse :</b> ${q.o[0]}</p>`}
+      <p>${q.e}</p>
+      <p class="ref">📖 ${THEMES[q.t].bsp} – ${q.r}</p>
+    </div>
+    <div class="suite"><button class="btn jaune" id="btnSuite">${dernier?'Voir mon compte rendu':'Question suivante'}</button></div>`;
+  $("#btnSuite").onclick=suivant;
+  $("#btnSuite").focus({preventScroll:true});
+  $("#zoneExplic").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function suivant(){
+  const p=partie;
+  if(mode==="survie"&&p.bars<=90) return fin();
+  p.i++;
+  if(p.i>=p.pool.length) return fin();
+  poserQuestion(); window.scrollTo({top:0,behavior:"smooth"});
+}
+function etincelles(){
+  const em=["🔥","💦","🧯","⭐","🚒"];
+  for(let i=0;i<16;i++){
+    const s=document.createElement("span"); s.className="etincelle"; s.textContent=em[i%em.length];
+    s.style.left=(window.innerWidth/2)+"px"; s.style.top=(window.innerHeight/3)+"px";
+    s.style.setProperty("--dx",(Math.random()*500-250)+"px");
+    s.style.setProperty("--dy",(Math.random()*400-120)+"px");
+    s.style.setProperty("--rot",(Math.random()*540-270)+"deg");
+    document.body.appendChild(s); setTimeout(()=>s.remove(),1100);
+  }
+}
+
+/* ============ Fin ============ */
+function fin(){
+  const p=partie; clearInterval(p.timer); memoire.parties++; sauver();
+  const n=p.rep.length, pct=n?Math.round(p.bonnes/n*100):0;
+  let badge,verdict,sous;
+  if(mode==="survie"){ badge="🧯"; verdict=`${p.bonnes} bonne${p.bonnes>1?'s':''} réponse${p.bonnes>1?'s':''} avant le repli`; sous=p.bonnes>=30?"Une bouteille inépuisable, chapeau.":p.bonnes>=15?"Belle reco, tu tiens la distance.":"Remise en condition, et on se réengage."; }
+  else if(pct>=90){ badge="🏆"; verdict="Feu éteint, intervention terminée !"; sous="Les BSP n’ont plus de secret pour toi."; }
+  else if(pct>=70){ badge="🚒"; verdict="Solide, chef !"; sous="Encore un peu de dégarnissage et c’est parfait."; }
+  else if(pct>=50){ badge="💦"; verdict="Le feu est maîtrisé."; sous="Reprends tes erreurs ci-dessous pour finir l’extinction."; }
+  else { badge="💪"; verdict="Reprise de feu possible…"; sous="On relit les erreurs et on repart en reco."; }
+  const parTh={};
+  p.rep.forEach(r=>{const t=r.q.t;parTh[t]=parTh[t]||{ok:0,n:0};parTh[t].n++;if(r.ok)parTh[t].ok++;});
+  const lignes=Object.entries(parTh).sort((a,b)=>a[1].ok/a[1].n-b[1].ok/b[1].n).map(([t,v])=>{
+    const r=Math.round(v.ok/v.n*100);
+    return `<div class="ligne-th"><span>${THEMES[t].ico} ${THEMES[t].nom}</span><span class="jauge"><i style="width:${r}%;background:${r>=70?'var(--vert)':r>=50?'var(--flamme)':'var(--rouge)'}"></i></span><b>${v.ok}/${v.n}</b></div>`;
+  }).join("");
+  const erreurs=p.rep.filter(r=>!r.ok);
+  $("#ecranFin").innerHTML=`
+    <article class="fenetre">
+      <div class="tete"><span class="th">📋 Compte rendu de reconnaissance</span><span class="num">${mode==="chrono"?"Départ réflexe":mode==="survie"?"Reco d’attaque":"Entraînement"}</span></div>
+      <div class="resultat">
+        <div class="badge">${badge}</div>
+        <div class="grosnote">${mode==="survie"?p.bonnes:pct+" %"}</div>
+        <p class="verdict">${verdict}</p>
+        <p class="sous">${sous}</p>
+        <p class="sous" style="margin-top:8px">${p.score} points – meilleure série ${p.serieMax} 🔥 – ARI à ${Math.round(p.bars)} bars</p>
+        <div class="bilan-th">${lignes}</div>
+        <div class="depart" style="justify-content:center">
+          ${erreurs.length?'<button class="btn" id="btnRejouerErr">Rejouer mes erreurs ('+erreurs.length+')</button>':''}
+          <button class="btn sec" id="btnRejouer">Nouvelle partie</button>
+          <button class="btn jaune" id="btnAccueil">Accueil</button>
+        </div>
+      </div>
+    </article>
+    ${erreurs.length?`<h2>À revoir</h2><div class="erreurs">${erreurs.map(r=>`
+      <div class="err">
+        <p class="q">${THEMES[r.q.t].ico} ${r.q.q}</p>
+        <p>Ta réponse : ${r.choisi}</p>
+        <p class="ok">✔ ${r.q.o[0]}</p>
+        <p>${r.q.e}</p>
+        <p class="ref">📖 ${THEMES[r.q.t].bsp} – ${r.q.r}</p>
+      </div>`).join("")}</div>`:''}`;
+  afficher("#ecranFin");
+  if(pct>=90&&mode!=="survie") etincelles();
+  const re=$("#btnRejouerErr"); if(re) re.onclick=()=>demarrer(melange(erreurs.map(r=>r.q)));
+  $("#btnRejouer").onclick=()=>$("#btnGo").onclick();
+  $("#btnAccueil").onclick=accueil;
+}
+
+document.addEventListener("keydown",e=>{
+  if($("#ecranQuiz").classList.contains("hidden")||!partie) return;
+  if(!partie.repondu&&["1","2","3","4"].includes(e.key)){const k=+e.key-1;if(partie.choix[k])repondre(k);}
+  else if(partie.repondu&&e.key==="Enter"&&e.target.tagName!=="BUTTON"){e.preventDefault();suivant();}
+});
+
+accueil();
+</script>
+</body>
+</html>
